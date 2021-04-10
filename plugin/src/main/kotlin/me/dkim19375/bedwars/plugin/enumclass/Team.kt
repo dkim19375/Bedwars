@@ -1,5 +1,6 @@
 package me.dkim19375.bedwars.plugin.enumclass
 
+import me.dkim19375.bedwars.plugin.gui.MainShopGUI
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
@@ -14,6 +15,17 @@ enum class Team(val color: DyeColor, val displayName: String) {
     YELLOW(DyeColor.YELLOW, "Yellow"),
     GREEN(DyeColor.LIME, "Lime"),
     BLUE(DyeColor.LIGHT_BLUE, "Blue");
+
+    companion object {
+        fun fromString(str: String?): Team? {
+            str ?: return null
+            return try {
+                Team.valueOf(str)
+            } catch (_: IllegalArgumentException) {
+                return null
+            }
+        }
+    }
 }
 
 fun Team.getColored(type: Material): ItemStack {

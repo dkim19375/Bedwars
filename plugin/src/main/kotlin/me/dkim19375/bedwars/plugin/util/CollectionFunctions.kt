@@ -37,8 +37,32 @@ fun <T> List<T>.convertToString(): List<String> {
     return map { item -> item.toString() }
 }
 
+fun <T> T.containsAny(vararg element: List<T>): Boolean {
+    this?: return false
+    element.forEach { tList ->
+        for (t in tList) {
+            t?: continue
+            if (equals(t)) {
+                return true
+            }
+        }
+    }
+    return false
+}
+
+fun <T> List<T>.containsAny(vararg element: T): Boolean {
+    forEach { t ->
+        if (element.contains(t)) {
+            return true
+        }
+    }
+    return false
+}
+
 fun <T> List<T>.combine(other: List<T>): List<T> {
-    val list = toMutableList()
-    list.addAll(other)
-    return list.toList()
+    return plus(other).toList()
+}
+
+fun <T> Array<T>.combine(other: Array<T>): Array<T> {
+    return plus(other).clone()
 }

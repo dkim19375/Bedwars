@@ -1,11 +1,17 @@
 package me.dkim19375.bedwars.plugin.util
 
+import me.dkim19375.bedwars.plugin.BedwarsPlugin
+import net.kyori.adventure.platform.bukkit.BukkitAudiences
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.title.Title
+import net.kyori.adventure.util.Ticks
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.bukkit.plugin.java.JavaPlugin
 import java.util.*
 
 fun CommandSender.showHelpMessage(label: String, error: String?) {
@@ -40,4 +46,14 @@ fun Player.getItemAmount(type: Material): Int {
 
 fun Player.playSound(sound: Sound, volume: Float = 1.0f, pitch: Float = 1.0f) {
     playSound(location, sound, volume, pitch)
+}
+
+fun Player.sendTitle(title: String? = null, subtitle: String? = null, fadeIn: Int = 10, stay: Int = 50, fadeOut: Int = 10) {
+    val newTitle = Component.text(title?: "")
+    val newSubTitle = Component.text(subtitle?: "")
+    val times =
+        Title.Times.of(Ticks.duration(fadeIn.toLong()), Ticks.duration(stay.toLong()), Ticks.duration(fadeOut.toLong()))
+    val cTitle = Title.title(newTitle, newSubTitle, times)
+    val audience = BukkitAudiences.create(JavaPlugin.getPlugin(BedwarsPlugin::class.java)).player(this)
+    audience.showTitle(cTitle)
 }

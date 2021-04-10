@@ -31,6 +31,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, val data: GameData) {
     var task: BukkitTask? = null
     val beds = mutableMapOf<Team, Boolean>()
     val npcManager = NPCManager(plugin, data)
+    val upgradesManager = UpgradesManager(plugin, this)
 
     init {
         npcManager.disableAI()
@@ -225,7 +226,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, val data: GameData) {
             folder.delete()
             Files.copy(dir.toPath(), folder.toPath(), StandardCopyOption.REPLACE_EXISTING)
             Bukkit.getScheduler().runTask(plugin) {
-                data.world = originalCreator.createWorld()
+                data.copy(world = originalCreator.createWorld()).save(plugin)
                 state = GameState.STOPPED
             }
         }

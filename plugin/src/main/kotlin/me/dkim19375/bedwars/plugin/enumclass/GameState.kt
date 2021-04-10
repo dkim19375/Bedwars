@@ -5,5 +5,5 @@ enum class GameState(val running: Boolean) {
     LOBBY(false),
     STARTING(true),
     STARTED(true),
-    REGENERATING_WORLD(true)
+    REGENERATING_WORLD(true);
 }

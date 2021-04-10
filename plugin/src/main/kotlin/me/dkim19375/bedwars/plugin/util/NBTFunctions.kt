@@ -6,7 +6,6 @@ import de.tr7zw.nbtapi.NBTCompound
 import de.tr7zw.nbtapi.NBTEntity
 import de.tr7zw.nbtapi.NBTItem
 import de.tr7zw.nbtinjector.NBTInjector
-import org.bukkit.block.BlockState
 import org.bukkit.entity.Entity
 import org.bukkit.inventory.ItemStack
 
@@ -16,8 +15,6 @@ fun <T : Entity> T.getNBT(): NBTCompound {
 }
 
 fun <T : Entity> T.getVanillaNBT(): NBTCompound = NBTEntity(this)
-
-fun <T : BlockState> T.getNBT(): NBTCompound = NBTInjector.getNbtData(this)
 
 fun ItemStack.getNBT(): NBTCompound {
     return NBTItem(this)

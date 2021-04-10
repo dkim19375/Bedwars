@@ -6,7 +6,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("com.github.johnrengelman.shadow") version "6.1.0"
     id("java")
-    id("me.bristermitten.pdm") version "0.0.33"
     id("org.jetbrains.kotlin.jvm") version "1.4.32"
 }
 
@@ -17,11 +16,14 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
 }
 
+val basePackage = "me.dkim19375.bedwars"
+
 tasks {
     named<ShadowJar>("shadowJar") {
-        relocate("me.dkim19375.dkim19375core", "me.dkim19375.bedwars.dkim19375core")
-        relocate("me.bristermitten.pdm", "me.dkim19375.bedwars.pdm")
-        // relocate("de.tr7zw.changeme.nbtapi", "me.dkim19375.bedwars.nbtapi")
+        relocate("me.dkim19375.dkim19375core", "$basePackage.dkim19375core")
+        relocate("net.kyori.adventure", "$basePackage.adventure")
+        relocate("kotlin", "$basePackage.kotlin")
+        relocate("me.mattstudios.mfgui", "$basePackage.mfgui")
         finalizedBy("copyFileToServer")
     }
 }
@@ -38,18 +40,9 @@ repositories {
 }
 
 subprojects {
-    apply {
-        plugin("java")
-    }
-    apply {
-        plugin("org.jetbrains.kotlin.jvm")
-    }
-    apply {
-        plugin("me.bristermitten.pdm")
-    }
-    apply {
-        plugin("com.github.johnrengelman.shadow")
-    }
+    apply(plugin = "java")
+    apply(plugin = "org.jetbrains.kotlin.jvm")
+    apply(plugin = "com.github.johnrengelman.shadow")
 
     group = parent!!.group
     version = parent!!.version
@@ -73,11 +66,13 @@ subprojects {
     }
 
     dependencies {
-        pdm("org.jetbrains.kotlin", "kotlin-stdlib-jdk8", "1.4.32")
+        implementation("org.jetbrains.kotlin", "kotlin-stdlib-jdk8", "1.4.32")
         implementation("com.github.dkim19375", "dkim19375Core", "2.6.0")
-        pdm("me.mattstudios.utils", "matt-framework-gui", "2.0.3.3")
-        pdm("net.kyori", "adventure-api", "4.7.0")
-        pdm("net.kyori", "adventure-text-serializer-legacy", "4.7.0")
+        implementation("me.mattstudios.utils", "matt-framework-gui", "2.0.3.3")
+        implementation("net.kyori", "adventure-api", "4.7.0")
+        implementation("net.kyori", "adventure-text-serializer-legacy", "4.7.0")
+        implementation("net.kyori", "adventure-text-serializer-gson", "4.7.0")
+        implementation("net.kyori", "adventure-platform-bukkit", "+")
         // implementation("de.tr7zw:item-nbt-api:2.7.1")
         compileOnly("de.tr7zw", "item-nbt-api-plugin", "2.7.1")
         compileOnly("com.comphenix.protocol", "ProtocolLib", "4.6.0")
@@ -108,6 +103,5 @@ tasks.register<Copy>("copyFileToServer") {
 tasks {
     build {
         finalizedBy("copyFileToServer")
-        dependsOn("pdm")
     }
 }

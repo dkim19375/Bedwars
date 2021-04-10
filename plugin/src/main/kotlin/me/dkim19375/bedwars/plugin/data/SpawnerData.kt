@@ -9,7 +9,11 @@ data class SpawnerData(val type: SpawnerType, val location: Location) : Configur
         return mutableMapOf(Pair("type", type.name), Pair("location", location))
     }
 
-    @Suppress("unused")
-    constructor(map: Map<String, Any>) :
-            this(SpawnerType.valueOf(map["type"] as String), map["location"] as Location)
+    companion object {
+        @Suppress("unused")
+        @JvmStatic
+        fun deserialize(map: Map<String, Any>): SpawnerData {
+            return SpawnerData(SpawnerType.valueOf(map["type"] as String), map["location"] as Location)
+        }
+    }
 }

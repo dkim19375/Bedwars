@@ -16,7 +16,7 @@ class PotionConsumeListener(private val plugin: BedwarsPlugin) : Listener {
         if (item.type == Material.POTION && Potion.fromItemStack(item).type == PotionType.INVISIBILITY
         ) {
             val player: Player = player
-            plugin.hideArmor(player)
+            plugin.packetManager.hideArmor(player)
         }
     }
 }
