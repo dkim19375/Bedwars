@@ -1,17 +1,23 @@
 package me.dkim19375.bedwars.plugin.manager
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
+import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.enumclass.Team
 import me.dkim19375.bedwars.plugin.enumclass.TrapType
 import me.dkim19375.bedwars.plugin.enumclass.formatWithColors
+import me.dkim19375.bedwars.plugin.util.isArmor
+import me.dkim19375.bedwars.plugin.util.isWeapon
 import me.dkim19375.bedwars.plugin.util.sendTitle
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
+import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
 import java.util.*
 
-class UpgradesManager(private val plugin: BedwarsPlugin, val game: BedwarsGame) {
+@Suppress("MemberVisibilityCanBePrivate")
+class UpgradesManager(plugin: BedwarsPlugin, val game: BedwarsGame) {
     val sharpness = mutableMapOf<Team, Int>()
     val protection = mutableMapOf<Team, Int>()
     val haste = mutableMapOf<Team, Int>()
@@ -21,6 +27,29 @@ class UpgradesManager(private val plugin: BedwarsPlugin, val game: BedwarsGame) 
     val thirdTrap = mutableMapOf<Team, TrapType>()
     private val times = mutableMapOf<UUID, Long>()
 
+    init {
+        Bukkit.getScheduler().runTaskTimer(plugin, {
+            if (game.state != GameState.STARTED) {
+                return@runTaskTimer
+            }
+            val players = game.getPlayersInGame().map(Bukkit::getPlayer).filter(Objects::nonNull)
+            for (player in players) {
+                val team = game.getTeamOfPlayer(player)?: continue
+                val haste = haste[team]
+                if (haste != null) {
+                    player.addPotionEffect(PotionEffect(PotionEffectType.FAST_DIGGING, 100, haste - 1))
+                }
+                if (!healPool.contains(team)) {
+                    continue
+                }
+                game.data.beds.firstOrNull { d ->
+                    team == d.team && d.location.distance(player.location) < 8
+                } ?: continue
+                player.addPotionEffect(PotionEffect(PotionEffectType.REGENERATION, 80, 1))
+            }
+        }, 60L, 60L)
+    }
+
     private fun applyToPlayer(player: Player, trap: TrapType) {
         trap.removeEffects.forEach(player::removePotionEffect)
         trap.effects.forEach { (effect, amplifier) ->
@@ -29,7 +58,18 @@ class UpgradesManager(private val plugin: BedwarsPlugin, val game: BedwarsGame) 
     }
 
     fun applyUpgrades(player: Player) {
-
+        val team = game.getTeamOfPlayer(player) ?: return
+        val sharpness = sharpness[team]
+        val protection = protection[team]
+        if (sharpness == null && protection == null) return
+        for (item in player.inventory.contents) {
+            if (item.type.isArmor() && protection != null) {
+                item.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, protection)
+            }
+            if (item.type.isWeapon() && sharpness != null) {
+                item.addEnchantment(Enchantment.DAMAGE_ALL, sharpness)
+            }
+        }
     }
 
     fun triggerTrap(player: Player) {
