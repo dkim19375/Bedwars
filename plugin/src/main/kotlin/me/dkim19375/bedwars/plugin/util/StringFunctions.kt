@@ -1,11 +1,8 @@
 package me.dkim19375.bedwars.plugin.util
 
+import me.dkim19375.dkim19375core.UUIDUtils
 import java.util.*
 
 fun String.toUUID(): UUID? {
-    return try {
-        UUID.fromString(this)
-    } catch (_: IllegalArgumentException) {
-        null
-    }
+    return UUIDUtils.getFromString(this)
 }

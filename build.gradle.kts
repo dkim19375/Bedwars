@@ -67,7 +67,7 @@ subprojects {
 
     dependencies {
         implementation("org.jetbrains.kotlin", "kotlin-stdlib-jdk8", "1.4.32")
-        implementation("com.github.dkim19375", "dkim19375Core", "2.6.0")
+        implementation("com.github.dkim19375", "dkim19375Core", "2.6.1")
         implementation("me.mattstudios.utils", "matt-framework-gui", "2.0.3.3")
         implementation("net.kyori", "adventure-api", "4.7.0")
         implementation("net.kyori", "adventure-text-serializer-legacy", "4.7.0")

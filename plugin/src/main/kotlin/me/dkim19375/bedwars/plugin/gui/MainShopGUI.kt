@@ -22,7 +22,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
     var isSettingQuickBuy = false
 
     private fun reset() {
-        for (i in 0..53) {
+        for (i in 0..54) {
             menu.removeItem(i)
         }
     }
@@ -283,10 +283,6 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
         if (isSettingQuickBuy) {
             return
         }
-        if (event.isShiftClick) {
-            isSettingQuickBuy = true
-
-        }
         val playerCostAmount = player.getItemAmount(item.costType.material)
         if (playerCostAmount < item.costAmount) {
             player.sendMessage("${ChatColor.RED}You need ${item.costAmount - playerCostAmount} more ${item.costType.displayname}!")
@@ -307,6 +303,19 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
             }
             menu.setItem(item.slot, formatItem(item).asGuiItem {
                 it.isCancelled = true
+                if (it.isShiftClick) {
+                    if (getBuySlots().firstOrNull { i ->
+                            plugin.dataFileManager.getQuickBuySlot(
+                                i,
+                                player.uniqueId
+                            ) == null
+                        } == null) {
+                        player.sendMessage("${ChatColor.RED}You have no available Quick Buy slots!")
+                        return@asGuiItem
+                    }
+
+                    return@asGuiItem
+                }
                 if (item.permanent) {
                     if (player.inventory.contents.any { i ->
                             i.type == item.item.material
@@ -314,9 +323,6 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
                         player.sendMessage("${ChatColor.RED}You already have that item!")
                         return@asGuiItem
                     }
-                }
-                if (it.isShiftClick) {
-
                 }
                 onClick(item, it)
             })
