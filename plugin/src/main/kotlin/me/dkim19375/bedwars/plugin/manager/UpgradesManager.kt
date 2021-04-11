@@ -18,7 +18,7 @@ import java.util.*
 
 @Suppress("MemberVisibilityCanBePrivate")
 class UpgradesManager(plugin: BedwarsPlugin, val game: BedwarsGame) {
-    val sharpness = mutableMapOf<Team, Int>()
+    val sharpness = mutableSetOf<Team>()
     val protection = mutableMapOf<Team, Int>()
     val haste = mutableMapOf<Team, Int>()
     val healPool = mutableSetOf<Team>()
@@ -59,15 +59,15 @@ class UpgradesManager(plugin: BedwarsPlugin, val game: BedwarsGame) {
 
     fun applyUpgrades(player: Player) {
         val team = game.getTeamOfPlayer(player) ?: return
-        val sharpness = sharpness[team]
+        val sharpness = sharpness.contains(team)
         val protection = protection[team]
-        if (sharpness == null && protection == null) return
+        if (!sharpness && protection == null) return
         for (item in player.inventory.contents) {
             if (item.type.isArmor() && protection != null) {
                 item.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, protection)
             }
-            if (item.type.isWeapon() && sharpness != null) {
-                item.addEnchantment(Enchantment.DAMAGE_ALL, sharpness)
+            if (item.type.isWeapon() && sharpness) {
+                item.addEnchantment(Enchantment.DAMAGE_ALL, 1)
             }
         }
     }

@@ -10,7 +10,7 @@ import org.bukkit.material.Bed
 data class BedData(val team: Team, val location: Location, val face: BlockFace) : ConfigurationSerializable {
     override fun serialize(): MutableMap<String, Any> {
         val map = mutableMapOf<String, Any>()
-        map["team"] = team.name
+        map["team"] = team
         map["location"] = location
         map["face"] = face.name
         return map
@@ -21,7 +21,7 @@ data class BedData(val team: Team, val location: Location, val face: BlockFace) 
         @JvmStatic
         fun deserialize(map: Map<String, Any>): BedData {
             return BedData(
-                Team.valueOf(map["team"] as String),
+                map["team"] as Team,
                 map["location"] as Location,
                 BlockFace.valueOf(map["face"] as String)
             )

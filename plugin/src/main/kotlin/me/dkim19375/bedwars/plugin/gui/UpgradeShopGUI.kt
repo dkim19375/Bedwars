@@ -3,8 +3,7 @@ package me.dkim19375.bedwars.plugin.gui
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.enumclass.Team
 import me.dkim19375.bedwars.plugin.enumclass.TrapType
-import me.dkim19375.bedwars.plugin.util.addLore
-import me.dkim19375.bedwars.plugin.util.combine
+import me.dkim19375.bedwars.plugin.util.*
 import me.mattstudios.mfgui.gui.components.util.ItemBuilder
 import me.mattstudios.mfgui.gui.guis.Gui
 import me.mattstudios.mfgui.gui.guis.GuiItem
@@ -115,6 +114,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
 
     @Suppress("deprecation")
     fun showMainScreen() {
+        reset()
         val grayGlass = ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.GRAY.data.toShort())
         menu.setItem(4, 4, getTrapItemOnMainScreen(1))
         menu.setItem(4, 5, getTrapItemOnMainScreen(2))
@@ -122,11 +122,112 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
         menu.filler.fillBetweenPoints(
             3, 1, 3, 9, ItemBuilder.from(grayGlass)
                 .setName("${ChatColor.DARK_GRAY}\u2191 ${ChatColor.GRAY}Purchasable")
-                .addLore("${ChatColor.DARK_GRAY}\u2193 ${ChatColor.GRAY}Traps Queue")
+                .setLore("${ChatColor.DARK_GRAY}\u2193 ${ChatColor.GRAY}Traps Queue")
                 .asGuiItem {
                     it.isCancelled = true
                 }
         )
+        plugin.gameManager.getGame(player)?.let { game ->
+            val upgrades = game.upgradesManager
+            val sharpness = upgrades.sharpness.contains(team)
+            val protection = upgrades.protection[team]
+            val haste = upgrades.haste[team]
+            val healPool = upgrades.healPool.contains(team)
+
+            // upgrades
+            val sharpSword = ItemBuilder.from(Material.IRON_SWORD)
+                .setName("${sharpness.getGreenOrRed()}Sharpened Swords")
+                .setLore(
+                    "Your team permanently gains".setGray(),
+                    "Sharpness I on all swords and".setGray(),
+                    "axes!".setGray(),
+                    " ",
+                    "Cost: ${ChatColor.AQUA}4 Diamonds".setGray(),
+                    " ",
+                    (if (sharpness) "${ChatColor.GREEN}UNLOCKED" else {
+                        "${ChatColor.YELLOW}Click to purchase!"
+                    })
+                )
+            val armor = ItemBuilder.from(Material.IRON_CHESTPLATE)
+                .setName(
+                    "${(protection.zeroNonNull() >= 4).getGreenOrRed()}Reinforced Armor ${
+                        (protection.zeroNonNull() + 1).limit(
+                            4
+                        ).toRomanNumeral()
+                    }"
+                )
+                .setLore(
+                    "Your team permanently gains".setGray(),
+                    "Protection on all armor pieces!".setGray(),
+                    " ",
+                    "${(protection.zeroNonNull() >= 1).getGreenOrGray()}Tier 1: Protection I, ${ChatColor.AQUA}2 Diamonds",
+                    "${(protection.zeroNonNull() >= 2).getGreenOrGray()}Tier 2: Protection II, ${ChatColor.AQUA}4 Diamonds",
+                    "${(protection.zeroNonNull() >= 3).getGreenOrGray()}Tier 3: Protection III, ${ChatColor.AQUA}8 Diamonds",
+                    "${(protection.zeroNonNull() >= 4).getGreenOrGray()}Tier 4: Protection IV, ${ChatColor.AQUA}16 Diamonds",
+                    " ",
+                    (if (protection.zeroNonNull() >= 4) "${ChatColor.GREEN}UNLOCKED" else {
+                        "${ChatColor.YELLOW}Click to purchase!"
+                    })
+                )
+            val maniacMiner = ItemBuilder.from(Material.GOLD_PICKAXE)
+                .setName(
+                    "${(haste.zeroNonNull() >= 4).getGreenOrRed()}Maniac Miner ${
+                        (haste.zeroNonNull() + 1).limit(2).toRomanNumeral()
+                    }"
+                )
+                .setLore(
+                    "All players on your team".setGray(),
+                    "permanently gain Haste.".setGray(),
+                    " ",
+                    "${(haste.zeroNonNull() >= 1).getGreenOrGray()}Tier 1: Haste I, ${ChatColor.AQUA}2 Diamonds",
+                    "${(haste.zeroNonNull() >= 2).getGreenOrGray()}Tier 2: Haste II, ${ChatColor.AQUA}4 Diamonds",
+                    " ",
+                    (if (haste.zeroNonNull() >= 2) "${ChatColor.GREEN}UNLOCKED" else {
+                        "${ChatColor.YELLOW}Click to purchase!"
+                    })
+                )
+            val healPoolItem = ItemBuilder.from(Material.BEACON)
+                .setName("${healPool.getGreenOrRed()}Heal Pool")
+                .setLore(
+                    "Creates a Regeneration field".setGray(),
+                    "around your base!".setGray(),
+                    " ",
+                    "Cost: ${ChatColor.AQUA}1 Diamond".setGray(),
+                    " ",
+                    (if (healPool) "${ChatColor.GREEN}UNLOCKED" else {
+                        "${ChatColor.YELLOW}Click to purchase!"
+                    })
+                )
+            val buyTrapItem = ItemBuilder.from(Material.LEATHER)
+                .setName("${ChatColor.YELLOW}Buy a trap")
+                .setLore(
+                    "Purchased traps will be".setGray(),
+                    "queued on the right.".setGray(),
+                    " ",
+                    "${ChatColor.YELLOW}Click to browse!"
+                )
+            menu.setItem(2, 3, sharpSword.asGuiItem { event ->
+                event.isCancelled = true
+            })
+            menu.setItem(2, 4, armor.asGuiItem { event ->
+                event.isCancelled = true
+            })
+            menu.setItem(2, 5, maniacMiner.asGuiItem { event ->
+                event.isCancelled = true
+            })
+            menu.setItem(2, 6, healPoolItem.asGuiItem { event ->
+                event.isCancelled = true
+            })
+            menu.setItem(2, 7, buyTrapItem.asGuiItem { event ->
+                event.isCancelled = true
+            })
+        }
+        menu.updateTitle("Upgrades & Traps")
         menu.update()
+    }
+
+
+    fun showTrapScreen() {
+
     }
 }
