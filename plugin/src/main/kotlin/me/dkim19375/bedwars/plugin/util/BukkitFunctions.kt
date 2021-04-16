@@ -77,58 +77,24 @@ fun Material.isArmor() = when (this) {
 }
 
 fun Material.isTool() = when (this) {
-    Material.WOOD_PICKAXE -> {
-        true
-    }
-    Material.WOOD_AXE -> {
-        true
-    }
-    Material.STONE_PICKAXE -> {
-        true
-    }
-    Material.STONE_AXE -> {
-        true
-    }
-    Material.GOLD_PICKAXE -> {
-        true
-    }
-    Material.GOLD_AXE -> {
-        true
-    }
-    Material.IRON_PICKAXE -> {
-        true
-    }
-    Material.IRON_AXE -> {
-        true
-    }
-    Material.DIAMOND_PICKAXE -> {
-        true
-    }
-    Material.DIAMOND_AXE -> {
-        true
-    }
-    else -> {
-        false
-    }
+    Material.WOOD_PICKAXE -> true
+    Material.WOOD_AXE -> true
+    Material.STONE_PICKAXE -> true
+    Material.STONE_AXE -> true
+    Material.GOLD_PICKAXE -> true
+    Material.GOLD_AXE -> true
+    Material.IRON_PICKAXE -> true
+    Material.IRON_AXE -> true
+    Material.DIAMOND_PICKAXE -> true
+    Material.DIAMOND_AXE -> true
+    else -> false
 }
 
 fun Material.isWeapon() = when (this) {
-    Material.WOOD_SWORD -> {
-        true
-    }
-    Material.STONE_SWORD -> {
-        true
-    }
-    Material.GOLD_SWORD -> {
-        true
-    }
-    Material.IRON_SWORD -> {
-        true
-    }
-    Material.DIAMOND_SWORD -> {
-        true
-    }
-    else -> {
-        false
-    }
+    Material.WOOD_SWORD -> true
+    Material.STONE_SWORD -> true
+    Material.GOLD_SWORD -> true
+    Material.IRON_SWORD -> true
+    Material.DIAMOND_SWORD -> true
+    else -> false
 }
