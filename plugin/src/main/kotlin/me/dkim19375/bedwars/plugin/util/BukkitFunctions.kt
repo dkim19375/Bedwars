@@ -57,57 +57,23 @@ private fun getEntityFromLoop(uuid: UUID): Entity? {
 }
 
 fun Material.isArmor() = when (this) {
-    Material.LEATHER_HELMET -> {
-        true
-    }
-    Material.LEATHER_CHESTPLATE -> {
-        true
-    }
-    Material.LEATHER_LEGGINGS -> {
-        true
-    }
-    Material.LEATHER_BOOTS -> {
-        true
-    }
-    Material.CHAINMAIL_HELMET -> {
-        true
-    }
-    Material.CHAINMAIL_CHESTPLATE -> {
-        true
-    }
-    Material.CHAINMAIL_LEGGINGS -> {
-        true
-    }
-    Material.CHAINMAIL_BOOTS -> {
-        true
-    }
-    Material.IRON_HELMET -> {
-        true
-    }
-    Material.IRON_CHESTPLATE -> {
-        true
-    }
-    Material.IRON_LEGGINGS -> {
-        true
-    }
-    Material.IRON_BOOTS -> {
-        true
-    }
-    Material.DIAMOND_HELMET -> {
-        true
-    }
-    Material.DIAMOND_CHESTPLATE -> {
-        true
-    }
-    Material.DIAMOND_LEGGINGS -> {
-        true
-    }
-    Material.DIAMOND_BOOTS -> {
-        true
-    }
-    else -> {
-        false
-    }
+    Material.LEATHER_HELMET -> true
+    Material.LEATHER_CHESTPLATE -> true
+    Material.LEATHER_LEGGINGS -> true
+    Material.LEATHER_BOOTS -> true
+    Material.CHAINMAIL_HELMET -> true
+    Material.CHAINMAIL_CHESTPLATE -> true
+    Material.CHAINMAIL_LEGGINGS -> true
+    Material.CHAINMAIL_BOOTS -> true
+    Material.IRON_HELMET -> true
+    Material.IRON_CHESTPLATE -> true
+    Material.IRON_LEGGINGS -> true
+    Material.IRON_BOOTS -> true
+    Material.DIAMOND_HELMET -> true
+    Material.DIAMOND_CHESTPLATE -> true
+    Material.DIAMOND_LEGGINGS -> true
+    Material.DIAMOND_BOOTS -> true
+    else -> false
 }
 
 fun Material.isTool() = when (this) {
