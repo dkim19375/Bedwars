@@ -21,11 +21,15 @@ class NPCManager(
         for (uuid in gameData.shopVillagers.toList()) {
             val entity = uuid.getEntity()
             if (entity == null) {
-                gameData.shopVillagers.remove(uuid)
+                val villagers = gameData.shopVillagers.toMutableList()
+                villagers.remove(uuid)
+                gameData.copy(shopVillagers = villagers).save(plugin)
                 continue
             }
             if (entity !is Villager) {
-                gameData.shopVillagers.remove(uuid)
+                val villagers = gameData.shopVillagers.toMutableList()
+                villagers.remove(uuid)
+                gameData.copy(shopVillagers = villagers).save(plugin)
                 continue
             }
             set.add(entity)
@@ -39,11 +43,15 @@ class NPCManager(
         for (uuid in gameData.upgradeVillagers.toList()) {
             val entity = uuid.getEntity()
             if (entity == null) {
-                gameData.upgradeVillagers.remove(uuid)
+                val villagers = gameData.upgradeVillagers.toMutableList()
+                villagers.remove(uuid)
+                gameData.copy(upgradeVillagers = villagers).save(plugin)
                 continue
             }
             if (entity !is Villager) {
-                gameData.upgradeVillagers.remove(uuid)
+                val villagers = gameData.upgradeVillagers.toMutableList()
+                villagers.remove(uuid)
+                gameData.copy(upgradeVillagers = villagers).save(plugin)
                 continue
             }
             set.add(entity)

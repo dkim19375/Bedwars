@@ -46,7 +46,7 @@ class PacketManager(private val plugin: BedwarsPlugin) {
         plugin.gameManager.invisPlayers.add(player.uniqueId)
     }
 
-    private fun restoreArmor(player: Player) {
+    fun restoreArmor(player: Player) {
         plugin.gameManager.invisPlayers.remove(player.uniqueId)
         broadcastNearby(player, setItem(player, player.inventory.boots, 1))
         broadcastNearby(player, setItem(player, player.inventory.leggings, 2))

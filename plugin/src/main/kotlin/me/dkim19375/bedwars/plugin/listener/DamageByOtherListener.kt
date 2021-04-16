@@ -15,7 +15,7 @@ class DamageByOtherListener(private val plugin: BedwarsPlugin) : Listener {
         val player = entity as Player
         if (plugin.gameManager.invisPlayers.contains(player.uniqueId)) {
             player.sendMessage(ChatColor.RED.toString() + "You took damage from another player, your armor is now visible!")
-            plugin.restoreArmor(player)
+            plugin.packetManager.restoreArmor(player)
         }
     }
 }

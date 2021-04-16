@@ -24,6 +24,7 @@ tasks {
         relocate("net.kyori.adventure", "$basePackage.adventure")
         relocate("kotlin", "$basePackage.kotlin")
         relocate("me.mattstudios.mfgui", "$basePackage.mfgui")
+        relocate("me.dkim19375.itemmovedetectionlib", "$basePackage.itemmovedetectionlib")
         finalizedBy("copyFileToServer")
     }
 }
@@ -73,6 +74,7 @@ subprojects {
         implementation("net.kyori", "adventure-text-serializer-legacy", "4.7.0")
         implementation("net.kyori", "adventure-text-serializer-gson", "4.7.0")
         implementation("net.kyori", "adventure-platform-bukkit", "+")
+        implementation("com.github.dkim19375", "ItemMoveDetectionLib", "1.0.1")
         // implementation("de.tr7zw:item-nbt-api:2.7.1")
         compileOnly("de.tr7zw", "item-nbt-api-plugin", "2.7.1")
         compileOnly("com.comphenix.protocol", "ProtocolLib", "4.6.0")

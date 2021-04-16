@@ -16,6 +16,7 @@ import me.dkim19375.bedwars.plugin.manager.PacketManager
 import me.dkim19375.bedwars.plugin.manager.ScoreboardManager
 import me.dkim19375.dkim19375core.ConfigFile
 import me.dkim19375.dkim19375core.CoreJavaPlugin
+import me.dkim19375.itemmovedetectionlib.ItemMoveDetectionLib
 import org.bukkit.configuration.serialization.ConfigurationSerialization
 import java.util.logging.Level
 
@@ -59,6 +60,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
     override fun onEnable() {
         val before = System.currentTimeMillis()
         try {
+            ItemMoveDetectionLib.register()
             initVariables()
             registerCommands()
             registerListeners()
@@ -102,13 +104,18 @@ class BedwarsPlugin : CoreJavaPlugin() {
     }
 
     private fun registerListeners() {
+        registerListener(PlayerMoveListener())
         registerListener(PlayerQuitListener(this))
+        registerListener(PlayerDeathListener(this))
+        registerListener(ItemTransferListener(this))
         registerListener(DamageByOtherListener(this))
         registerListener(PotionConsumeListener(this))
-        registerListener(scoreboardManager)
-        registerListener(PlayerMoveListener())
-        registerListener(PlayerCoordsChangeListener(this))
         registerListener(InventoryClickListener(this))
         registerListener(PlayerDropItemListener(this))
+        registerListener(PlayerInteractListener(this))
+        registerListener(PlayerInventoryListener(this))
+        registerListener(PlayerItemDamageListener(this))
+        registerListener(PlayerCoordsChangeListener(this))
+        registerListener(scoreboardManager)
     }
 }

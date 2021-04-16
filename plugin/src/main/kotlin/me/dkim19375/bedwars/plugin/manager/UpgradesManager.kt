@@ -72,6 +72,19 @@ class UpgradesManager(plugin: BedwarsPlugin, val game: BedwarsGame) {
         }
     }
 
+    fun getLevel(team: Team): Int {
+        if (!firstTrap.containsKey(team)) {
+            return 0
+        }
+        if (!secondTrap.containsKey(team)) {
+            return 1
+        }
+        if (!thirdTrap.containsKey(team)) {
+            return 2
+        }
+        return 3
+    }
+
     fun triggerTrap(player: Player) {
         val teamOfPlayer = game.getTeamOfPlayer(player) ?: return
         val bedData = game.data.beds.firstOrNull { d ->

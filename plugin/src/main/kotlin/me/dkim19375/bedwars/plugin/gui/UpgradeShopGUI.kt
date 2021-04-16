@@ -3,13 +3,13 @@ package me.dkim19375.bedwars.plugin.gui
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.enumclass.Team
 import me.dkim19375.bedwars.plugin.enumclass.TrapType
+import me.dkim19375.bedwars.plugin.enumclass.UpgradeType
+import me.dkim19375.bedwars.plugin.manager.BedwarsGame
 import me.dkim19375.bedwars.plugin.util.*
 import me.mattstudios.mfgui.gui.components.util.ItemBuilder
 import me.mattstudios.mfgui.gui.guis.Gui
 import me.mattstudios.mfgui.gui.guis.GuiItem
-import org.bukkit.ChatColor
-import org.bukkit.DyeColor
-import org.bukkit.Material
+import org.bukkit.*
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
@@ -36,6 +36,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
 
     fun showPlayer() {
         menu.open(player)
+        showMainScreen()
     }
 
     private fun reset() {
@@ -115,6 +116,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
     @Suppress("deprecation")
     fun showMainScreen() {
         reset()
+        menu.updateTitle("Upgrades & Traps")
         val grayGlass = ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.GRAY.data.toShort())
         menu.setItem(4, 4, getTrapItemOnMainScreen(1))
         menu.setItem(4, 5, getTrapItemOnMainScreen(2))
@@ -208,26 +210,163 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
                 )
             menu.setItem(2, 3, sharpSword.asGuiItem { event ->
                 event.isCancelled = true
+                onClick(UpgradeType.SHARPNESS)
             })
             menu.setItem(2, 4, armor.asGuiItem { event ->
                 event.isCancelled = true
+                onClick(UpgradeType.PROTECTION)
             })
             menu.setItem(2, 5, maniacMiner.asGuiItem { event ->
                 event.isCancelled = true
+                onClick(UpgradeType.HASTE)
             })
             menu.setItem(2, 6, healPoolItem.asGuiItem { event ->
                 event.isCancelled = true
+                onClick(UpgradeType.HEAL_POOL)
             })
             menu.setItem(2, 7, buyTrapItem.asGuiItem { event ->
                 event.isCancelled = true
+                showTrapScreen()
             })
         }
         menu.updateTitle("Upgrades & Traps")
         menu.update()
     }
 
+    private fun showTrapScreen() {
+        reset()
+        menu.updateTitle("Queue a trap")
+        val game = plugin.gameManager.getGame(player)?: return
+        val upgrades = game.upgradesManager
 
-    fun showTrapScreen() {
+        val diamonds = player.getItemAmount(Material.DIAMOND)
+        val first = diamonds >= 1
+        val second = diamonds >= 2
+        val third = diamonds >= 3
+        val level = upgrades.getLevel(team)
+        val cost = level + 1
 
+        val itsATrap = ItemBuilder.from(Material.TRIPWIRE_HOOK)
+            .setName("$${ChatColor.RED}It's a trap!")
+            .setLore(
+                itsATrapLore.combine(
+                    listOf(
+                        " ",
+                        "Cost: ${ChatColor.AQUA}$cost Diamond".setGray(),
+                        " ",
+                        hasEnoughBool(diamonds >= cost)
+                    )
+                )
+            )
+    }
+
+    private fun hasEnoughBool(bool: Boolean): String {
+        if (bool) {
+            return "${ChatColor.YELLOW}Click to purchase!"
+        }
+        return "${ChatColor.RED}You don't have enough Diamonds!"
+    }
+
+    private fun onClick(type: UpgradeType) {
+        val game = plugin.gameManager.getGame(player) ?: return
+        val upgrades = game.upgradesManager
+        val playerItems = player.getItemAmount(Material.DIAMOND)
+
+        when (type) {
+            UpgradeType.SHARPNESS -> {
+                if (!verifyItems(upgrades.sharpness.contains(team), 4)) {
+                    return
+                }
+                upgrades.sharpness.add(team)
+                sendUpgradeMessage("Sharpness", game)
+                return
+            }
+            UpgradeType.PROTECTION -> {
+                if (!verifyHasPurchase(upgrades.protection.getOrDefault(team, 0) >= 4)) {
+                    return
+                }
+                val level = upgrades.protection.getOrDefault(team, 0)
+                val cost = ProtectionLevel.fromInt(level + 1).cost
+                if (playerItems < cost) {
+                    player.sendMessage("${ChatColor.RED}You need ${cost - playerItems} more Diamond!")
+                    player.playSound(Sound.ANVIL_LAND, pitch = 0.8f)
+                    return
+                }
+                upgrades.protection[team] = level + 1
+                sendUpgradeMessage("Reinforced Armor ${(level + 1).toRomanNumeral()}", game)
+                return
+            }
+            UpgradeType.HASTE -> {
+                if (!verifyHasPurchase(upgrades.haste.getOrDefault(team, 0) >= 2)) {
+                    return
+                }
+                val level = upgrades.haste.getOrDefault(team, 0)
+                val cost = (level + 1) * 2
+                if (playerItems < cost) {
+                    player.sendMessage("${ChatColor.RED}You need ${cost - playerItems} more Diamond!")
+                    player.playSound(Sound.ANVIL_LAND, pitch = 0.8f)
+                    return
+                }
+                upgrades.haste[team] = level + 1
+                sendUpgradeMessage("Maniac Miner ${(level + 1).toRomanNumeral()}", game)
+                return
+            }
+            UpgradeType.HEAL_POOL -> {
+                if (!verifyItems(upgrades.healPool.contains(team), 1)) {
+                    return
+                }
+                upgrades.healPool.add(team)
+                sendUpgradeMessage("Heal Pool", game)
+                return
+            }
+        }
+    }
+
+    private fun verifyHasPurchase(hasUpgrade: Boolean): Boolean {
+        return if (hasUpgrade) {
+            player.sendMessage("${ChatColor.RED}You already have this purchased!")
+            false
+        } else true
+    }
+
+    private fun verifyItems(hasUpgrade: Boolean, cost: Int): Boolean {
+        if (!verifyHasPurchase(hasUpgrade)) {
+            return false
+        }
+        val playerItems = player.getItemAmount(Material.DIAMOND)
+        if (playerItems < cost) {
+            player.sendMessage("${ChatColor.RED}You need ${cost - playerItems} more Diamond!")
+            player.playSound(Sound.ANVIL_LAND, pitch = 0.8f)
+            return false
+        }
+        return true
+    }
+
+    private fun sendUpgradeMessage(upgrade: String, game: BedwarsGame) {
+        player.playSound(Sound.NOTE_PLING)
+        player.sendMessage("${ChatColor.GREEN}Successfully purchased $upgrade!")
+        for (uuid in game.getPlayersInTeam(team)) {
+            val p = Bukkit.getPlayer(uuid) ?: continue
+            p.sendMessage("${player.displayName} ${ChatColor.GREEN}has purchased $upgrade!")
+        }
+    }
+
+    enum class ProtectionLevel(val cost: Int) {
+        ONE(2),
+        TWO(4),
+        THREE(8),
+        FOUR(16);
+
+        companion object {
+            fun fromInt(int: Int): ProtectionLevel {
+                return when (int) {
+                    1 -> ONE
+                    2 -> TWO
+                    3 -> THREE
+                    4 -> FOUR
+                    else -> ONE
+                }
+            }
+        }
     }
 }

@@ -21,7 +21,7 @@ import java.nio.file.StandardCopyOption
 import java.util.*
 
 @Suppress("JoinDeclarationAndAssignment", "MemberVisibilityCanBePrivate")
-class BedwarsGame(private val plugin: BedwarsPlugin, val data: GameData) {
+class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     var state = GameState.LOBBY
         private set
     var countdown = 10 * 20
@@ -29,9 +29,16 @@ class BedwarsGame(private val plugin: BedwarsPlugin, val data: GameData) {
     val players = mutableMapOf<Team, MutableSet<UUID>>()
     val playersInLobby = mutableSetOf<UUID>()
     var task: BukkitTask? = null
+    private val worldName: String = data.world.name!!
     val beds = mutableMapOf<Team, Boolean>()
     val npcManager = NPCManager(plugin, data)
     val upgradesManager = UpgradesManager(plugin, this)
+    val spawnerManager = SpawnerManager(plugin, this)
+    var data = data
+        private set
+        get() {
+            return plugin.dataFileManager.getGameData(worldName)!!
+        }
 
     init {
         npcManager.disableAI()
@@ -68,6 +75,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, val data: GameData) {
             i++
 
         }
+        spawnerManager.start()
     }
 
     fun stop(winner: Player?, team: Team) {
@@ -77,10 +85,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, val data: GameData) {
                     ?: team.displayName.formatWithColors(team.color)
             } has won BedWars!"
         )
-        players.clear()
-        playersInLobby.clear()
-        state = GameState.STOPPED
-        regenerateMap()
+        forceStop()
     }
 
     fun forceStop() {
@@ -88,6 +93,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, val data: GameData) {
         players.clear()
         playersInLobby.clear()
         state = GameState.STOPPED
+        spawnerManager.runnable?.cancel()
         regenerateMap()
     }
 
@@ -153,6 +159,10 @@ class BedwarsGame(private val plugin: BedwarsPlugin, val data: GameData) {
         }
     }
 
+    fun playerKilled(player: Player) {
+
+    }
+
     fun leavePlayer(player: Player) {
         if (state == GameState.LOBBY || state == GameState.STARTING) {
             if (!playersInLobby.contains(player.uniqueId)) {
@@ -170,6 +180,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, val data: GameData) {
             if (getTeamOfPlayer(player) == null) {
                 return
             }
+
             return
         }
     }

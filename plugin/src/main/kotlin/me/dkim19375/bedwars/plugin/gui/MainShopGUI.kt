@@ -2,6 +2,7 @@ package me.dkim19375.bedwars.plugin.gui
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.enumclass.ArmorType
+import me.dkim19375.bedwars.plugin.enumclass.MainShopItems
 import me.dkim19375.bedwars.plugin.util.*
 import me.mattstudios.mfgui.gui.components.util.ItemBuilder
 import me.mattstudios.mfgui.gui.guis.Gui
@@ -10,11 +11,9 @@ import org.bukkit.ChatColor
 import org.bukkit.DyeColor
 import org.bukkit.Material
 import org.bukkit.Sound
-import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
-import org.bukkit.potion.PotionType
 
 @Suppress("MemberVisibilityCanBePrivate")
 class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin) {
@@ -38,95 +37,14 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
 
     @Suppress("DEPRECATION")
     private fun setTopRow() {
-        // top slots
-        val quickBuyItem = getItemBuilderForTop(Material.NETHER_STAR)
-            .setName("${ChatColor.AQUA}Quick Buy")
-            .asGuiItem {
-                it.isCancelled = true
-                if (isSettingQuickBuy) {
-                    player.sendMessage("${ChatColor.RED}Cancelled Quick Buy selection!")
-                    isSettingQuickBuy = false
-                }
-                showQuickBuy()
-            }
-        val blocksItem = getItemBuilderForTop(Material.HARD_CLAY)
-            .setName("${ChatColor.GREEN}Blocks")
-            .asGuiItem {
-                it.isCancelled = true
-                if (isSettingQuickBuy) {
-                    player.sendMessage("${ChatColor.RED}Cancelled Quick Buy selection!")
-                    isSettingQuickBuy = false
-                }
-                showBlocks()
-            }
-        val meleeItem = getItemBuilderForTop(Material.HARD_CLAY)
-            .setName("${ChatColor.GREEN}Melee")
-            .asGuiItem {
-                it.isCancelled = true
-                if (isSettingQuickBuy) {
-                    player.sendMessage("${ChatColor.RED}Cancelled Quick Buy selection!")
-                    isSettingQuickBuy = false
-                }
-                showMelee()
-            }
-        val armorItem = getItemBuilderForTop(Material.HARD_CLAY)
-            .setName("${ChatColor.GREEN}Armor")
-            .asGuiItem {
-                it.isCancelled = true
-                if (isSettingQuickBuy) {
-                    player.sendMessage("${ChatColor.RED}Cancelled Quick Buy selection!")
-                    isSettingQuickBuy = false
-                }
-                showArmor()
-            }
-        val toolsItem = getItemBuilderForTop(Material.HARD_CLAY)
-            .setName("${ChatColor.GREEN}Tools")
-            .asGuiItem {
-                it.isCancelled = true
-                if (isSettingQuickBuy) {
-                    player.sendMessage("${ChatColor.RED}Cancelled Quick Buy selection!")
-                    isSettingQuickBuy = false
-                }
-                showTools()
-            }
-        val rangedItem = getItemBuilderForTop(Material.HARD_CLAY)
-            .setName("${ChatColor.GREEN}Ranged")
-            .asGuiItem {
-                it.isCancelled = true
-                if (isSettingQuickBuy) {
-                    player.sendMessage("${ChatColor.RED}Cancelled Quick Buy selection!")
-                    isSettingQuickBuy = false
-                }
-                showRanged()
-            }
-        val potionsItem = getItemBuilderForTop(Material.HARD_CLAY)
-            .setName("${ChatColor.GREEN}Potions")
-            .asGuiItem {
-                it.isCancelled = true
-                if (isSettingQuickBuy) {
-                    player.sendMessage("${ChatColor.RED}Cancelled Quick Buy selection!")
-                    isSettingQuickBuy = false
-                }
-                showPotions()
-            }
-        val utilityItem = getItemBuilderForTop(Material.HARD_CLAY)
-            .setName("${ChatColor.GREEN}Utility")
-            .asGuiItem {
-                it.isCancelled = true
-                if (isSettingQuickBuy) {
-                    player.sendMessage("${ChatColor.RED}Cancelled Quick Buy selection!")
-                    isSettingQuickBuy = false
-                }
-                showUtility()
-            }
-        menu.setItem(0, quickBuyItem)
-        menu.setItem(2, blocksItem)
-        menu.setItem(3, meleeItem)
-        menu.setItem(4, armorItem)
-        menu.setItem(5, toolsItem)
-        menu.setItem(6, rangedItem)
-        menu.setItem(7, potionsItem)
-        menu.setItem(8, utilityItem)
+        menu.setItem(0, getGuiItem("${ChatColor.AQUA}Quick Buy", this::showQuickBuy, Material.NETHER_STAR))
+        menu.setItem(2, getGuiItem("Blocks", this::showBlocks))
+        menu.setItem(3, getGuiItem("Melee", this::showMelee))
+        menu.setItem(4, getGuiItem("Armor", this::showArmor))
+        menu.setItem(5, getGuiItem("Tools", this::showTools))
+        menu.setItem(6, getGuiItem("Ranged", this::showRanged))
+        menu.setItem(7, getGuiItem("Potions", this::showPotions))
+        menu.setItem(8, getGuiItem("Utility", this::showUtility))
         val grayGlass = ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.GRAY.data.toShort())
         menu.filler.fillBetweenPoints(
             2, 1, 2, 9, ItemBuilder.from(grayGlass)
@@ -137,6 +55,21 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
                 }
         )
         menu.update()
+    }
+
+    private fun getGuiItem(name: String, whatToShow: () -> Unit, material: Material = Material.HARD_CLAY) =
+        getItemBuilderForTop(material)
+            .setName("${ChatColor.GREEN}$name")
+            .asGuiItem {
+                it.isCancelled = true
+                checkIfSettingQuickBuy()
+                whatToShow()
+            }
+
+    private fun checkIfSettingQuickBuy() {
+        if (!isSettingQuickBuy) return
+        player.sendMessage("${ChatColor.RED}Cancelled Quick Buy selection!")
+        isSettingQuickBuy = false
     }
 
     @Suppress("DEPRECATION")
@@ -206,7 +139,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
             }
     }
 
-    private fun givePlayerItem(item: Items) {
+    private fun givePlayerItem(item: MainShopItems) {
         if (player.inventory.hasArmor(ArmorType.fromMaterial(item.item.material))) {
             player.sendMessage("${ChatColor.RED}You already have this!")
             return
@@ -243,13 +176,9 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
         return amount
     }
 
-    private fun formatItem(item: Items): ItemBuilder {
+    private fun formatItem(item: MainShopItems): ItemBuilder {
         val team = plugin.gameManager.getTeamOfPlayer(player)
-        val itemstack = if (team == null) {
-            item.item.toItemStack(null)
-        } else {
-            item.item.toItemStack(team.color)
-        }
+        val itemstack = item.item.toItemStack(team?.color)
         val amount = player.getItemAmount(item.costType.material)
         val builder: ItemBuilder
         if (amount >= item.costAmount) {
@@ -278,7 +207,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
         return builder.addLore("")
     }
 
-    private fun onClick(item: Items, event: InventoryClickEvent) {
+    private fun onClick(item: MainShopItems, event: InventoryClickEvent) {
         event.isCancelled = true
         if (isSettingQuickBuy) {
             return
@@ -297,19 +226,19 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
         reset()
         setTopRow()
         putGreenGlass(col)
-        for (item in Items.getByType(ItemType.BLOCKS)) {
+        for (item in MainShopItems.getByType(ItemType.BLOCKS)) {
             if (item.defaultOnSpawn) {
                 continue
             }
             menu.setItem(item.slot, formatItem(item).asGuiItem {
                 it.isCancelled = true
                 if (it.isShiftClick) {
-                    if (getBuySlots().firstOrNull { i ->
+                    if (getBuySlots().none { i ->
                             plugin.dataFileManager.getQuickBuySlot(
                                 i,
                                 player.uniqueId
                             ) == null
-                        } == null) {
+                        }) {
                         player.sendMessage("${ChatColor.RED}You have no available Quick Buy slots!")
                         return@asGuiItem
                     }
@@ -385,239 +314,5 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
         IRON(Material.IRON_INGOT, ChatColor.WHITE, "Iron"),
         GOLD(Material.GOLD_INGOT, ChatColor.GOLD, "Gold"),
         EMERALD(Material.EMERALD, ChatColor.GREEN, "Emerald")
-    }
-
-    @Suppress("unused")
-    enum class Items(
-        val slot: Int, val item: ItemWrapper, val costAmount: Int, val costType: CostType,
-        val displayname: String, val permanent: Boolean = false, val defaultOnSpawn: Boolean = false,
-        val type: ItemType
-    ) {
-        WOOL(
-            19, ItemWrapper(Material.WOOL, 16), 4, CostType.IRON, "Wool",
-            type = ItemType.BLOCKS
-        ),
-        HARDENED_CLAY(
-            20, ItemWrapper(Material.HARD_CLAY, 16), 12, CostType.IRON,
-            "Clay", type = ItemType.BLOCKS
-        ),
-        BLAST_PROOF_GLASS(
-            21, ItemWrapper(Material.GLASS, 4), 12, CostType.IRON,
-            "Blast Proof Glass", type = ItemType.BLOCKS
-        ),
-        END_STONE(
-            22, ItemWrapper(Material.ENDER_STONE, 12), 24, CostType.IRON,
-            "Endstone", type = ItemType.BLOCKS
-        ),
-        WOOD(
-            23, ItemWrapper(Material.WOOD, 16), 4, CostType.GOLD, "Wood",
-            type = ItemType.BLOCKS
-        ),
-        OBSIDIAN(
-            24, ItemWrapper(Material.OBSIDIAN, 4), 4, CostType.EMERALD, "Obsidian",
-            type = ItemType.BLOCKS
-        ),
-        WOOD_SWORD(
-            -1, ItemWrapper(Material.WOOD_SWORD, 1), 0, CostType.IRON, "Wooden Sword",
-            permanent = true,
-            defaultOnSpawn = true, ItemType.MELEE
-        ),
-        STONE_SWORD(
-            19, ItemWrapper(Material.STONE_SWORD, 1), 10, CostType.IRON,
-            "Stone Sword", type = ItemType.MELEE
-        ),
-        IRON_SWORD(
-            20, ItemWrapper(Material.IRON_SWORD, 1), 7, CostType.GOLD,
-            "Iron Sword", type = ItemType.MELEE
-        ),
-        KB_STICK(
-            21,
-            ItemWrapper(Material.STICK, 1, enchants = listOf(Enchantment.KNOCKBACK)),
-            10,
-            CostType.GOLD,
-            "Stick (Knockback I)",
-            permanent = true,
-            type = ItemType.MELEE
-        ),
-        LEATHER_ARMOR(
-            -1, ItemWrapper(Material.LEATHER_BOOTS, 1), 0, CostType.IRON,
-            "Leather Armor", permanent = true,
-            defaultOnSpawn = true, type = ItemType.ARMOR
-        ),
-        CHAIN_ARMOR(
-            19,
-            ItemWrapper(Material.CHAINMAIL_BOOTS, 1),
-            40,
-            CostType.IRON, "Chainmail Armor",
-            permanent = true,
-            type = ItemType.ARMOR
-        ),
-        IRON_ARMOR(
-            20,
-            ItemWrapper(Material.IRON_BOOTS, 1),
-            12,
-            CostType.GOLD, "Iron Armor",
-            permanent = true,
-            type = ItemType.ARMOR
-        ),
-        DIAMOND_ARMOR(
-            21,
-            ItemWrapper(Material.DIAMOND_BOOTS, 1),
-            6,
-            CostType.EMERALD, "Diamond Armor",
-            permanent = true,
-            type = ItemType.ARMOR
-        ),
-        SHEARS(
-            19,
-            ItemWrapper(Material.SHEARS, 1),
-            30,
-            CostType.IRON,
-            "Shears",
-            permanent = true,
-            type = ItemType.TOOLS
-        ),
-        WOOD_PICK(
-            20,
-            ItemWrapper(Material.WOOD_PICKAXE, 1),
-            10,
-            CostType.IRON, "Wooden Pickaxe",
-            permanent = true,
-            type = ItemType.TOOLS
-        ),
-        STONE_PICK(
-            21, ItemWrapper(Material.STONE_PICKAXE, 1), 10, CostType.IRON,
-            "Stone Pickaxe", type = ItemType.TOOLS
-        ),
-        IRON_PICKAXE(
-            22, ItemWrapper(Material.IRON_PICKAXE, 1), 3, CostType.GOLD,
-            "Iron Pickaxe", type = ItemType.TOOLS
-        ),
-        DIAMOND_PICKAXE(
-            23,
-            ItemWrapper(Material.DIAMOND_PICKAXE, 1),
-            6,
-            CostType.GOLD,
-            "Diamond Pickaxe",
-            type = ItemType.TOOLS
-        ),
-        WOOD_AXE(
-            24,
-            ItemWrapper(Material.WOOD_AXE, 1),
-            10,
-            CostType.IRON,
-            "Wooden Axe",
-            permanent = true,
-            type = ItemType.TOOLS
-        ),
-        STONE_AXE(
-            25, ItemWrapper(Material.STONE_AXE, 1), 10, CostType.IRON,
-            "Stone Axe", type = ItemType.TOOLS
-        ),
-        IRON_AXE(
-            28, ItemWrapper(Material.IRON_AXE, 1), 3, CostType.GOLD,
-            "Iron Axe", type = ItemType.TOOLS
-        ),
-        DIAMOND_AXE(
-            29, ItemWrapper(Material.DIAMOND_AXE, 1), 6, CostType.GOLD,
-            "Diamond Axe", type = ItemType.TOOLS
-        ),
-        ARROW(
-            19, ItemWrapper(Material.ARROW, 8), 2, CostType.GOLD,
-            "Arrow", type = ItemType.RANGED
-        ),
-        BOW(
-            19, ItemWrapper(Material.BOW, 1), 12, CostType.GOLD,
-            "Bow", type = ItemType.RANGED
-        ),
-        POWER_BOW(
-            19,
-            ItemWrapper(Material.BOW, 1, enchants = listOf(Enchantment.ARROW_DAMAGE)),
-            24,
-            CostType.GOLD, "Bow (Power I)",
-            type = ItemType.RANGED
-        ),
-        PUNCH_BOW(
-            19, ItemWrapper(Material.BOW, 1, enchants = listOf(Enchantment.ARROW_DAMAGE, Enchantment.ARROW_KNOCKBACK)),
-            6, CostType.EMERALD, "Bow (Power I, Punch I)", type = ItemType.RANGED
-        ),
-        SPEED(
-            19,
-            ItemWrapper(Material.POTION, 1, PotionType.SPEED, 2),
-            1,
-            CostType.EMERALD,
-            "Speed II Potion",
-            type = ItemType.POTIONS
-        ),
-        JUMP(
-            20,
-            ItemWrapper(Material.POTION, 1, PotionType.JUMP, 5),
-            1,
-            CostType.EMERALD,
-            "Jump V Potion",
-            type = ItemType.POTIONS
-        ),
-        INVISIBILITY(
-            21,
-            ItemWrapper(Material.POTION, 1, PotionType.INVISIBILITY, 1),
-            2,
-            CostType.EMERALD,
-            "Invisibility Potion",
-            type = ItemType.POTIONS
-        ),
-        PEARL(
-            19, ItemWrapper(Material.ENDER_PEARL, 1), 4, CostType.EMERALD,
-            "Ender Pearl", type = ItemType.UTILITY
-        ),
-        GOLDEN_APPLE(
-            20,
-            ItemWrapper(Material.GOLDEN_APPLE, 1),
-            3,
-            CostType.GOLD,
-            "Golden Apple",
-            type = ItemType.UTILITY
-        ),
-        FIREBALL(
-            21, ItemWrapper(Material.FIREBALL, 1), 40, CostType.IRON,
-            "Fireball", type = ItemType.UTILITY
-        ),
-        TNT(
-            22, ItemWrapper(Material.TNT, 1), 4, CostType.GOLD,
-            "TNT", type = ItemType.UTILITY
-        ),
-        WATER_BUCKET(
-            23, ItemWrapper(Material.WATER_BUCKET, 1), 1, CostType.EMERALD,
-            "Water Bucket", type = ItemType.UTILITY
-        );
-
-        companion object {
-            fun getByMaterial(material: Material): Items? {
-                values().forEach { i ->
-                    if (i.item.material == material) {
-                        return i
-                    }
-                }
-                return null
-            }
-
-            fun getByType(type: ItemType): Set<Items> {
-                val set = mutableSetOf<Items>()
-                values().forEach { i ->
-                    if (i.type == type) {
-                        set.add(i)
-                    }
-                }
-                return set.toSet()
-            }
-
-            fun fromString(str: String?): Items? {
-                str ?: return null
-                return try {
-                    valueOf(str)
-                } catch (_: IllegalArgumentException) {
-                    return null
-                }
-            }
-        }
     }
 }

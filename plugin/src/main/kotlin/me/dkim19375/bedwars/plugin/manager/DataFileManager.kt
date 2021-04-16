@@ -1,13 +1,14 @@
 package me.dkim19375.bedwars.plugin.manager
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
-import me.dkim19375.bedwars.plugin.gui.MainShopGUI
 import me.dkim19375.bedwars.plugin.data.GameData
+import me.dkim19375.bedwars.plugin.enumclass.MainShopItems
+import me.dkim19375.bedwars.plugin.util.safeCast
 import org.bukkit.Bukkit
 import java.util.*
 
 class DataFileManager(private val plugin: BedwarsPlugin) {
-    var save = false
+    private var save = false
 
     init {
         Bukkit.getScheduler().runTask(plugin) {
@@ -20,11 +21,11 @@ class DataFileManager(private val plugin: BedwarsPlugin) {
         }
     }
 
-    fun getQuickBuySlot(slot: Int, player: UUID): MainShopGUI.Items? {
-        return MainShopGUI.Items.fromString(plugin.dataFile.config.getString("$player.shop.quick-buy.$slot"))
+    fun getQuickBuySlot(slot: Int, player: UUID): MainShopItems? {
+        return MainShopItems.fromString(plugin.dataFile.config.getString("$player.shop.quick-buy.$slot"))
     }
 
-    fun setQuickBuySlot(slot: Int, player: UUID, item: MainShopGUI.Items?) {
+    fun setQuickBuySlot(slot: Int, player: UUID, item: MainShopItems?) {
         if (item == null) {
             plugin.dataFile.config.set("$player.shop.quick-buy.$slot", null)
             save = true
@@ -37,6 +38,10 @@ class DataFileManager(private val plugin: BedwarsPlugin) {
     fun setGameData(data: GameData) {
         plugin.dataFile.config.set("game-data.${data.world.name}", data)
         save = true
+    }
+
+    fun getGameData(world: String): GameData? {
+        return plugin.dataFile.config.get("game-data.$world").safeCast(GameData::class.java)
     }
 
     fun getGameDatas(): Set<GameData> {

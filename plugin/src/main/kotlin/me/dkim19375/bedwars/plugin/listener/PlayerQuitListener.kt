@@ -8,9 +8,8 @@ import org.bukkit.event.player.PlayerQuitEvent
 class PlayerQuitListener(private val plugin: BedwarsPlugin) : Listener {
     @EventHandler
     private fun PlayerQuitEvent.onQuit() {
-        plugin.gameManager.getRunningGames().forEach { (_, game) ->
-            game.leavePlayer(player)
-        }
         plugin.gameManager.invisPlayers.remove(player.uniqueId)
+        plugin.gameManager.getGame(player)?: return
+        player.damage(player.maxHealth * 2)
     }
 }
