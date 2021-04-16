@@ -41,7 +41,7 @@ class DataFileManager(private val plugin: BedwarsPlugin) {
     }
 
     fun getGameData(world: String): GameData? {
-        return plugin.dataFile.config.get("game-data.$world").safeCast(GameData::class.java)
+        return plugin.dataFile.config.get("game-data.$world") as? GameData
     }
 
     fun getGameDatas(): Set<GameData> {

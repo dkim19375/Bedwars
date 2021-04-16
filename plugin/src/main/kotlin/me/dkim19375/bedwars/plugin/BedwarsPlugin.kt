@@ -18,7 +18,6 @@ import me.dkim19375.dkim19375core.ConfigFile
 import me.dkim19375.dkim19375core.CoreJavaPlugin
 import me.dkim19375.itemmovedetectionlib.ItemMoveDetectionLib
 import org.bukkit.configuration.serialization.ConfigurationSerialization
-import java.util.logging.Level
 
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -41,40 +40,23 @@ class BedwarsPlugin : CoreJavaPlugin() {
 
     override fun onLoad() {
         val before = System.currentTimeMillis()
-        try {
-            ConfigurationSerialization.registerClass(Team::class.java)
-            ConfigurationSerialization.registerClass(BedData::class.java)
-            ConfigurationSerialization.registerClass(SpawnerData::class.java)
-            ConfigurationSerialization.registerClass(GameData::class.java)
-            NBTInjector.inject()
-            assemble.boards
-        } catch (e: Exception) {
-            e.printStackTrace()
-            log(Level.SEVERE, "An exception occurred while enabling ${description.name}!")
-            disable = true
-            return
-        }
+        ConfigurationSerialization.registerClass(Team::class.java)
+        ConfigurationSerialization.registerClass(BedData::class.java)
+        ConfigurationSerialization.registerClass(SpawnerData::class.java)
+        ConfigurationSerialization.registerClass(GameData::class.java)
+        NBTInjector.inject()
+        assemble.boards
         log("Successfully loaded (not enabled) ${description.name} v${description.version} in ${System.currentTimeMillis() - before}ms!")
     }
 
     override fun onEnable() {
         val before = System.currentTimeMillis()
-        try {
-            ItemMoveDetectionLib.register()
-            initVariables()
-            registerCommands()
-            registerListeners()
-            reloadConfig()
-            packetManager.addListeners()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            if (disable) {
-                exception.printStackTrace()
-            }
-            log(Level.SEVERE, "An exception occurred while enabling ${description.name}!")
-            server.pluginManager.disablePlugin(this)
-            return
-        }
+        ItemMoveDetectionLib.register()
+        initVariables()
+        registerCommands()
+        registerListeners()
+        reloadConfig()
+        packetManager.addListeners()
         log("Successfully enabled ${description.name} v${description.version} in ${System.currentTimeMillis() - before}ms!")
     }
 

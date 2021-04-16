@@ -8,13 +8,11 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable
 import org.bukkit.material.Bed
 
 data class BedData(val team: Team, val location: Location, val face: BlockFace) : ConfigurationSerializable {
-    override fun serialize(): MutableMap<String, Any> {
-        val map = mutableMapOf<String, Any>()
-        map["team"] = team
-        map["location"] = location
-        map["face"] = face.name
-        return map
-    }
+    override fun serialize(): Map<String, Any> =
+        mapOf(
+            "team" to team,
+            "location" to location,
+            "face" to face.name)
 
     companion object {
         @Suppress("unused")

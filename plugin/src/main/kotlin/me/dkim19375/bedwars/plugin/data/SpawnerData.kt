@@ -5,9 +5,10 @@ import org.bukkit.Location
 import org.bukkit.configuration.serialization.ConfigurationSerializable
 
 data class SpawnerData(val type: SpawnerType, val location: Location) : ConfigurationSerializable {
-    override fun serialize(): MutableMap<String, Any> {
-        return mutableMapOf(Pair("type", type.name), Pair("location", location))
-    }
+    override fun serialize(): Map<String, Any> = mapOf(
+        "type" to type.name,
+        "location" to location
+    )
 
     companion object {
         @Suppress("unused")

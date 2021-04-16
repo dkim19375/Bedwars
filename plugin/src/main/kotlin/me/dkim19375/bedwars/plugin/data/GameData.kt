@@ -8,7 +8,7 @@ import org.bukkit.World
 import org.bukkit.configuration.serialization.ConfigurationSerializable
 import java.util.*
 
-data class GameData (
+data class GameData(
     val displayName: String,
     val world: World,
     val minPlayers: Int = 2,
@@ -22,19 +22,17 @@ data class GameData (
 
     fun save(plugin: BedwarsPlugin) = plugin.dataFileManager.setGameData(this)
 
-    override fun serialize(): MutableMap<String, Any> {
-        val map = mutableMapOf<String, Any>()
-        map["display-name"] = displayName
-        map["world"] = world.name
-        map["min-players"] = minPlayers
-        map["max-players"] = maxPlayers
-        map["teams"] = teams.toList()
-        map["shop-villagers"] = shopVillagers.map(UUID::toString)
-        map["upgrade-villagers"] = upgradeVillagers.map(UUID::toString)
-        map["spawners"] = spawners.toList()
-        map["beds"] = beds.toList()
-        return map
-    }
+    override fun serialize(): Map<String, Any> = mapOf(
+        "display-name" to displayName,
+        "world" to world.name,
+        "min-players" to minPlayers,
+        "max-players" to maxPlayers,
+        "teams" to teams.toList(),
+        "shop-villagers" to shopVillagers.map(UUID::toString),
+        "upgrade-villagers" to upgradeVillagers.map(UUID::toString),
+        "spawners" to spawners.toList(),
+        "beds" to beds.toList()
+    )
 
     companion object {
         @Suppress("unused", "unchecked_cast")
