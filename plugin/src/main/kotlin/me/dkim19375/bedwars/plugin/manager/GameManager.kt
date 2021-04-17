@@ -14,6 +14,8 @@ import java.util.*
 class GameManager(plugin: BedwarsPlugin) {
     private val games = mutableMapOf<String, BedwarsGame>()
     val invisPlayers = mutableSetOf<UUID>()
+    val tnt = mutableMapOf<UUID, UUID>()
+    //                      tnt  player
 
     init {
         Bukkit.getScheduler().runTaskTimer(plugin, {
@@ -71,10 +73,12 @@ class GameManager(plugin: BedwarsPlugin) {
         return null
     }
 
-    fun getGame(player: Player): BedwarsGame? {
+    fun getGame(player: UUID): BedwarsGame? {
         val gameName = getPlayerInGame(player)?: return null
         return getGame(gameName)
     }
+
+    fun getGame(player: Player): BedwarsGame? = getGame(player.uniqueId)
 
     fun getGame(name: String): BedwarsGame? {
         games.forEach { (gName, game) ->
@@ -103,7 +107,9 @@ class GameManager(plugin: BedwarsPlugin) {
         return game.getTeamOfPlayer(player)
     }
 
-    fun getPlayerInGame(player: Player): String? {
+    fun getPlayerInGame(player: Player): String? = getPlayerInGame(player.uniqueId)
+
+    fun getPlayerInGame(player: UUID): String? {
         getGames().forEach { (name, game) ->
             if (game.getTeamOfPlayer(player) != null) {
                 return name

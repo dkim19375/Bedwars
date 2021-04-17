@@ -4,6 +4,7 @@ import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.enumclass.Team
 import me.dkim19375.bedwars.plugin.util.toUUID
 import org.bukkit.Bukkit
+import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.configuration.serialization.ConfigurationSerializable
 import java.util.*
@@ -13,11 +14,12 @@ data class GameData(
     val world: World,
     val minPlayers: Int = 2,
     val maxPlayers: Int = 8,
-    val teams: Set<Team>,
+    val teams: Map<Team, TeamData>,
     val shopVillagers: List<UUID>,
     val upgradeVillagers: List<UUID>,
     val spawners: Set<SpawnerData>,
-    val beds: Set<BedData>
+    val beds: Set<BedData>,
+    val spec: Location
 ) : ConfigurationSerializable {
 
     fun save(plugin: BedwarsPlugin) = plugin.dataFileManager.setGameData(this)
@@ -31,7 +33,8 @@ data class GameData(
         "shop-villagers" to shopVillagers.map(UUID::toString),
         "upgrade-villagers" to upgradeVillagers.map(UUID::toString),
         "spawners" to spawners.toList(),
-        "beds" to beds.toList()
+        "beds" to beds.toList(),
+        "spec" to spec
     )
 
     companion object {
@@ -43,11 +46,12 @@ data class GameData(
                 Bukkit.getWorld(map["world"] as String),
                 Integer.valueOf(map["min-players"] as String),
                 Integer.valueOf(map["max-players"] as String),
-                (map["teams"] as List<Team>).toSet(),
-                (map["shop-villagers"] as List<String>).map(String::toUUID).toMutableList() as MutableList<UUID>,
-                (map["upgrade-villagers"] as List<String>).map(String::toUUID).toMutableList() as MutableList<UUID>,
+                (map["teams"] as Map<Team, TeamData>).toMap(),
+                (map["shop-villagers"] as List<String>).map(String::toUUID).toList() as List<UUID>,
+                (map["upgrade-villagers"] as List<String>).map(String::toUUID).toList() as List<UUID>,
                 (map["spawners"] as List<SpawnerData>).toSet(),
-                (map["beds"] as List<BedData>).toSet()
+                (map["beds"] as List<BedData>).toSet(),
+                map["spec"] as Location
             )
         }
     }

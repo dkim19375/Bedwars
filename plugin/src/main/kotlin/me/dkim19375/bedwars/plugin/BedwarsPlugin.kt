@@ -8,6 +8,7 @@ import me.dkim19375.bedwars.plugin.command.TabCompletionHandler
 import me.dkim19375.bedwars.plugin.data.BedData
 import me.dkim19375.bedwars.plugin.data.GameData
 import me.dkim19375.bedwars.plugin.data.SpawnerData
+import me.dkim19375.bedwars.plugin.data.TeamData
 import me.dkim19375.bedwars.plugin.enumclass.Team
 import me.dkim19375.bedwars.plugin.listener.*
 import me.dkim19375.bedwars.plugin.manager.DataFileManager
@@ -41,6 +42,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
     override fun onLoad() {
         val before = System.currentTimeMillis()
         ConfigurationSerialization.registerClass(Team::class.java)
+        ConfigurationSerialization.registerClass(TeamData::class.java)
         ConfigurationSerialization.registerClass(BedData::class.java)
         ConfigurationSerialization.registerClass(SpawnerData::class.java)
         ConfigurationSerialization.registerClass(GameData::class.java)
@@ -64,6 +66,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
         ProtocolLibrary.getProtocolManager().removePacketListeners(this)
         dataFile.save()
         ConfigurationSerialization.unregisterClass(Team::class.java)
+        ConfigurationSerialization.unregisterClass(TeamData::class.java)
         ConfigurationSerialization.unregisterClass(BedData::class.java)
         ConfigurationSerialization.unregisterClass(SpawnerData::class.java)
         ConfigurationSerialization.unregisterClass(GameData::class.java)
@@ -87,8 +90,12 @@ class BedwarsPlugin : CoreJavaPlugin() {
 
     private fun registerListeners() {
         registerListener(PlayerMoveListener())
+        registerListener(ExplodeListeners(this))
+        registerListener(BlockPlaceListener(this))
+        registerListener(BlockBreakListener(this))
         registerListener(PlayerQuitListener(this))
         registerListener(PlayerDeathListener(this))
+        registerListener(EntityDamageListener(this))
         registerListener(ItemTransferListener(this))
         registerListener(DamageByOtherListener(this))
         registerListener(PotionConsumeListener(this))

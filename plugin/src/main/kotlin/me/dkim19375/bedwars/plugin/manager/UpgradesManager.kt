@@ -14,10 +14,11 @@ import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
+import org.bukkit.scheduler.BukkitTask
 import java.util.*
 
 @Suppress("MemberVisibilityCanBePrivate")
-class UpgradesManager(plugin: BedwarsPlugin, val game: BedwarsGame) {
+class UpgradesManager(private val plugin: BedwarsPlugin, val game: BedwarsGame) {
     val sharpness = mutableSetOf<Team>()
     val protection = mutableMapOf<Team, Int>()
     val haste = mutableMapOf<Team, Int>()
@@ -26,9 +27,24 @@ class UpgradesManager(plugin: BedwarsPlugin, val game: BedwarsGame) {
     val secondTrap = mutableMapOf<Team, TrapType>()
     val thirdTrap = mutableMapOf<Team, TrapType>()
     private val times = mutableMapOf<UUID, Long>()
+    var task: BukkitTask? = null
 
-    init {
-        Bukkit.getScheduler().runTaskTimer(plugin, {
+    fun stop() {
+        task?.cancel()
+        task = null
+        sharpness.clear()
+        protection.clear()
+        haste.clear()
+        healPool.clear()
+        firstTrap.clear()
+        secondTrap.clear()
+        thirdTrap.clear()
+        times.clear()
+    }
+
+    fun resetTask() {
+        task?.cancel()
+        task = Bukkit.getScheduler().runTaskTimer(plugin, {
             if (game.state != GameState.STARTED) {
                 return@runTaskTimer
             }

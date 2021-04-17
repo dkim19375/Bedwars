@@ -1,7 +1,9 @@
 package me.dkim19375.bedwars.plugin.util
 
+import me.dkim19375.bedwars.plugin.data.LocationWrapper
 import me.dkim19375.bedwars.plugin.enumclass.ArmorType
 import org.bukkit.Bukkit
+import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
@@ -98,3 +100,5 @@ fun Material.isWeapon() = when (this) {
     Material.DIAMOND_SWORD -> true
     else -> false
 }
+
+fun Location.getWrapper() = LocationWrapper(this)

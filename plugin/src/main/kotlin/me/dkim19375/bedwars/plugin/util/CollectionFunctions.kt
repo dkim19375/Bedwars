@@ -11,7 +11,7 @@ fun <V> Map<String, V>.getKeyFromStr(key: String): String? {
 }
 
 fun Collection<String>.containsIgnoreCase(value: String): Boolean {
-    return any { item -> item == value }
+    return any { item -> item.equals(value, ignoreCase = true) }
 }
 
 fun <T> MutableCollection<MutableSet<T>>.getCombinedValues(): List<T> {

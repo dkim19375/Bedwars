@@ -2,6 +2,7 @@ package me.dkim19375.bedwars.plugin.manager
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.GameData
+import me.dkim19375.bedwars.plugin.data.LocationWrapper
 import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.enumclass.SpawnerType
 import me.dkim19375.bedwars.plugin.enumclass.Team
@@ -25,7 +26,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     var state = GameState.LOBBY
         private set
     var countdown = 10 * 20
-    var time = 0
+    var time: Long = 0
     val players = mutableMapOf<Team, MutableSet<UUID>>()
     val playersInLobby = mutableSetOf<UUID>()
     var task: BukkitTask? = null
@@ -34,6 +35,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     val npcManager = NPCManager(plugin, data)
     val upgradesManager = UpgradesManager(plugin, this)
     val spawnerManager = SpawnerManager(plugin, this)
+    val placedBlocks = mutableSetOf<LocationWrapper>()
     var data = data
         private set
         get() {
@@ -67,14 +69,19 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
 
     private fun setupAfterStart() {
         updatePlayers()
+        upgradesManager.resetTask()
         var i = 1
         val teams = data.teams.toList()
         for (uuid in playersInLobby.shuffled()) {
-            val player = Bukkit.getPlayer(uuid)
-            val team = teams[i % teams.size]
+            val player = Bukkit.getPlayer(uuid)?: continue
+            val teamData = teams[i % teams.size]
+            val team = teamData.first
+            val set = players.getOrDefault(team, mutableSetOf())
+            set.add(player.uniqueId)
+            players[team] = set
             i++
-
         }
+        time = System.currentTimeMillis()
         spawnerManager.start()
     }
 
@@ -92,8 +99,14 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         Bukkit.broadcastMessage("The bedwars game has been force stopped!")
         players.clear()
         playersInLobby.clear()
+        task?.cancel()
+        task = null
+        beds.clear()
+        time = 0
         state = GameState.STOPPED
         spawnerManager.runnable?.cancel()
+        upgradesManager.stop()
+        placedBlocks.clear()
         regenerateMap()
     }
 
@@ -160,6 +173,10 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     fun playerKilled(player: Player) {
+        val team = getTeamOfPlayer(player)?: return
+        if (beds.getOrDefault(team, false)) {
+            return
+        }
 
     }
 
@@ -195,9 +212,11 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         return setOf()
     }
 
-    fun getTeamOfPlayer(player: Player): Team? {
+    fun getTeamOfPlayer(player: Player): Team? = getTeamOfPlayer(player.uniqueId)
+
+    fun getTeamOfPlayer(player: UUID): Team? {
         players.forEach { (team, players) ->
-            if (players.contains(player.uniqueId)) {
+            if (players.contains(player)) {
                 return team
             }
         }
