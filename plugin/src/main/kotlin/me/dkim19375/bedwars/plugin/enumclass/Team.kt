@@ -59,7 +59,7 @@ fun Team.getColored(item: ItemStack): ItemStack {
 
 fun String.formatWithColors(color: DyeColor): String {
     val component = Component.text(this, TextColor.color(color.color.asRGB()))
-    return LegacyComponentSerializer.legacyAmpersand().serialize(component) + ChatColor.RESET.toString()
+    return LegacyComponentSerializer.legacySection().serialize(component) + ChatColor.RESET.toString()
 }
 
 fun DyeColor.formatText(text: String): String {

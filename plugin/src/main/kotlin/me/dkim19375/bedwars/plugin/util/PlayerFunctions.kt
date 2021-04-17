@@ -2,7 +2,7 @@ package me.dkim19375.bedwars.plugin.util
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
-import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.kyori.adventure.title.Title
 import net.kyori.adventure.util.Ticks
 import org.bukkit.Bukkit
@@ -50,9 +50,23 @@ fun Player.playSound(sound: Sound, volume: Float = 1.0f, pitch: Float = 1.0f) {
     playSound(location, sound, volume, pitch)
 }
 
-fun Player.sendTitle(title: String? = null, subtitle: String? = null, fadeIn: Int = 10, stay: Int = 50, fadeOut: Int = 10) {
-    val newTitle = Component.text(title?: "")
-    val newSubTitle = Component.text(subtitle?: "")
+fun Player.sendOtherTitle(
+    title: String? = null,
+    subtitle: String? = null,
+    fadeIn: Int = 10,
+    stay: Int = 50,
+    fadeOut: Int = 10
+) = sendTitle(title, subtitle, fadeIn, stay, fadeOut)
+
+fun Player.sendTitle(
+    title: String? = null,
+    subtitle: String? = null,
+    fadeIn: Int = 10,
+    stay: Int = 50,
+    fadeOut: Int = 10
+) {
+    val newTitle = LegacyComponentSerializer.legacySection().deserialize(title ?: "")
+    val newSubTitle = LegacyComponentSerializer.legacySection().deserialize(subtitle ?: "")
     val times =
         Title.Times.of(Ticks.duration(fadeIn.toLong()), Ticks.duration(stay.toLong()), Ticks.duration(fadeOut.toLong()))
     val cTitle = Title.title(newTitle, newSubTitle, times)

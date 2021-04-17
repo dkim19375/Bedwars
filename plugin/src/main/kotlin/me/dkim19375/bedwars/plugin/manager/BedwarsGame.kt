@@ -3,19 +3,18 @@ package me.dkim19375.bedwars.plugin.manager
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.GameData
 import me.dkim19375.bedwars.plugin.data.LocationWrapper
+import me.dkim19375.bedwars.plugin.data.PlayerData
 import me.dkim19375.bedwars.plugin.enumclass.GameState
-import me.dkim19375.bedwars.plugin.enumclass.SpawnerType
 import me.dkim19375.bedwars.plugin.enumclass.Team
 import me.dkim19375.bedwars.plugin.enumclass.formatWithColors
 import me.dkim19375.bedwars.plugin.util.getCombinedValues
 import me.dkim19375.bedwars.plugin.util.getPlayers
+import me.dkim19375.bedwars.plugin.util.sendOtherTitle
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
-import org.bukkit.Location
+import org.bukkit.GameMode
 import org.bukkit.WorldCreator
-import org.bukkit.block.Block
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.scheduler.BukkitTask
 import java.nio.file.Files
@@ -38,9 +37,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     val upgradesManager = UpgradesManager(plugin, this)
     val spawnerManager = SpawnerManager(plugin, this)
     val placedBlocks = mutableSetOf<LocationWrapper>()
-    val beforeLocs = mutableMapOf<UUID, Location>()
-    val beforeInvs = mutableMapOf<UUID, Array<ItemStack>>()
-    val beforeChests = mutableMapOf<UUID, Array<ItemStack>>()
+    val beforeData = mutableMapOf<UUID, PlayerData>()
 
     var data = data
         private set
@@ -87,6 +84,9 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             players[team] = set
             i++
         }
+        for (team in teams) {
+            beds[team.first] = true
+        }
         time = System.currentTimeMillis()
         spawnerManager.start()
     }
@@ -114,9 +114,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         upgradesManager.stop()
         placedBlocks.clear()
         revertBack()
-        beforeChests.clear()
-        beforeInvs.clear()
-        beforeLocs.clear()
+        beforeData.clear()
         regenerateMap()
     }
 
@@ -146,10 +144,16 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     fun isRunning() = state.running
 
     fun updatePlayers() {
+        if (state != GameState.STARTED) {
+            return
+        }
         for (team in players.keys.toList()) {
             for (player in players.getOrDefault(team, setOf()).toList()) {
                 if (Bukkit.getPlayer(player) != null) continue
                 players.getOrDefault(team, mutableSetOf()).remove(player)
+            }
+            if (beds[team] == true && players.getOrDefault(team, setOf()).isEmpty()) {
+                bedBreak(team, null)
             }
         }
     }
@@ -165,9 +169,8 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         }
         playersInLobby.add(player.uniqueId)
         broadcast("${player.displayName}${ChatColor.GREEN} has joined the game! ${playersInLobby.size}/${data.maxPlayers}")
-        beforeChests[player.uniqueId] = player.enderChest.contents.clone()
-        beforeInvs[player.uniqueId] = player.inventory.contents.clone()
-        beforeLocs[player.uniqueId] = player.location.clone()
+        player.gameMode = GameMode.CREATIVE
+        beforeData[player.uniqueId] = PlayerData.getPlayer(player)
         player.enderChest.clear()
         player.inventory.clear()
         player.teleport(data.lobby)
@@ -197,6 +200,30 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     fun playerKilled(player: Player) {
         val team = getTeamOfPlayer(player) ?: return
         if (beds.getOrDefault(team, false)) {
+            val teamData = data.teams[team] ?: return
+            player.inventory.clear()
+            player.gameMode = GameMode.SPECTATOR
+            player.teleport(data.spec)
+            object : BukkitRunnable() {
+                var countDown = 5
+                override fun run() {
+                    if (countDown <= 0) {
+                        player.teleport(teamData.spawn)
+                        player.gameMode = GameMode.SURVIVAL
+                        player.sendOtherTitle("${ChatColor.GREEN}Respawned!")
+                        cancel()
+                        return
+                    }
+                    player.sendOtherTitle(
+                        "${ChatColor.RED}You died!",
+                        "${ChatColor.YELLOW}Respawning in ${ChatColor.GREEN}$countDown",
+                        fadeIn = 0,
+                        stay = 25,
+                        fadeOut = 0
+                    )
+                    countDown--
+                }
+            }.runTaskTimer(plugin, 0L, 20L)
             return
         }
 
@@ -204,18 +231,8 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
 
     fun revertPlayer(uuid: UUID) {
         val player = Bukkit.getPlayer(uuid) ?: return
-        val beforeChest = beforeChests[uuid]
-        if (beforeChest != null) {
-            player.enderChest.contents = beforeChest
-        }
-        val beforeInv = beforeInvs[uuid]
-        if (beforeInv != null) {
-            player.inventory.contents = beforeInv
-        }
-        val beforeLoc = beforeLocs[uuid]
-        if (beforeLoc != null) {
-            player.teleport(beforeLoc)
-        }
+        val data = beforeData[uuid]?: return
+        data.apply(player)
     }
 
     fun leavePlayer(player: Player) {
@@ -233,10 +250,10 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             return
         }
         if (state == GameState.STARTED) {
-            if (getTeamOfPlayer(player) == null) {
-                return
-            }
-
+            val team = getTeamOfPlayer(player) ?: return
+            revertPlayer(player.uniqueId)
+            broadcast("${player.displayName.formatWithColors(team.color)}${ChatColor.RED} has left the game!")
+            updatePlayers()
             return
         }
     }
@@ -301,23 +318,28 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         }
     }
 
-    // SETTING UP
-
-    fun addSpawner(spawner: SpawnerType, location: Location) {
-
-    }
-
-    fun addBed(team: Team, block: Block) {
-
-    }
-
     // DURING GAME EVENTS
 
-    fun bedBreak(team: Team, player: Player) {
+    fun bedBreak(team: Team, player: Player?) {
+        if (beds[team] == false) {
+            return
+        }
+        beds[team] = false
+        getPlayersInTeam(team).getPlayers().forEach { p ->
+            p.sendOtherTitle("${ChatColor.RED}BED DESTROYED!", "You will no longer respawn!")
+        }
+        if (player == null) {
+            broadcast(
+                "${ChatColor.BOLD}BED DESTRUCTION > ${team.displayName.formatWithColors(team.color)}${ChatColor.GRAY}'s " +
+                        "bed was broken!"
+            )
+            return
+        }
         val teamOfPlayer = getTeamOfPlayer(player) ?: return
         broadcast(
-            "${team.displayName.formatWithColors(team.color)}'s bed was broken by " +
-                    "${player.displayName.formatWithColors(teamOfPlayer.color)}!"
+            "${ChatColor.BOLD}BED DESTRUCTION > ${team.displayName.formatWithColors(team.color)}${ChatColor.GRAY}'s " +
+                    "bed was broken by " +
+                    "${player.displayName.formatWithColors(teamOfPlayer.color)}${ChatColor.GRAY}!"
         )
     }
 
