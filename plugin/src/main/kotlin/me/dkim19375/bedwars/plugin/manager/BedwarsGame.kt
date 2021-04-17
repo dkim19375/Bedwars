@@ -79,6 +79,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             val player = Bukkit.getPlayer(uuid) ?: continue
             val teamData = teams[i % teams.size]
             val team = teamData.first
+            player.playerListName = player.name.formatWithColors(team.color)
             val set = players.getOrDefault(team, mutableSetOf())
             set.add(player.uniqueId)
             players[team] = set
@@ -226,7 +227,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             }.runTaskTimer(plugin, 0L, 20L)
             return
         }
-
+        leavePlayer(player)
     }
 
     fun revertPlayer(uuid: UUID) {
@@ -252,20 +253,17 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         if (state == GameState.STARTED) {
             val team = getTeamOfPlayer(player) ?: return
             revertPlayer(player.uniqueId)
+            player.playerListName = player.displayName
             broadcast("${player.displayName.formatWithColors(team.color)}${ChatColor.RED} has left the game!")
             updatePlayers()
             return
         }
     }
 
-    fun getPlayersInGame(): Set<UUID> {
-        if (state == GameState.LOBBY || state == GameState.STARTING) {
-            return playersInLobby.toSet()
-        }
-        if (state == GameState.STARTED) {
-            return players.values.getCombinedValues().toSet()
-        }
-        return setOf()
+    fun getPlayersInGame(): Set<UUID> = when (state) {
+        GameState.LOBBY -> playersInLobby.toSet()
+        GameState.STARTED -> players.values.getCombinedValues().toSet()
+        else -> setOf()
     }
 
     fun getTeamOfPlayer(player: Player): Team? = getTeamOfPlayer(player.uniqueId)

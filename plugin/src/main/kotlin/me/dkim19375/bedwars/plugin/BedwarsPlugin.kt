@@ -35,8 +35,6 @@ class BedwarsPlugin : CoreJavaPlugin() {
         private set
     lateinit var assemble: Assemble
         private set
-    private lateinit var exception: Exception
-    private var disable = false
 
 
     override fun onLoad() {
@@ -101,6 +99,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
         registerListener(PotionConsumeListener(this))
         registerListener(InventoryClickListener(this))
         registerListener(PlayerDropItemListener(this))
+        registerListener(PlayerTeleportListener(this))
         registerListener(PlayerInventoryListener(this))
         registerListener(PlayerItemDamageListener(this))
         registerListener(PlayerCoordsChangeListener(this))
