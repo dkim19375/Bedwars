@@ -72,6 +72,14 @@ class UpgradesManager(plugin: BedwarsPlugin, val game: BedwarsGame) {
         }
     }
 
+    fun addTrap(team: Team, type: TrapType) {
+        when (getLevel(team)) {
+            0 -> firstTrap[team] = type
+            1 -> secondTrap[team] = type
+            2 -> thirdTrap[team] = type
+        }
+    }
+
     fun getLevel(team: Team): Int {
         if (!firstTrap.containsKey(team)) {
             return 0

@@ -112,6 +112,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
             .addLore("${ChatColor.AQUA}Sneak Click to remove from Quick Buy!")
             .asGuiItem { event ->
                 event.isCancelled = true
+                item.type.getShowMethod()
                 if (event.view.player !is Player) {
                     return@asGuiItem
                 }
@@ -207,11 +208,12 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
         return builder.addLore("")
     }
 
-    private fun onClick(item: MainShopItems, event: InventoryClickEvent) {
+    private fun onClick(item: MainShopItems, event: InventoryClickEvent, menuAction: (MainShopGUI) -> Unit) {
         event.isCancelled = true
         if (isSettingQuickBuy) {
             return
         }
+        menuAction(this)
         val playerCostAmount = player.getItemAmount(item.costType.material)
         if (playerCostAmount < item.costAmount) {
             player.sendMessage("${ChatColor.RED}You need ${item.costAmount - playerCostAmount} more ${item.costType.displayname}!")
@@ -226,7 +228,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
         reset()
         setTopRow()
         putGreenGlass(col)
-        for (item in MainShopItems.getByType(ItemType.BLOCKS)) {
+        for (item in MainShopItems.values()) {
             if (item.defaultOnSpawn) {
                 continue
             }
@@ -253,7 +255,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
                         return@asGuiItem
                     }
                 }
-                onClick(item, it)
+                onClick(item, it, item.type.getShowMethod())
             })
         }
         menu.updateTitle(name)
@@ -307,7 +309,17 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
         TOOLS,
         RANGED,
         POTIONS,
-        UTILITY
+        UTILITY;
+
+        fun getShowMethod(): (MainShopGUI) -> Unit = when (this) {
+            BLOCKS -> MainShopGUI::showBlocks
+            MELEE -> MainShopGUI::showMelee
+            ARMOR -> MainShopGUI::showArmor
+            TOOLS -> MainShopGUI::showTools
+            RANGED -> MainShopGUI::showRanged
+            POTIONS -> MainShopGUI::showPotions
+            UTILITY -> MainShopGUI::showUtility
+        }
     }
 
     enum class CostType(val material: Material, val color: ChatColor, val displayname: String) {

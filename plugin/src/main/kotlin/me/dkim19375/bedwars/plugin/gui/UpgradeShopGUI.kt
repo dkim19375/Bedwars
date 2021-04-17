@@ -68,7 +68,10 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
                     "${ChatColor.GRAY}number of traps queued.",
                     "${ChatColor.GRAY}Next trap: ${ChatColor.AQUA}$number Diamond${if (number == 1) "" else "s"}"
                 )
-                .asGuiItem { event -> event.isCancelled = true }
+                .asGuiItem { event ->
+                    event.isCancelled = true
+                    showMainScreen()
+                }
         val game = plugin.gameManager.getGame(player) ?: return default
         val trapType = when (number) {
             1 -> {
@@ -110,7 +113,10 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
                     )
                 }"
             )
-            .asGuiItem { event -> event.isCancelled = true }
+            .asGuiItem { event ->
+                event.isCancelled = true
+                showMainScreen()
+            }
     }
 
     @Suppress("deprecation")
@@ -235,30 +241,95 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
 
     private fun showTrapScreen() {
         reset()
-        menu.updateTitle("Queue a trap")
-        val game = plugin.gameManager.getGame(player)?: return
+        val game = plugin.gameManager.getGame(player) ?: return
         val upgrades = game.upgradesManager
 
         val diamonds = player.getItemAmount(Material.DIAMOND)
-        val first = diamonds >= 1
-        val second = diamonds >= 2
-        val third = diamonds >= 3
         val level = upgrades.getLevel(team)
         val cost = level + 1
+        val hasEnough = diamonds >= cost
+        val enoughStr = hasEnoughBool(hasEnough)
 
-        val itsATrap = ItemBuilder.from(Material.TRIPWIRE_HOOK)
-            .setName("$${ChatColor.RED}It's a trap!")
-            .setLore(
-                itsATrapLore.combine(
-                    listOf(
-                        " ",
-                        "Cost: ${ChatColor.AQUA}$cost Diamond".setGray(),
-                        " ",
-                        hasEnoughBool(diamonds >= cost)
-                    )
-                )
+        val itsATrap =
+            getTrapItem(
+                cost,
+                enoughStr,
+                Material.TRIPWIRE_HOOK,
+                itsATrapLore,
+                TrapType.ITS_A_TRAP.displayName,
+                TrapType.ITS_A_TRAP
             )
+        val counterOffensive =
+            getTrapItem(
+                cost,
+                enoughStr,
+                Material.FEATHER,
+                counterOffensiveLore,
+                TrapType.COUNTER_OFFENSIVE.displayName,
+                TrapType.COUNTER_OFFENSIVE
+            )
+        val alarm = getTrapItem(
+            cost,
+            enoughStr,
+            Material.REDSTONE_TORCH_ON,
+            alarmLore,
+            TrapType.ALARM.displayName,
+            TrapType.ALARM
+        )
+        val mining = getTrapItem(
+            cost,
+            enoughStr,
+            Material.IRON_PICKAXE,
+            fatigueLore,
+            TrapType.MINER_FATIGUE.displayName,
+            TrapType.MINER_FATIGUE
+        )
+        menu.setItem(2, 2, itsATrap)
+        menu.setItem(2, 3, counterOffensive)
+        menu.setItem(2, 4, alarm)
+        menu.setItem(2, 5, mining)
+        menu.updateTitle("Queue a trap")
+        menu.update()
     }
+
+    private fun onTrapClick(trap: TrapType) {
+        val game = plugin.gameManager.getGame(player) ?: return
+        val upgrades = game.upgradesManager
+        val diamonds = player.getItemAmount(Material.DIAMOND)
+        val level = upgrades.getLevel(team)
+        val cost = level + 1
+        if (diamonds < cost) {
+            player.sendMessage("${ChatColor.RED}You need ${cost - diamonds} more Diamond!")
+            player.playSound(Sound.ANVIL_LAND, pitch = 0.8f)
+            return
+        }
+        player.inventory.removeItem(ItemStack(Material.DIAMOND, cost))
+        upgrades.addTrap(team, trap)
+        sendUpgradeMessage(trap.displayName, game)
+    }
+
+    private fun getTrapItem(
+        cost: Int,
+        hasEnough: String,
+        material: Material,
+        firstLore: List<String>,
+        name: String,
+        type: TrapType
+    ): GuiItem = ItemBuilder.from(material)
+        .setName("$${ChatColor.RED}$name")
+        .setLore(firstLore.combine(getCostList(cost, hasEnough)))
+        .asGuiItem {
+            it.isCancelled = true
+            onTrapClick(type)
+            showTrapScreen()
+        }
+
+    private fun getCostList(cost: Int, hasEnough: String): List<String> = listOf(
+        " ",
+        "Cost: ${ChatColor.AQUA}$cost Diamond".setGray(),
+        " ",
+        hasEnough
+    )
 
     private fun hasEnoughBool(bool: Boolean): String {
         if (bool) {
@@ -270,13 +341,14 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
     private fun onClick(type: UpgradeType) {
         val game = plugin.gameManager.getGame(player) ?: return
         val upgrades = game.upgradesManager
-        val playerItems = player.getItemAmount(Material.DIAMOND)
+        showMainScreen()
 
         when (type) {
             UpgradeType.SHARPNESS -> {
                 if (!verifyItems(upgrades.sharpness.contains(team), 4)) {
                     return
                 }
+                player.inventory.removeItem(ItemStack(Material.DIAMOND, 4))
                 upgrades.sharpness.add(team)
                 sendUpgradeMessage("Sharpness", game)
                 return
@@ -287,13 +359,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
                 }
                 val level = upgrades.protection.getOrDefault(team, 0)
                 val cost = ProtectionLevel.fromInt(level + 1).cost
-                if (playerItems < cost) {
-                    player.sendMessage("${ChatColor.RED}You need ${cost - playerItems} more Diamond!")
-                    player.playSound(Sound.ANVIL_LAND, pitch = 0.8f)
-                    return
-                }
-                upgrades.protection[team] = level + 1
-                sendUpgradeMessage("Reinforced Armor ${(level + 1).toRomanNumeral()}", game)
+                chargeUpgradable(upgrades.protection, cost, game, "Reinforced Armor")
                 return
             }
             UpgradeType.HASTE -> {
@@ -302,13 +368,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
                 }
                 val level = upgrades.haste.getOrDefault(team, 0)
                 val cost = (level + 1) * 2
-                if (playerItems < cost) {
-                    player.sendMessage("${ChatColor.RED}You need ${cost - playerItems} more Diamond!")
-                    player.playSound(Sound.ANVIL_LAND, pitch = 0.8f)
-                    return
-                }
-                upgrades.haste[team] = level + 1
-                sendUpgradeMessage("Maniac Miner ${(level + 1).toRomanNumeral()}", game)
+                chargeUpgradable(upgrades.haste, cost, game, "Maniac Miner")
                 return
             }
             UpgradeType.HEAL_POOL -> {
@@ -316,10 +376,25 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
                     return
                 }
                 upgrades.healPool.add(team)
+                player.inventory.removeItem(ItemStack(Material.DIAMOND, 1))
                 sendUpgradeMessage("Heal Pool", game)
                 return
             }
         }
+    }
+
+    private fun chargeUpgradable(map: MutableMap<Team, Int>, cost: Int, game: BedwarsGame, name: String) {
+        val level = map.getOrDefault(team, 0)
+        val playerItems = player.getItemAmount(Material.DIAMOND)
+        if (playerItems < cost) {
+            player.sendMessage("${ChatColor.RED}You need ${cost - playerItems} more Diamond!")
+            player.playSound(Sound.ANVIL_LAND, pitch = 0.8f)
+            return
+        }
+        map[team] = level + 1
+        player.inventory.removeItem(ItemStack(Material.DIAMOND, cost))
+        sendUpgradeMessage("$name ${(level + 1).toRomanNumeral()}", game)
+        return
     }
 
     private fun verifyHasPurchase(hasUpgrade: Boolean): Boolean {
