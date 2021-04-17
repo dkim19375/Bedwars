@@ -33,6 +33,8 @@ private fun CommandSender.sendHelpMsgFormatted(label: String, arg: String, descr
 
 fun List<UUID>.getPlayers() = map(Bukkit::getPlayer).filter(Objects::nonNull)
 
+fun Set<UUID>.getPlayers() = map(Bukkit::getPlayer).filter(Objects::nonNull)
+
 fun Player.getItemAmount(type: Material): Int {
     var amount = 0
     val inv = inventory.contents.toList()

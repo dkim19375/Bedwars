@@ -5,13 +5,15 @@ import io.github.thatkawaiisam.assemble.events.AssembleBoardCreateEvent
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.enumclass.formatText
+import me.dkim19375.bedwars.plugin.util.Delay
+import me.dkim19375.bedwars.plugin.util.formatTime
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 
-class ScoreboardManager(@Suppress("unused") private val plugin: BedwarsPlugin) : AssembleAdapter, Listener {
+class ScoreboardManager(private val plugin: BedwarsPlugin) : AssembleAdapter, Listener {
 
     override fun getTitle(player: Player): String {
         plugin.gameManager.getGame(player)?: return ""
@@ -35,7 +37,9 @@ class ScoreboardManager(@Suppress("unused") private val plugin: BedwarsPlugin) :
             return list
         }
         if (game.state != GameState.STARTED) return list
-        for (team in game.data.teams) {
+        list.add("Time: ${ChatColor.GREEN}${Delay.fromTime(game.time).seconds.formatTime()}")
+        list.add(" ")
+        for (team in game.data.teams.keys) {
             val stringBuilder = StringBuilder(team.color.formatText(team.name[0].toString().toUpperCase()))
             stringBuilder.append(" ${ChatColor.WHITE}${team.displayName}: ")
             if (game.getPlayersInTeam(team).isEmpty()) {

@@ -14,8 +14,8 @@ import java.util.*
 class GameManager(plugin: BedwarsPlugin) {
     private val games = mutableMapOf<String, BedwarsGame>()
     val invisPlayers = mutableSetOf<UUID>()
-    val tnt = mutableMapOf<UUID, UUID>()
-    //                      tnt  player
+    val explosives = mutableMapOf<UUID, UUID>()
+    //                        explosive  player
 
     init {
         Bukkit.getScheduler().runTaskTimer(plugin, {

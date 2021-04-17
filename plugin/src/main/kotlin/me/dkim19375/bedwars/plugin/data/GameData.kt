@@ -19,7 +19,8 @@ data class GameData(
     val upgradeVillagers: List<UUID>,
     val spawners: Set<SpawnerData>,
     val beds: Set<BedData>,
-    val spec: Location
+    val spec: Location,
+    val lobby: Location
 ) : ConfigurationSerializable {
 
     fun save(plugin: BedwarsPlugin) = plugin.dataFileManager.setGameData(this)
@@ -34,7 +35,8 @@ data class GameData(
         "upgrade-villagers" to upgradeVillagers.map(UUID::toString),
         "spawners" to spawners.toList(),
         "beds" to beds.toList(),
-        "spec" to spec
+        "spec" to spec,
+        "lobby" to lobby
     )
 
     companion object {
@@ -51,7 +53,8 @@ data class GameData(
                 (map["upgrade-villagers"] as List<String>).map(String::toUUID).toList() as List<UUID>,
                 (map["spawners"] as List<SpawnerData>).toSet(),
                 (map["beds"] as List<BedData>).toSet(),
-                map["spec"] as Location
+                map["spec"] as Location,
+                map["lobby"] as Location
             )
         }
     }

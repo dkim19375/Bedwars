@@ -101,10 +101,10 @@ class BedwarsPlugin : CoreJavaPlugin() {
         registerListener(PotionConsumeListener(this))
         registerListener(InventoryClickListener(this))
         registerListener(PlayerDropItemListener(this))
-        registerListener(PlayerInteractListener(this))
         registerListener(PlayerInventoryListener(this))
         registerListener(PlayerItemDamageListener(this))
         registerListener(PlayerCoordsChangeListener(this))
+        registerListener(EntityDamageByEntityListener(this))
         registerListener(scoreboardManager)
     }
 }

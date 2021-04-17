@@ -14,6 +14,17 @@ fun Int?.zeroNonNull(): Int {
     return this?: 0
 }
 
+fun Int.formatTime() = toLong().formatTime()
+
+fun Long.formatTime(): String {
+    val minutes = this / 60
+    var seconds = (this % 60).toString()
+    if (seconds.length < 2) {
+        seconds = "0$seconds"
+    }
+    return "$minutes:$seconds"
+}
+
 fun Int.limit(limit: Int): Int {
     if (this > limit) {
         return limit

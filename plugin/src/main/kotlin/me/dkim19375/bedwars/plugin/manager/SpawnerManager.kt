@@ -44,6 +44,13 @@ class SpawnerManager(private val plugin: BedwarsPlugin, private val game: Bedwar
         runnable?.runTaskTimer(plugin, 5L, 5L)
     }
 
+    fun reset() {
+        timeFromLast.clear()
+        upgradeLevels.clear()
+        runnable?.cancel()
+        runnable = null
+    }
+
     fun getTimeUntilNextDrop(type: SpawnerType): Delay {
         val fromLast = timeFromLast[type] ?: return Delay.fromSeconds(0)
         val diff = type.getDelay(upgradeLevels.getOrDefault(type, 1)).millis - Delay.fromTime(fromLast).millis

@@ -8,12 +8,14 @@ import me.dkim19375.bedwars.plugin.enumclass.SpawnerType
 import me.dkim19375.bedwars.plugin.enumclass.Team
 import me.dkim19375.bedwars.plugin.enumclass.formatWithColors
 import me.dkim19375.bedwars.plugin.util.getCombinedValues
+import me.dkim19375.bedwars.plugin.util.getPlayers
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.WorldCreator
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.scheduler.BukkitTask
 import java.nio.file.Files
@@ -36,6 +38,10 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     val upgradesManager = UpgradesManager(plugin, this)
     val spawnerManager = SpawnerManager(plugin, this)
     val placedBlocks = mutableSetOf<LocationWrapper>()
+    val beforeLocs = mutableMapOf<UUID, Location>()
+    val beforeInvs = mutableMapOf<UUID, Array<ItemStack>>()
+    val beforeChests = mutableMapOf<UUID, Array<ItemStack>>()
+
     var data = data
         private set
         get() {
@@ -73,7 +79,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         var i = 1
         val teams = data.teams.toList()
         for (uuid in playersInLobby.shuffled()) {
-            val player = Bukkit.getPlayer(uuid)?: continue
+            val player = Bukkit.getPlayer(uuid) ?: continue
             val teamData = teams[i % teams.size]
             val team = teamData.first
             val set = players.getOrDefault(team, mutableSetOf())
@@ -96,7 +102,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     fun forceStop() {
-        Bukkit.broadcastMessage("The bedwars game has been force stopped!")
+        getPlayersInGame().getPlayers().forEach(this::leavePlayer)
         players.clear()
         playersInLobby.clear()
         task?.cancel()
@@ -104,10 +110,20 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         beds.clear()
         time = 0
         state = GameState.STOPPED
-        spawnerManager.runnable?.cancel()
+        spawnerManager.reset()
         upgradesManager.stop()
         placedBlocks.clear()
+        revertBack()
+        beforeChests.clear()
+        beforeInvs.clear()
+        beforeLocs.clear()
         regenerateMap()
+    }
+
+    private fun revertBack() {
+        for (uuid in getPlayersInGame().toSet()) {
+            revertPlayer(uuid)
+        }
     }
 
     fun canStart(force: Boolean): Result {
@@ -149,6 +165,12 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         }
         playersInLobby.add(player.uniqueId)
         broadcast("${player.displayName}${ChatColor.GREEN} has joined the game! ${playersInLobby.size}/${data.maxPlayers}")
+        beforeChests[player.uniqueId] = player.enderChest.contents.clone()
+        beforeInvs[player.uniqueId] = player.inventory.contents.clone()
+        beforeLocs[player.uniqueId] = player.location.clone()
+        player.enderChest.clear()
+        player.inventory.clear()
+        player.teleport(data.lobby)
         if (playersInLobby.size >= data.minPlayers) {
             start(false)
         }
@@ -173,14 +195,31 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     fun playerKilled(player: Player) {
-        val team = getTeamOfPlayer(player)?: return
+        val team = getTeamOfPlayer(player) ?: return
         if (beds.getOrDefault(team, false)) {
             return
         }
 
     }
 
+    fun revertPlayer(uuid: UUID) {
+        val player = Bukkit.getPlayer(uuid) ?: return
+        val beforeChest = beforeChests[uuid]
+        if (beforeChest != null) {
+            player.enderChest.contents = beforeChest
+        }
+        val beforeInv = beforeInvs[uuid]
+        if (beforeInv != null) {
+            player.inventory.contents = beforeInv
+        }
+        val beforeLoc = beforeLocs[uuid]
+        if (beforeLoc != null) {
+            player.teleport(beforeLoc)
+        }
+    }
+
     fun leavePlayer(player: Player) {
+        revertPlayer(player.uniqueId)
         if (state == GameState.LOBBY || state == GameState.STARTING) {
             if (!playersInLobby.contains(player.uniqueId)) {
                 return

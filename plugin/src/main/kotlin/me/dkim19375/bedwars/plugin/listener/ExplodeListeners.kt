@@ -13,8 +13,8 @@ import org.bukkit.event.entity.EntityExplodeEvent
 class ExplodeListeners(private val plugin: BedwarsPlugin) : Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     private fun EntityExplodeEvent.onExplode() {
-        val uuid = plugin.gameManager.tnt[entity.uniqueId] ?: return
-        plugin.gameManager.tnt.remove(entity.uniqueId)
+        val uuid = plugin.gameManager.explosives[entity.uniqueId] ?: return
+        plugin.gameManager.explosives.remove(entity.uniqueId)
         val game = plugin.gameManager.getGame(uuid)
         if (game == null) {
             isCancelled = true

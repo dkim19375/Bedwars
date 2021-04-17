@@ -3,7 +3,6 @@ package me.dkim19375.bedwars.plugin.manager
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.GameData
 import me.dkim19375.bedwars.plugin.enumclass.MainShopItems
-import me.dkim19375.bedwars.plugin.util.safeCast
 import org.bukkit.Bukkit
 import java.util.*
 

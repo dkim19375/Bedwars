@@ -18,6 +18,7 @@ class Delay private constructor(time: Long) : Cloneable {
         return clone(millis)
     }
 
+    @Suppress("MemberVisibilityCanBePrivate")
     fun clone(millis: Long = this.millis): Delay {
         return Delay(millis)
     }

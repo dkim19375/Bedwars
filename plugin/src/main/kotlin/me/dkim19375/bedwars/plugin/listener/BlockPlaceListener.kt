@@ -16,7 +16,7 @@ class BlockPlaceListener(private val plugin: BedwarsPlugin) : Listener {
         if (block.type == Material.TNT) {
             isCancelled = true
             val tnt = block.world.spawn(block.location, TNTPrimed::class.java)
-            plugin.gameManager.tnt[tnt.uniqueId] = player.uniqueId
+            plugin.gameManager.explosives[tnt.uniqueId] = player.uniqueId
             return
         }
         game.placedBlocks.add(LocationWrapper(block.location))
