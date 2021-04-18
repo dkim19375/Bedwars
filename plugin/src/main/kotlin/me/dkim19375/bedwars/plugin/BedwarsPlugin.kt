@@ -11,10 +11,7 @@ import me.dkim19375.bedwars.plugin.data.SpawnerData
 import me.dkim19375.bedwars.plugin.data.TeamData
 import me.dkim19375.bedwars.plugin.enumclass.Team
 import me.dkim19375.bedwars.plugin.listener.*
-import me.dkim19375.bedwars.plugin.manager.DataFileManager
-import me.dkim19375.bedwars.plugin.manager.GameManager
-import me.dkim19375.bedwars.plugin.manager.PacketManager
-import me.dkim19375.bedwars.plugin.manager.ScoreboardManager
+import me.dkim19375.bedwars.plugin.manager.*
 import me.dkim19375.dkim19375core.ConfigFile
 import me.dkim19375.dkim19375core.CoreJavaPlugin
 import me.dkim19375.itemmovedetectionlib.ItemMoveDetectionLib
@@ -62,6 +59,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
     }
 
     override fun onDisable() {
+        gameManager.getGames().values.forEach(BedwarsGame::forceStop)
         ProtocolLibrary.getProtocolManager().removePacketListeners(this)
         dataFile.save()
         ConfigurationSerialization.unregisterClass(Team::class.java)

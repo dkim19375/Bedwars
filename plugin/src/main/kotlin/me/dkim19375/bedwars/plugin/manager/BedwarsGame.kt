@@ -171,10 +171,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         playersInLobby.add(player.uniqueId)
         broadcast("${player.displayName}${ChatColor.GREEN} has joined the game! ${playersInLobby.size}/${data.maxPlayers}")
         player.gameMode = GameMode.CREATIVE
-        beforeData[player.uniqueId] = PlayerData.getPlayer(player)
-        player.enderChest.clear()
-        player.inventory.clear()
-        player.teleport(data.lobby)
+        beforeData[player.uniqueId] = PlayerData.getPlayerAndReset(player, data.lobby)
         if (playersInLobby.size >= data.minPlayers) {
             start(false)
         }

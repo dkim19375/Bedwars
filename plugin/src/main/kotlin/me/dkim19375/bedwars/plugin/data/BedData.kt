@@ -1,13 +1,15 @@
 package me.dkim19375.bedwars.plugin.data
 
 import me.dkim19375.bedwars.plugin.enumclass.Team
+import me.dkim19375.bedwars.plugin.util.getBedHead
 import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.configuration.serialization.ConfigurationSerializable
 import org.bukkit.material.Bed
 
-data class BedData(val team: Team, val location: Location, val face: BlockFace) : ConfigurationSerializable {
+@Suppress("DataClassPrivateConstructor")
+data class BedData private constructor(val team: Team, val location: Location, val face: BlockFace) : ConfigurationSerializable {
     override fun serialize(): Map<String, Any> =
         mapOf(
             "team" to team,
@@ -26,7 +28,7 @@ data class BedData(val team: Team, val location: Location, val face: BlockFace) 
         }
 
         fun getBedData(team: Team, block: Block): BedData {
-            return BedData(team, block.location, (block.state.data as Bed).facing)
+            return BedData(team, block.getBedHead(), (block.state.data as Bed).facing)
         }
     }
 }
