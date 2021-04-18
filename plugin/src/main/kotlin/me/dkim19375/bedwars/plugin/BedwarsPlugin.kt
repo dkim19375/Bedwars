@@ -19,6 +19,7 @@ import me.dkim19375.dkim19375core.ConfigFile
 import me.dkim19375.dkim19375core.CoreJavaPlugin
 import me.dkim19375.itemmovedetectionlib.ItemMoveDetectionLib
 import org.bukkit.configuration.serialization.ConfigurationSerialization
+import org.bukkit.event.Listener
 
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -87,23 +88,15 @@ class BedwarsPlugin : CoreJavaPlugin() {
     }
 
     private fun registerListeners() {
-        registerListener(PlayerMoveListener())
-        registerListener(ExplodeListeners(this))
-        registerListener(BlockPlaceListener(this))
-        registerListener(BlockBreakListener(this))
-        registerListener(PlayerQuitListener(this))
-        registerListener(PlayerDeathListener(this))
-        registerListener(EntityDamageListener(this))
-        registerListener(ItemTransferListener(this))
-        registerListener(DamageByOtherListener(this))
-        registerListener(PotionConsumeListener(this))
-        registerListener(InventoryClickListener(this))
-        registerListener(PlayerDropItemListener(this))
-        registerListener(PlayerTeleportListener(this))
-        registerListener(PlayerInventoryListener(this))
-        registerListener(PlayerItemDamageListener(this))
-        registerListener(PlayerCoordsChangeListener(this))
-        registerListener(EntityDamageByEntityListener(this))
-        registerListener(scoreboardManager)
+        registerListeners(
+            PlayerMoveListener(), ExplodeListeners(this), BlockPlaceListener(this),
+            BlockBreakListener(this), PlayerQuitListener(this), PlayerDeathListener(this),
+            EntityDamageListener(this), ItemTransferListener(this), DamageByOtherListener(this),
+            PotionConsumeListener(this), InventoryClickListener(this), PlayerDropItemListener(this),
+            PlayerTeleportListener(this), PlayerInventoryListener(this), PlayerItemDamageListener(this),
+            PlayerCoordsChangeListener(this), EntityDamageByEntityListener(this), scoreboardManager
+        )
     }
+
+    private fun registerListeners(vararg listeners: Listener) = listeners.forEach(this::registerListener)
 }
