@@ -10,6 +10,15 @@ fun <V> Map<String, V>.getKeyFromStr(key: String): String? {
     return null
 }
 
+fun <V> Map<String, V>.getIgnoreCase(other: String): V? {
+    for (entry in entries) {
+        if (entry.key.equals(other, ignoreCase = true)) {
+            return entry.value
+        }
+    }
+    return null
+}
+
 fun Collection<String>.containsIgnoreCase(value: String): Boolean {
     return any { item -> item.equals(value, ignoreCase = true) }
 }

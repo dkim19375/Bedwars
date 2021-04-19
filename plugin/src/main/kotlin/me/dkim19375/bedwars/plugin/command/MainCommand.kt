@@ -1,9 +1,11 @@
 package me.dkim19375.bedwars.plugin.command
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
+import me.dkim19375.bedwars.plugin.builder.GameBuilder
 import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.enumclass.Permission
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
+import me.dkim19375.bedwars.plugin.util.getIgnoreCase
 import me.dkim19375.bedwars.plugin.util.hasPermission
 import me.dkim19375.bedwars.plugin.util.showHelpMessage
 import org.bukkit.Bukkit
@@ -17,6 +19,7 @@ private const val TOO_LITTLE_ARGS = "Not enough arguments!"
 private const val INVALID_GAME = "That is not a valid game!"
 private const val INVALID_ARG = "Invalid argument!"
 private const val MUST_BE_PLAYER = "You must be a player!"
+private const val NOT_EDIT_MODE = "The game must be in edit mode!"
 
 class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
     @Suppress("PrivatePropertyName")
@@ -228,7 +231,45 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 return true
             }
             "setup" -> {
-                val game = hasPermissionAndValidGame(sender, label, args) ?: return true
+                val game = hasPermissionAndValidGame(sender, label, args, false)
+                val builder: GameBuilder?
+                if (game == null) {
+                    builder = plugin.gameManager.builders.getIgnoreCase(args[1])
+                    if (builder == null) {
+                        sender.showHelpMessage(label, INVALID_GAME)
+                        return true
+                    }
+                }
+                if (args.size < 3) {
+                    sender.showHelpMessage(label, TOO_LITTLE_ARGS)
+                    return true
+                }
+                when (args[2].toLowerCase()) {
+                    "spec" -> {
+
+                    }
+                    "minplayers" -> {
+
+                    }
+                    "shop" -> {
+
+                    }
+                    "upgrades" -> {
+
+                    }
+                    "spawner" -> {
+
+                    }
+                    "team" -> {
+
+                    }
+                    "bed" -> {
+
+                    }
+                    "ready" -> {
+
+                    }
+                }
                 return true
             }
             else -> {
@@ -238,7 +279,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
         }
     }
 
-    private fun hasPermissionAndValidGame(sender: CommandSender, label: String, args: Array<out String>): BedwarsGame? {
+    private fun hasPermissionAndValidGame(sender: CommandSender, label: String, args: Array<out String>, showMsgForGame: Boolean = true): BedwarsGame? {
         if (!sender.hasPermission(Permission.SETUP)) {
             sender.showHelpMessage(label, NO_PERMISSION)
             return null
@@ -248,8 +289,16 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
             return null
         }
         val game = plugin.gameManager.getGame(args[1])
+        if (!showMsgForGame) {
+            return game
+        }
         if (game == null) {
             sender.showHelpMessage(label, INVALID_GAME)
+            return null
+        }
+        if (!game.isEditing()) {
+            sender.showHelpMessage(label, NOT_EDIT_MODE)
+            return null
         }
         return game
     }

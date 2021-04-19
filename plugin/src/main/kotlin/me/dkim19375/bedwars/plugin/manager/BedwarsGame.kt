@@ -125,6 +125,8 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         }
     }
 
+    fun isEditing() = plugin.dataFileManager.isEditing(data)
+
     fun canStart(force: Boolean): Result {
         updatePlayers()
         if (isRunning()) {

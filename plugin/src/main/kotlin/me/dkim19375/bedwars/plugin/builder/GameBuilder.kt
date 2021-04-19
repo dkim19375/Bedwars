@@ -16,33 +16,28 @@ class GameBuilder(private val plugin: BedwarsPlugin) {
     var world: World? = null
     var minPlayers: Int = 2
     var maxPlayers: Int = 8
-    var teams: Map<Team, TeamData>? = null
-    var shopVillagers: List<UUID>? = null
-    var upgradeVillagers: List<UUID>? = null
-    var spawners: Set<SpawnerData>? = null
-    var beds: Set<BedData>? = null
+    var teams: MutableMap<Team, TeamData> = mutableMapOf()
+    val shopVillagers: MutableList<UUID> = mutableListOf()
+    val upgradeVillagers: MutableList<UUID> = mutableListOf()
+    var spawners: MutableSet<SpawnerData> = mutableSetOf()
+    var beds: MutableSet<BedData> = mutableSetOf()
     var spec: Location? = null
     var lobby: Location? = null
 
     fun canBuild() =
         (displayName != null) &&
                 (world != null) &&
-                (teams != null) &&
-                (shopVillagers != null) &&
-                (upgradeVillagers != null) &&
-                (spawners != null) &&
-                (beds != null) &&
+                (teams.isEmpty()) &&
+                (shopVillagers.isEmpty()) &&
+                (upgradeVillagers.isEmpty()) &&
+                (spawners.isEmpty()) &&
+                (beds.isEmpty()) &&
                 (spec != null) &&
                 (lobby != null)
 
     fun build(): GameData? {
         val displayName = displayName ?: return null
         val world = world ?: return null
-        val teams = teams ?: return null
-        val shopVillagers = shopVillagers ?: return null
-        val upgradeVillagers = upgradeVillagers ?: return null
-        val spawners = spawners ?: return null
-        val beds = beds ?: return null
         val spec = spec ?: return null
         val lobby = lobby ?: return null
         return GameData(
