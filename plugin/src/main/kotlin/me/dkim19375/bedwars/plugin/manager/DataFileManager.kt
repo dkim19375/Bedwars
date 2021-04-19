@@ -4,6 +4,7 @@ import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.GameData
 import me.dkim19375.bedwars.plugin.enumclass.MainShopItems
 import org.bukkit.Bukkit
+import org.bukkit.Location
 import java.util.*
 
 class DataFileManager(private val plugin: BedwarsPlugin) {
@@ -39,23 +40,49 @@ class DataFileManager(private val plugin: BedwarsPlugin) {
         save = true
     }
 
+    fun removeGameData(data: GameData) {
+        plugin.dataFile.config.set("game-data.${data.world.name}", null)
+        save = true
+    }
+
     fun getGameData(world: String): GameData? {
         return plugin.dataFile.config.get("game-data.$world") as? GameData
     }
 
     fun getGameDatas(): Set<GameData> {
-        val section = plugin.dataFile.config.getConfigurationSection("game-data")?: return emptySet()
+        val section = plugin.dataFile.config.getConfigurationSection("game-data") ?: return emptySet()
         val dataSet = mutableSetOf<GameData>()
         for (key in section.getKeys(false)) {
             if (Bukkit.getWorld(key) == null) {
                 continue
             }
-            val data = section.get(key)?: continue
+            val data = section.get(key) ?: continue
             if (data !is GameData) {
                 continue
             }
             dataSet.add(data)
         }
         return dataSet.toSet()
+    }
+
+    fun setLobby(location: Location) {
+        plugin.dataFile.config.set("lobby", location)
+        save = true
+    }
+
+    fun getLobby(): Location? {
+        return plugin.dataFile.config.get("lobby") as? Location
+    }
+
+    fun isEditing(data: GameData) = plugin.dataFile.config.getBoolean("editing.${data.world.name}")
+
+    fun setEditing(data: GameData, editing: Boolean) {
+        if (!editing) {
+            plugin.dataFile.config.set("editing.${data.world.name}", null)
+            save = true
+            return
+        }
+        plugin.dataFile.config.set("editing.${data.world.name}", editing)
+        return
     }
 }

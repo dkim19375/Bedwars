@@ -1,9 +1,13 @@
 package me.dkim19375.bedwars.plugin.manager
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
+import me.dkim19375.bedwars.plugin.builder.GameBuilder
+import me.dkim19375.bedwars.plugin.data.GameData
+import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.enumclass.Team
 import me.dkim19375.bedwars.plugin.util.getKeyFromStr
 import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import org.bukkit.World
 import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffectType
@@ -11,8 +15,9 @@ import org.jetbrains.annotations.Contract
 import java.util.*
 
 @Suppress("MemberVisibilityCanBePrivate")
-class GameManager(plugin: BedwarsPlugin) {
+class GameManager(private val plugin: BedwarsPlugin) {
     private val games = mutableMapOf<String, BedwarsGame>()
+    val builders = mutableMapOf<String, GameBuilder>()
     val invisPlayers = mutableSetOf<UUID>()
     val explosives = mutableMapOf<UUID, UUID>()
     //                        explosive  player
@@ -20,7 +25,7 @@ class GameManager(plugin: BedwarsPlugin) {
     init {
         Bukkit.getScheduler().runTaskTimer(plugin, {
             for (uuid in getAllPlayers().toSet()) {
-                val player = Bukkit.getPlayer(uuid)?: continue
+                val player = Bukkit.getPlayer(uuid) ?: continue
                 if (player.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
                     invisPlayers.add(player.uniqueId)
                     continue
@@ -28,11 +33,28 @@ class GameManager(plugin: BedwarsPlugin) {
                 invisPlayers.remove(player.uniqueId)
             }
         }, 20L, 20L)
-        Bukkit.getScheduler().runTask(plugin) {
-            val dataSet = plugin.dataFileManager.getGameDatas()
-            for (data in dataSet) {
-                games[data.world.name] = BedwarsGame(plugin, data)
+        Bukkit.getScheduler().runTask(plugin, this::reloadData)
+    }
+
+    fun save() {
+        for (game in getGames().values) {
+            plugin.dataFileManager.setGameData(game.data)
+        }
+    }
+
+    fun reloadData() {
+        for (game in getRunningGames().values) {
+            game.broadcast("${ChatColor.RED}Reloading data, game stopped.")
+            game.forceStop()
+        }
+        val dataSet = plugin.dataFileManager.getGameDatas()
+        games.clear()
+        for (data in dataSet) {
+            val game = BedwarsGame(plugin, data)
+            if (plugin.dataFileManager.isEditing(data)) {
+                game.state = GameState.STOPPED
             }
+            games[data.world.name] = game
         }
     }
 
@@ -53,13 +75,13 @@ class GameManager(plugin: BedwarsPlugin) {
     }
 
     fun isGameRunning(game: String): Boolean {
-        return (games[games.getKeyFromStr(game)]?: return false).isRunning()
+        return (games[games.getKeyFromStr(game)] ?: return false).isRunning()
     }
 
     @Contract(pure = true, value = "null -> false")
     fun isGameRunning(world: World?): Boolean {
-        world?: return false
-        val gameWorld = getGame(world)?: return false
+        world ?: return false
+        val gameWorld = getGame(world) ?: return false
         return isGameRunning(gameWorld)
     }
 
@@ -74,7 +96,7 @@ class GameManager(plugin: BedwarsPlugin) {
     }
 
     fun getGame(player: UUID): BedwarsGame? {
-        val gameName = getPlayerInGame(player)?: return null
+        val gameName = getPlayerInGame(player) ?: return null
         return getGame(gameName)
     }
 
@@ -91,6 +113,17 @@ class GameManager(plugin: BedwarsPlugin) {
 
     fun getGames(): Map<String, BedwarsGame> = games.toMap()
 
+    fun addGame(world: String, game: BedwarsGame) {
+        games[world] = game
+    }
+
+    fun deleteGame(game: BedwarsGame) = deleteGame(game.data)
+
+    fun deleteGame(game: GameData) {
+        games.remove(game.world.name)
+        plugin.dataFileManager.removeGameData(game)
+    }
+
     fun getRunningGames(): Map<String, BedwarsGame> {
         val map = mutableMapOf<String, BedwarsGame>()
         for (entry in games.entries) {
@@ -102,8 +135,8 @@ class GameManager(plugin: BedwarsPlugin) {
     }
 
     fun getTeamOfPlayer(player: Player): Team? {
-        val gameName = getPlayerInGame(player)?: return null
-        val game = getGame(gameName)?: return null
+        val gameName = getPlayerInGame(player) ?: return null
+        val game = getGame(gameName) ?: return null
         return game.getTeamOfPlayer(player)
     }
 

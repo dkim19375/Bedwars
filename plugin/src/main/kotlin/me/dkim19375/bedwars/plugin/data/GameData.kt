@@ -2,6 +2,7 @@ package me.dkim19375.bedwars.plugin.data
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.enumclass.Team
+import me.dkim19375.bedwars.plugin.manager.BedwarsGame
 import me.dkim19375.bedwars.plugin.util.toUUID
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -23,7 +24,13 @@ data class GameData(
     val lobby: Location
 ) : ConfigurationSerializable {
 
-    fun save(plugin: BedwarsPlugin) = plugin.dataFileManager.setGameData(this)
+    fun save(plugin: BedwarsPlugin) {
+        plugin.dataFileManager.setGameData(this)
+        if (plugin.gameManager.getGame(world) != null) {
+            return
+        }
+        plugin.gameManager.addGame(world.name, BedwarsGame(plugin, this))
+    }
 
     override fun serialize(): Map<String, Any> = mapOf(
         "display-name" to displayName,

@@ -13,7 +13,7 @@ import org.bukkit.material.Colorable
 enum class Team(val color: DyeColor, val displayName: String) : ConfigurationSerializable {
     RED(DyeColor.RED, "Red"),
     YELLOW(DyeColor.YELLOW, "Yellow"),
-    GREEN(DyeColor.LIME, "Lime"),
+    GREEN(DyeColor.LIME, "Green"),
     BLUE(DyeColor.LIGHT_BLUE, "Blue");
 
     override fun serialize(): MutableMap<String, Any> {

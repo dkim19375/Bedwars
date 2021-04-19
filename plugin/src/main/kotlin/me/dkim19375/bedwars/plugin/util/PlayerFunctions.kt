@@ -1,6 +1,8 @@
 package me.dkim19375.bedwars.plugin.util
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
+import me.dkim19375.bedwars.plugin.data.HelpMessage
+import me.dkim19375.bedwars.plugin.enumclass.Permission
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.kyori.adventure.title.Title
@@ -11,24 +13,63 @@ import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.bukkit.permissions.Permissible
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.*
+import kotlin.math.ceil
 
-fun CommandSender.showHelpMessage(label: String, error: String?) {
+val commands = listOf(
+    HelpMessage("help [page]", "Show this help menu", Permission.HELP),
+    HelpMessage("list", "List bedwars maps and games", Permission.LIST),
+    HelpMessage("join <name>", "Join a bedwars game", Permission.JOIN),
+    HelpMessage("queue", "Queue to join a bedwars game", Permission.JOIN),
+    HelpMessage("leave", "Leave a bedwars game", Permission.LEAVE),
+    HelpMessage("reload", "Reload the plugin's config files", Permission.RELOAD),
+    HelpMessage("create <name>", "Create a new bedwars game", Permission.SETUP),
+    HelpMessage("delete <name>", "Delete a bedwars game", Permission.SETUP),
+    HelpMessage("save <name>", "Save a bedwars game", Permission.SETUP),
+    HelpMessage("stop <name>", "Stop a bedwars game", Permission.STOP),
+    HelpMessage("edit <name>", "Prevents a bedwars game from being started (used when editing)", Permission.SETUP),
+    HelpMessage("setup <name> spec", "Set the spectator spot", Permission.SETUP),
+    HelpMessage("setup <name> minplayers [min]", "Set the minimum players", Permission.SETUP),
+    HelpMessage("setup <name> maxplayers [max]", "Set the maximum players", Permission.SETUP),
+    HelpMessage("setup <name> shop add", "Set the villager being looked at as a shop", Permission.SETUP),
+    HelpMessage("setup <name> shop remove", "Removes the villager being looked at as a shop", Permission.SETUP),
+    HelpMessage("setup <name> upgrades add", "Set the villager being looked at as an upgrade shop", Permission.SETUP),
+    HelpMessage("setup <name> upgrades remove", "Removes the villager being looked at as an upgrade shop", Permission.SETUP),
+    HelpMessage("setup <name> spawner add <iron/gold/diamond/emerald>", "Add a spawner", Permission.SETUP),
+    HelpMessage("setup <name> spawner remove", "Removes a spawner within 5 blocks", Permission.SETUP),
+    HelpMessage("setup <name> team", "Get the current teams", Permission.SETUP),
+    HelpMessage("setup <name> team add <color>", "Create a team", Permission.SETUP),
+    HelpMessage("setup <name> team remove <color>", "Remove a team", Permission.SETUP),
+    HelpMessage("setup <name> bed add <color>", "Set the bed of the team color", Permission.SETUP),
+    HelpMessage("setup <name> bed remove <color>", "Unsets the bed of the team color", Permission.SETUP),
+    HelpMessage("setup <name> ready", "Detects if the game can be saved", Permission.SETUP),
+)
+
+fun CommandSender.showHelpMessage(label: String, error: String?, page: Int = 1) {
     sendMessage("${ChatColor.DARK_BLUE}------------------------------------------------")
-    sendMessage("${ChatColor.GREEN}Bedwars Help Page")
-    sendHelpMsgFormatted(label, "help", "Show this help menu")
-    sendHelpMsgFormatted(label, "list", "List bedwars maps and games")
-    sendHelpMsgFormatted(label, "create <name>", "Create a new bedwars game")
-    sendHelpMsgFormatted(label, "delete <name>", "Delete a bedwars game")
+    sendMessage("${ChatColor.GREEN}Bedwars Help Page: $page/${getMaxHelpPages()}  <> = required  [] = optional")
+    val newCommands = commands.filter { msg -> hasPermission(msg.permission) }
+    for (i in ((page - 1) * 7) until page * 7) {
+        sendHelpMsgFormatted(label, newCommands[i])
+    }
     error?.let {
         sendMessage("${ChatColor.RED}$it")
     }
     sendMessage("${ChatColor.DARK_BLUE}------------------------------------------------")
 }
 
-private fun CommandSender.sendHelpMsgFormatted(label: String, arg: String, description: String) {
-    sendMessage("${ChatColor.AQUA}/$label $arg - ${ChatColor.GOLD}$description")
+fun Permissible.getMaxHelpPages(): Int {
+    val newCommands = commands.filter { msg -> hasPermission(msg.permission) }
+    return ceil(newCommands.size.toDouble() / 7.0).toInt()
+}
+
+private fun CommandSender.sendHelpMsgFormatted(label: String, message: HelpMessage) {
+    if (!hasPermission(message.permission)) {
+        return
+    }
+    sendMessage("${ChatColor.AQUA}/$label ${message.arg} - ${ChatColor.GOLD}${message.description}")
 }
 
 fun List<UUID>.getPlayers() = map(Bukkit::getPlayer).filter(Objects::nonNull)
@@ -45,6 +86,8 @@ fun Player.getItemAmount(type: Material): Int {
     }
     return amount
 }
+
+fun Permissible.hasPermission(permission: Permission) = hasPermission(permission.permission)
 
 fun Player.playSound(sound: Sound, volume: Float = 1.0f, pitch: Float = 1.0f) {
     playSound(location, sound, volume, pitch)

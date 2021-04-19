@@ -9,7 +9,13 @@ class LocationWrapper(loc: Location) {
     val z: Int = loc.blockZ
     val world: World = loc.world
 
+    @Suppress("MemberVisibilityCanBePrivate")
     fun getLocation() = Location(world, x.toDouble(), y.toDouble(), z.toDouble())
+
+    fun getDistance(other: LocationWrapper): Double = getDistance(other.getLocation())
+
+    @Suppress("MemberVisibilityCanBePrivate")
+    fun getDistance(other: Location): Double = getLocation().distance(other)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

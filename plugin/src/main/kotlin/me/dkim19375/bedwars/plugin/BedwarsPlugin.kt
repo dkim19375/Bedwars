@@ -60,6 +60,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
 
     override fun onDisable() {
         gameManager.getGames().values.forEach(BedwarsGame::forceStop)
+        gameManager.save()
         ProtocolLibrary.getProtocolManager().removePacketListeners(this)
         dataFile.save()
         ConfigurationSerialization.unregisterClass(Team::class.java)
@@ -68,6 +69,11 @@ class BedwarsPlugin : CoreJavaPlugin() {
         ConfigurationSerialization.unregisterClass(SpawnerData::class.java)
         ConfigurationSerialization.unregisterClass(GameData::class.java)
         unregisterConfig(dataFile)
+    }
+
+    override fun reloadConfig() {
+        super.reloadConfig()
+        gameManager.reloadData()
     }
 
     private fun initVariables() {
@@ -92,7 +98,8 @@ class BedwarsPlugin : CoreJavaPlugin() {
             EntityDamageListener(this), ItemTransferListener(this), DamageByOtherListener(this),
             PotionConsumeListener(this), InventoryClickListener(this), PlayerDropItemListener(this),
             PlayerTeleportListener(this), PlayerInventoryListener(this), PlayerItemDamageListener(this),
-            PlayerCoordsChangeListener(this), EntityDamageByEntityListener(this), scoreboardManager
+            PlayerCoordsChangeListener(this), EntityDamageByEntityListener(this), CraftItemListener(this),
+            scoreboardManager
         )
     }
 

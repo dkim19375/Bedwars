@@ -23,12 +23,14 @@ data class PlayerData(
         fun getPlayer(player: Player) =
             PlayerData(player.gameMode, player.inventory.contents, player.enderChest.contents, player.location)
 
-        fun getPlayerAndReset(player: Player, location: Location, gamemode: GameMode = GameMode.SURVIVAL): PlayerData {
+        fun getPlayerAndReset(player: Player, location: Location?, gamemode: GameMode = GameMode.SURVIVAL): PlayerData {
             val data = getPlayer(player)
             player.gameMode = gamemode
             player.inventory.clear()
             player.enderChest.clear()
-            player.teleport(location)
+            if (location != null) {
+                player.teleport(location)
+            }
             return data
         }
     }

@@ -1,5 +1,6 @@
 package me.dkim19375.bedwars.plugin.builder
 
+import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.BedData
 import me.dkim19375.bedwars.plugin.data.GameData
 import me.dkim19375.bedwars.plugin.data.SpawnerData
@@ -10,7 +11,7 @@ import org.bukkit.World
 import java.util.*
 
 @Suppress("MemberVisibilityCanBePrivate")
-class GameBuilder {
+class GameBuilder(private val plugin: BedwarsPlugin) {
     var displayName: String? = null
     var world: World? = null
     var minPlayers: Int = 2
@@ -21,6 +22,7 @@ class GameBuilder {
     var spawners: Set<SpawnerData>? = null
     var beds: Set<BedData>? = null
     var spec: Location? = null
+    var lobby: Location? = null
 
     fun canBuild() =
         (displayName != null) &&
@@ -30,7 +32,8 @@ class GameBuilder {
                 (upgradeVillagers != null) &&
                 (spawners != null) &&
                 (beds != null) &&
-                (spec != null)
+                (spec != null) &&
+                (lobby != null)
 
     fun build(): GameData? {
         val displayName = displayName ?: return null
@@ -41,6 +44,7 @@ class GameBuilder {
         val spawners = spawners ?: return null
         val beds = beds ?: return null
         val spec = spec ?: return null
+        val lobby = lobby ?: return null
         return GameData(
             displayName,
             world,
@@ -51,7 +55,8 @@ class GameBuilder {
             upgradeVillagers,
             spawners,
             beds,
-            spec
+            spec,
+            lobby
         )
     }
 

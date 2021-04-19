@@ -25,7 +25,6 @@ import java.util.*
 @Suppress("JoinDeclarationAndAssignment", "MemberVisibilityCanBePrivate")
 class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     var state = GameState.LOBBY
-        private set
     var countdown = 10 * 20
     var time: Long = 0
     val players = mutableMapOf<Team, MutableSet<UUID>>()
@@ -117,6 +116,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         revertBack()
         beforeData.clear()
         regenerateMap()
+        state = GameState.LOBBY
     }
 
     private fun revertBack() {
@@ -160,7 +160,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     fun addPlayer(player: Player): Result {
-        if (state != GameState.STARTING) {
+        if (state != GameState.LOBBY) {
             if (isRunning()) {
                 return Result.GAME_RUNNING
             }
@@ -171,7 +171,11 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         playersInLobby.add(player.uniqueId)
         broadcast("${player.displayName}${ChatColor.GREEN} has joined the game! ${playersInLobby.size}/${data.maxPlayers}")
         player.gameMode = GameMode.CREATIVE
-        beforeData[player.uniqueId] = PlayerData.getPlayerAndReset(player, data.lobby)
+        val lobby = plugin.dataFileManager.getLobby()
+        beforeData[player.uniqueId] = PlayerData.getPlayerAndReset(
+            player,
+            if (plugin.config.getBoolean("use-main-lobby") && lobby != null) lobby else data.lobby
+        )
         if (playersInLobby.size >= data.minPlayers) {
             start(false)
         }
@@ -229,7 +233,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
 
     fun revertPlayer(uuid: UUID) {
         val player = Bukkit.getPlayer(uuid) ?: return
-        val data = beforeData[uuid]?: return
+        val data = beforeData[uuid] ?: return
         data.apply(player)
     }
 
