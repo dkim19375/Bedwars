@@ -11,13 +11,12 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable
 import java.util.*
 
 data class GameData(
-    val displayName: String,
     val world: World,
     val minPlayers: Int = 2,
     val maxPlayers: Int = 8,
     val teams: Map<Team, TeamData>,
-    val shopVillagers: List<UUID>,
-    val upgradeVillagers: List<UUID>,
+    val shopVillagers: Set<UUID>,
+    val upgradeVillagers: Set<UUID>,
     val spawners: Set<SpawnerData>,
     val beds: Set<BedData>,
     val spec: Location,
@@ -33,7 +32,6 @@ data class GameData(
     }
 
     override fun serialize(): Map<String, Any> = mapOf(
-        "display-name" to displayName,
         "world" to world.name,
         "min-players" to minPlayers,
         "max-players" to maxPlayers,
@@ -51,13 +49,14 @@ data class GameData(
         @JvmStatic
         fun deserialize(map: Map<String, Any>): GameData {
             return GameData(
-                map["display-name"] as String,
                 Bukkit.getWorld(map["world"] as String),
                 Integer.valueOf(map["min-players"] as String),
                 Integer.valueOf(map["max-players"] as String),
                 (map["teams"] as Map<Team, TeamData>).toMap(),
-                (map["shop-villagers"] as List<String>).map(String::toUUID).toList() as List<UUID>,
-                (map["upgrade-villagers"] as List<String>).map(String::toUUID).toList() as List<UUID>,
+                (map["shop-villagers"] as List<String>).map(String::toUUID).filter(Objects::nonNull).map { i -> i!! }
+                    .toSet(),
+                (map["upgrade-villagers"] as List<String>).map(String::toUUID).filter(Objects::nonNull).map { i -> i!! }
+                    .toSet(),
                 (map["spawners"] as List<SpawnerData>).toSet(),
                 (map["beds"] as List<BedData>).toSet(),
                 map["spec"] as Location,

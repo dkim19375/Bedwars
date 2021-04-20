@@ -25,7 +25,7 @@ class ScoreboardManager(private val plugin: BedwarsPlugin) : AssembleAdapter, Li
         val list = mutableListOf<String>()
         list.add(" ")
         if (game.state == GameState.LOBBY || game.state == GameState.STARTING) {
-            list.add("Map: ${ChatColor.GREEN}${game.data.displayName}")
+            list.add("Map: ${ChatColor.GREEN}${game.data.world.name}")
             list.add("Players: ${ChatColor.GREEN}${game.playersInLobby.size}/${game.data.maxPlayers}")
             if (game.task != null) {
                 list.add(" ")

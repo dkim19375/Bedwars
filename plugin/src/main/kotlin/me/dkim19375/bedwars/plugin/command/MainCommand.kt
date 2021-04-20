@@ -144,7 +144,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                     sender.sendMessage("${ChatColor.RED}Could not find any games!")
                     return true
                 }
-                sender.sendMessage("${ChatColor.GREEN}Successfully found a game: ${maxGame.first.data.displayName}!")
+                sender.sendMessage("${ChatColor.GREEN}Successfully found a game: ${maxGame.first.data.world.name}!")
                 maxGame.first.addPlayer(sender)
                 return true
             }
