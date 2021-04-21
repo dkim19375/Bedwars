@@ -14,5 +14,6 @@ enum class ErrorMessages(val message: String) {
     MUST_BE_PLAYER("${ChatColor.RED}You must be a player!"),
     NOT_EDIT_MODE("${ChatColor.RED}The game must be in edit mode!"),
     INVALID_WORLD("${ChatColor.RED}The world is not valid!"),
-    INVALID_TEAM("${ChatColor.RED}That is not a valid team!")
+    INVALID_TEAM("${ChatColor.RED}That is not a valid team!"),
+    GAME_ALREADY_EXISTS("${ChatColor.RED}That game already exists!"),
 }

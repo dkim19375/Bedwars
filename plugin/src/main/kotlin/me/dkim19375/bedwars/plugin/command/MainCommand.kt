@@ -3,6 +3,7 @@ package me.dkim19375.bedwars.plugin.command
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.builder.DataEditor
 import me.dkim19375.bedwars.plugin.data.BedData
+import me.dkim19375.bedwars.plugin.data.SerializablePair
 import me.dkim19375.bedwars.plugin.data.SpawnerData
 import me.dkim19375.bedwars.plugin.data.TeamData
 import me.dkim19375.bedwars.plugin.enumclass.*
@@ -116,7 +117,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                     sender.sendMessage(ErrorMessages.MUST_BE_PLAYER.message)
                     return true
                 }
-                var maxGame: Pair<BedwarsGame, Int>? = null
+                var maxGame: SerializablePair<BedwarsGame, Int>? = null
                 for (game in plugin.gameManager.getGames().values) {
                     if (game.state != GameState.LOBBY) {
                         continue
@@ -125,12 +126,12 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                         continue
                     }
                     if (maxGame == null) {
-                        maxGame = Pair(game, game.data.maxPlayers - game.getPlayersInGame().size)
+                        maxGame = SerializablePair(game, game.data.maxPlayers - game.getPlayersInGame().size)
                         continue
                     }
                     val other = maxGame.second
                     if (other > game.data.maxPlayers - game.getPlayersInGame().size) {
-                        maxGame = Pair(game, game.data.maxPlayers - game.getPlayersInGame().size)
+                        maxGame = SerializablePair(game, game.data.maxPlayers - game.getPlayersInGame().size)
                     }
                 }
                 if (maxGame == null) {
@@ -175,7 +176,24 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                     sender.sendMessage(ErrorMessages.NO_PERMISSION.message)
                     return true
                 }
-                TODO()
+                if (sender !is Player) {
+                    sender.sendMessage(ErrorMessages.MUST_BE_PLAYER.message)
+                    return true
+                }
+                val world = sender.world
+                val worldName = world.name
+                if (plugin.gameManager.getGame(worldName) != null) {
+                    sender.sendMessage(ErrorMessages.GAME_ALREADY_EXISTS.message)
+                    return true
+                }
+                if (plugin.gameManager.builders.keys.containsIgnoreCase(worldName)) {
+                    sender.sendMessage(ErrorMessages.GAME_ALREADY_EXISTS.message)
+                    return true
+                }
+                val builder = DataEditor(plugin, null, null, world).save()
+                plugin.gameManager.builders[worldName] = builder
+                sender.sendMessage("${ChatColor.GREEN}Successfully created a game!")
+                return true
             }
             "delete" -> {
                 if (!sender.hasPermission(Permission.SETUP)) {
@@ -230,11 +248,11 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 return true
             }
             "setup" -> {
-                val editor = getEditorFromWorld(args[1], sender) ?: return true
                 if (args.size < 3) {
                     sender.sendMessage(ErrorMessages.TOO_LITTLE_ARGS.message)
                     return true
                 }
+                val editor = getEditorFromWorld(args[1], sender) ?: return true
                 if (sender !is Player) {
                     sender.sendMessage(ErrorMessages.MUST_BE_PLAYER.message)
                     return true
@@ -266,12 +284,19 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                             return true
                         }
                         sender.sendMessage("${ChatColor.GREEN}Saving the data...")
+                        gameData.save(plugin)
                         val game = BedwarsGame(plugin, gameData)
                         game.saveMap()
                         plugin.dataFileManager.setEditing(gameData, false)
                         plugin.gameManager.builders.remove(gameData.world.name)
                         plugin.gameManager.addGame(game)
                         sender.sendMessage("${ChatColor.GREEN}Successfully saved! (Map: ${game.data.world.name})")
+                        return true
+                    }
+                    "lobby" -> {
+                        editor.data.lobby = sender.location
+                        editor.save()
+                        sender.sendMessage("${ChatColor.GREEN}Successfully set the lobby!")
                         return true
                     }
                     "spec" -> {
@@ -356,18 +381,18 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                             sender.sendMessage(ErrorMessages.INVALID_ARG.message)
                             return true
                         }
-                        var closestSpawner: Pair<SpawnerData, Double>? = null
+                        var closestSpawner: SerializablePair<SpawnerData, Double>? = null
                         for (spawner in editor.data.spawners) {
                             val distance = spawner.location.distance(sender.location)
                             if (distance > 5) {
                                 continue
                             }
                             if (closestSpawner == null) {
-                                closestSpawner = Pair(spawner, distance)
+                                closestSpawner = SerializablePair(spawner, distance)
                                 continue
                             }
                             if (distance < closestSpawner.second) {
-                                closestSpawner = Pair(spawner, distance)
+                                closestSpawner = SerializablePair(spawner, distance)
                             }
                         }
                         if (closestSpawner == null) {
@@ -453,13 +478,9 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                                 sender.sendMessage(ErrorMessages.INVALID_TEAM.message)
                                 return true
                             }
-                            val block = sender.getTargetBlock(emptySet(), 5)
-                            if (block == null) {
-                                sender.sendMessage("${ChatColor.RED}You are not looking at a bed!")
-                                return true
-                            }
-                            if (block.type != Material.BED_BLOCK) {
-                                sender.sendMessage("${ChatColor.RED}You are not looking at a bed!")
+                            val block = sender.location.block
+                            if (!(block.type == Material.BED_BLOCK || block.type == Material.BED)) {
+                                sender.sendMessage("${ChatColor.RED}You are not standing on a bed!")
                                 return true
                             }
                             for (bed in editor.data.beds) {

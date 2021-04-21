@@ -15,7 +15,7 @@ class BlockBreakListener(private val plugin: BedwarsPlugin) : Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private fun BlockBreakEvent.onBreak() {
         val game = plugin.gameManager.getGame(player) ?: return
-        if (block.type == Material.BED_BLOCK) {
+        if (block.type == Material.BED_BLOCK || block.type == Material.BED) {
             val team = game.getTeamOfPlayer(player)?: return
             val location = block.getBedHead()
             val beds = game.data.beds

@@ -1,5 +1,7 @@
 package me.dkim19375.bedwars.plugin.util
 
+import me.dkim19375.bedwars.plugin.data.SerializablePair
+
 
 fun <V> Map<String, V>.getKeyFromStr(key: String): String? {
     for (str in keys) {
@@ -8,6 +10,24 @@ fun <V> Map<String, V>.getKeyFromStr(key: String): String? {
         }
     }
     return null
+}
+
+fun <T> List<T>.getSafe(index: Int): T? {
+    if (index >= size) {
+        return null
+    }
+    if (index < 0) {
+        return null
+    }
+    return get(index)
+}
+
+fun <K, V> serializedPairMapOf(vararg pairs: SerializablePair<K, V>): Map<K, V> {
+    val newPairs = mutableListOf<Pair<K, V>>()
+    for (pair in pairs) {
+        newPairs.add(pair.toPair())
+    }
+    return mapOf(*newPairs.toTypedArray())
 }
 
 fun <V> Map<String, V>.getIgnoreCase(other: String): V? {

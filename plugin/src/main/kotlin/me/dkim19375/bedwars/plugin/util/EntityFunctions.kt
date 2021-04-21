@@ -2,6 +2,7 @@ package me.dkim19375.bedwars.plugin.util
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.HelpMessage
+import me.dkim19375.bedwars.plugin.data.SerializablePair
 import me.dkim19375.bedwars.plugin.enumclass.Permission
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
@@ -23,16 +24,17 @@ val commands = listOf(
     HelpMessage("help [page]", "Show this help menu", Permission.HELP),
     HelpMessage("list", "List bedwars maps and games", Permission.LIST),
     HelpMessage("join <name>", "Join a bedwars game", Permission.JOIN),
-    HelpMessage("queue", "Queue to join a bedwars game", Permission.JOIN),
+    HelpMessage("quickjoin", "Quickly a bedwars game", Permission.JOIN),
     HelpMessage("leave", "Leave a bedwars game", Permission.LEAVE),
     HelpMessage("reload", "Reload the plugin's config files", Permission.RELOAD),
-    HelpMessage("create <name>", "Create a new bedwars game", Permission.SETUP),
+    HelpMessage("create", "Create a new bedwars game", Permission.SETUP),
     HelpMessage("delete <name>", "Delete a bedwars game", Permission.SETUP),
     HelpMessage("save <name>", "Save a bedwars game", Permission.SETUP),
     HelpMessage("stop <name>", "Stop a bedwars game", Permission.STOP),
     HelpMessage("edit <name>", "Prevents a bedwars game from being started (used when editing)", Permission.SETUP),
     HelpMessage("setup <name> ready", "Detects if the game can be saved", Permission.SETUP),
     HelpMessage("setup <name> finish", "Finishes a game setup, also saves it", Permission.SETUP),
+    HelpMessage("setup <name> lobby", "Set the lobby location", Permission.SETUP),
     HelpMessage("setup <name> spec", "Set the spectator spot", Permission.SETUP),
     HelpMessage("setup <name> minplayers [min]", "Set the minimum players", Permission.SETUP),
     HelpMessage("setup <name> maxplayers [max]", "Set the maximum players", Permission.SETUP),
@@ -45,8 +47,8 @@ val commands = listOf(
     HelpMessage("setup <name> team", "Get the current teams", Permission.SETUP),
     HelpMessage("setup <name> team add <color>", "Create a team, with the spawn at your location", Permission.SETUP),
     HelpMessage("setup <name> team remove <color>", "Remove a team", Permission.SETUP),
-    HelpMessage("setup <name> bed add <color>", "Set the bed of the team color of the bed you are looking at (5 blocks)", Permission.SETUP),
-    HelpMessage("setup <name> bed remove <color>", "Unsets the bed of the team color of the bed you are looking at (5 blocks)", Permission.SETUP),
+    HelpMessage("setup <name> bed add <color>", "Set the bed of the team color of the bed you are standing on", Permission.SETUP),
+    HelpMessage("setup <name> bed remove <color>", "Unsets the bed of the team color", Permission.SETUP),
 )
 
 fun CommandSender.showHelpMessage(label: String, page: Int = 1) = showHelpMessage(label, null, page)
@@ -57,7 +59,8 @@ fun CommandSender.showHelpMessage(label: String, error: String?, page: Int = 1) 
             "Help Page: $page/${getMaxHelpPages()}  <> = required  [] = optional")
     val newCommands = commands.filter { msg -> hasPermission(msg.permission) }
     for (i in ((page - 1) * 7) until page * 7) {
-        sendHelpMsgFormatted(label, newCommands[i])
+        val cmd = newCommands.getSafe(i)?: continue
+        sendHelpMsgFormatted(label, cmd)
     }
     error?.let {
         sendMessage("${ChatColor.RED}$it")
@@ -99,7 +102,7 @@ fun Player.playSound(sound: Sound, volume: Float = 1.0f, pitch: Float = 1.0f) {
 }
 
 fun LivingEntity.getLookingAt(distance: Double = 4.0): LivingEntity? {
-    var closest: Pair<LivingEntity, Double>? = null
+    var closest: SerializablePair<LivingEntity, Double>? = null
     for (entity in getNearbyEntities(distance, distance, distance)) {
         if (entity !is LivingEntity) {
             continue
@@ -109,11 +112,11 @@ fun LivingEntity.getLookingAt(distance: Double = 4.0): LivingEntity? {
         }
         val entityDistance = location.distance(entity.location)
         if (closest == null) {
-            closest = Pair(entity, entityDistance)
+            closest = SerializablePair(entity, entityDistance)
             continue
         }
         if (closest.second > entityDistance) {
-            closest = Pair(entity, entityDistance)
+            closest = SerializablePair(entity, entityDistance)
         }
     }
     return closest?.first
