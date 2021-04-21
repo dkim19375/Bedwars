@@ -70,7 +70,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     private fun setupAfterStart() {
-        updatePlayers()
+        update()
         upgradesManager.resetTask()
         var i = 1
         val teams = data.teams.toList()
@@ -128,7 +128,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     fun isEditing() = plugin.dataFileManager.isEditing(data)
 
     fun canStart(force: Boolean): Result {
-        updatePlayers()
+        update()
         if (isRunning()) {
             return Result.GAME_RUNNING
         }
@@ -146,7 +146,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
 
     fun isRunning() = state.running
 
-    fun updatePlayers() {
+    fun update() {
         if (state != GameState.STARTED) {
             return
         }
@@ -158,6 +158,13 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             if (beds[team] == true && players.getOrDefault(team, setOf()).isEmpty()) {
                 bedBreak(team, null)
             }
+        }
+        if (getPlayersInGame().isEmpty()) {
+            throw IllegalStateException("No players in game.. game is still active")
+        }
+        if (getPlayersInGame().size == 1) {
+            val player = Bukkit.getPlayer(getPlayersInGame().first())
+            stop(player, getTeamOfPlayer(player)!!)
         }
     }
 
@@ -258,7 +265,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             revertPlayer(player.uniqueId)
             player.playerListName = player.displayName
             broadcast("${player.displayName.formatWithColors(team.color)}${ChatColor.RED} has left the game!")
-            updatePlayers()
+            update()
             return
         }
     }
@@ -342,6 +349,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
                     "bed was broken by " +
                     "${player.displayName.formatWithColors(teamOfPlayer.color)}${ChatColor.GRAY}!"
         )
+        update()
     }
 
     enum class Result {
