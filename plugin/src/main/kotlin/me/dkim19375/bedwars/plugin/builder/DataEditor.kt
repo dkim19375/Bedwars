@@ -1,9 +1,12 @@
 package me.dkim19375.bedwars.plugin.builder
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
+import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
+import me.dkim19375.bedwars.plugin.util.getIgnoreCase
+import org.bukkit.World
 
-class DataEditor(private val plugin: BedwarsPlugin, game: BedwarsGame?, builder: GameBuilder?, val world: String) {
+class DataEditor(private val plugin: BedwarsPlugin, game: BedwarsGame?, builder: GameBuilder?, val world: World) {
     val data: GameBuilder
     val type: GameDataType
     lateinit var game: BedwarsGame
@@ -13,7 +16,7 @@ class DataEditor(private val plugin: BedwarsPlugin, game: BedwarsGame?, builder:
         if (game == null) {
             type = GameDataType.BUILDER
             if (builder == null) {
-                data = GameBuilder()
+                data = GameBuilder(world)
             } else {
                 data = GameBuilder(
                     builder.world,
@@ -49,11 +52,13 @@ class DataEditor(private val plugin: BedwarsPlugin, game: BedwarsGame?, builder:
     fun save(): GameBuilder {
         val newData = getBuilder()
         if (type != GameDataType.EXISTING) {
+            plugin.gameManager.builders[world.name] = newData
             return newData
         }
         val newGameData = newData.build() ?: return newData
         val newGame = BedwarsGame(plugin, newGameData)
-        plugin.gameManager.addGame(world, newGame)
+        newGame.state = GameState.STOPPED
+        plugin.gameManager.addGame(newGame)
         plugin.dataFileManager.setGameData(newGameData)
         return newData
     }
@@ -71,6 +76,20 @@ class DataEditor(private val plugin: BedwarsPlugin, game: BedwarsGame?, builder:
             data.spec?.clone(),
             data.lobby?.clone()
         )
+    }
+
+    companion object {
+        fun findFromWorld(world: World, plugin: BedwarsPlugin): DataEditor? {
+            val builder = plugin.gameManager.builders.getIgnoreCase(world.name)
+            val game = plugin.gameManager.getGame(world)
+            if (builder == null) {
+                if (game == null) {
+                    return null
+                }
+                return DataEditor(plugin, game, null, world)
+            }
+            return DataEditor(plugin, null, builder, world)
+        }
     }
 
     enum class GameDataType {

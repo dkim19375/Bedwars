@@ -19,7 +19,7 @@ class TabCompletionHandler(private val plugin: BedwarsPlugin) : TabCompleter {
         add("core", "help", "list", "join", "queue", "leave", "reload", "create", "delete", "save", "stop", "setup")
         add("spawners", "iron", "gold", "diamond", "emerald")
         add("colors", *Team.values().map(Team::displayName).toTypedArray())
-        add("setup", "spec", "minplayers", "maxplayers", "shop", "upgrades", "spawner", "team", "bed", "ready", "spec")
+        add("setup", "spec", "minplayers", "maxplayers", "shop", "upgrades", "spawner", "team", "bed", "ready", "spec", "finish")
         add("addRemove", "add", "remove")
     }
 

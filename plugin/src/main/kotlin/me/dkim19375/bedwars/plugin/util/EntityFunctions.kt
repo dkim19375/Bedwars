@@ -12,6 +12,7 @@ import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.permissions.Permissible
 import org.bukkit.plugin.java.JavaPlugin
@@ -30,6 +31,8 @@ val commands = listOf(
     HelpMessage("save <name>", "Save a bedwars game", Permission.SETUP),
     HelpMessage("stop <name>", "Stop a bedwars game", Permission.STOP),
     HelpMessage("edit <name>", "Prevents a bedwars game from being started (used when editing)", Permission.SETUP),
+    HelpMessage("setup <name> ready", "Detects if the game can be saved", Permission.SETUP),
+    HelpMessage("setup <name> finish", "Finishes a game setup, also saves it", Permission.SETUP),
     HelpMessage("setup <name> spec", "Set the spectator spot", Permission.SETUP),
     HelpMessage("setup <name> minplayers [min]", "Set the minimum players", Permission.SETUP),
     HelpMessage("setup <name> maxplayers [max]", "Set the maximum players", Permission.SETUP),
@@ -40,12 +43,13 @@ val commands = listOf(
     HelpMessage("setup <name> spawner add <iron/gold/diamond/emerald>", "Add a spawner", Permission.SETUP),
     HelpMessage("setup <name> spawner remove", "Removes a spawner within 5 blocks", Permission.SETUP),
     HelpMessage("setup <name> team", "Get the current teams", Permission.SETUP),
-    HelpMessage("setup <name> team add <color>", "Create a team", Permission.SETUP),
+    HelpMessage("setup <name> team add <color>", "Create a team, with the spawn at your location", Permission.SETUP),
     HelpMessage("setup <name> team remove <color>", "Remove a team", Permission.SETUP),
-    HelpMessage("setup <name> bed add <color>", "Set the bed of the team color", Permission.SETUP),
-    HelpMessage("setup <name> bed remove <color>", "Unsets the bed of the team color", Permission.SETUP),
-    HelpMessage("setup <name> ready", "Detects if the game can be saved", Permission.SETUP),
+    HelpMessage("setup <name> bed add <color>", "Set the bed of the team color of the bed you are looking at (5 blocks)", Permission.SETUP),
+    HelpMessage("setup <name> bed remove <color>", "Unsets the bed of the team color of the bed you are looking at (5 blocks)", Permission.SETUP),
 )
+
+fun CommandSender.showHelpMessage(label: String, page: Int = 1) = showHelpMessage(label, null, page)
 
 fun CommandSender.showHelpMessage(label: String, error: String?, page: Int = 1) {
     sendMessage("${ChatColor.DARK_BLUE}------------------------------------------------")
@@ -91,6 +95,34 @@ fun Permissible.hasPermission(permission: Permission) = hasPermission(permission
 
 fun Player.playSound(sound: Sound, volume: Float = 1.0f, pitch: Float = 1.0f) {
     playSound(location, sound, volume, pitch)
+}
+
+fun LivingEntity.getLookingAt(distance: Double = 4.0): LivingEntity? {
+    var closest: Pair<LivingEntity, Double>? = null
+    for (entity in getNearbyEntities(distance, distance, distance)) {
+        if (entity !is LivingEntity) {
+            continue
+        }
+        if (!isLookingAt(entity)) {
+            continue
+        }
+        val distance = location.distance(entity.location)
+        if (closest == null) {
+            closest = Pair(entity, distance)
+            continue
+        }
+        if (closest.second > distance) {
+            closest = Pair(entity, distance)
+        }
+    }
+    return closest?.first
+}
+
+fun LivingEntity.isLookingAt(other: LivingEntity): Boolean {
+    val eye = eyeLocation
+    val toEntity = other.eyeLocation.toVector().subtract(eye.toVector())
+    val dot = toEntity.normalize().dot(eye.direction)
+    return dot > 0.99
 }
 
 fun Player.sendOtherTitle(

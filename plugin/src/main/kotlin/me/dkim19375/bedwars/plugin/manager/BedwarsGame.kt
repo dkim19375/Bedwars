@@ -284,7 +284,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         val folder = data.world.worldFolder
         val originalCreator = WorldCreator(data.world.name).copy(data.world)
         Bukkit.unloadWorld(data.world, true)
-        val savedWorld = Paths.get(plugin.dataFolder.absolutePath, "worlds", data.world.name).toFile()
+        val savedWorld = Paths.get(Bukkit.getWorldContainer().absolutePath, data.world.name).toFile()
         Bukkit.getScheduler().runTaskAsynchronously(plugin) {
             savedWorld.delete()
             Files.copy(folder.toPath(), savedWorld.toPath(), StandardCopyOption.REPLACE_EXISTING)

@@ -17,10 +17,10 @@ enum class SpawnerType(val material: Material, val delayFirst: Delay, val delayS
     }
 
     companion object {
-        fun fromString(str: String?): Team? {
+        fun fromString(str: String?): SpawnerType? {
             str ?: return null
             return try {
-                Team.valueOf(str)
+                valueOf(str.toUpperCase())
             } catch (_: IllegalArgumentException) {
                 return null
             }

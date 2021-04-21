@@ -5,11 +5,13 @@ import me.dkim19375.bedwars.plugin.builder.GameBuilder
 import me.dkim19375.bedwars.plugin.data.GameData
 import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.enumclass.Team
+import me.dkim19375.bedwars.plugin.util.getIgnoreCase
 import me.dkim19375.bedwars.plugin.util.getKeyFromStr
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.World
 import org.bukkit.entity.Player
+import org.bukkit.entity.Villager
 import org.bukkit.potion.PotionEffectType
 import org.jetbrains.annotations.Contract
 import java.util.*
@@ -81,19 +83,10 @@ class GameManager(private val plugin: BedwarsPlugin) {
     @Contract(pure = true, value = "null -> false")
     fun isGameRunning(world: World?): Boolean {
         world ?: return false
-        val gameWorld = getGame(world) ?: return false
-        return isGameRunning(gameWorld)
+        return isGameRunning(world.name)
     }
 
-    fun getGame(world: World): String? {
-        for (entry in games.entries) {
-            val gameWorld = entry.value.data.world
-            if (world.uid == gameWorld.uid) {
-                return entry.key
-            }
-        }
-        return null
-    }
+    fun getGame(world: World): BedwarsGame? = getGame(world.name)
 
     fun getGame(player: UUID): BedwarsGame? {
         val gameName = getPlayerInGame(player) ?: return null
@@ -102,19 +95,12 @@ class GameManager(private val plugin: BedwarsPlugin) {
 
     fun getGame(player: Player): BedwarsGame? = getGame(player.uniqueId)
 
-    fun getGame(name: String): BedwarsGame? {
-        games.forEach { (gName, game) ->
-            if (gName.equals(name, ignoreCase = true)) {
-                return game
-            }
-        }
-        return null
-    }
+    fun getGame(name: String): BedwarsGame? = games.getIgnoreCase(name)
 
     fun getGames(): Map<String, BedwarsGame> = games.toMap()
 
-    fun addGame(world: String, game: BedwarsGame) {
-        games[world] = game
+    fun addGame(game: BedwarsGame) {
+        games[game.data.world.name] = game
     }
 
     fun deleteGame(game: BedwarsGame) = deleteGame(game.data)
@@ -122,6 +108,48 @@ class GameManager(private val plugin: BedwarsPlugin) {
     fun deleteGame(game: GameData) {
         games.remove(game.world.name)
         plugin.dataFileManager.removeGameData(game)
+    }
+
+    fun getVillagers() = getShopVillagers().toMutableSet().plus(getUpgradeVillagers()).toSet()
+
+    fun getUpgradeVillagers(): Set<Villager> {
+        val set = mutableSetOf<Villager>()
+        for (game in games.values) {
+            set.addAll(game.npcManager.getUpgradeVillagers())
+        }
+        return set.toSet()
+    }
+
+    fun getShopVillagers(): Set<Villager> {
+        val set = mutableSetOf<Villager>()
+        for (game in games.values) {
+            set.addAll(game.npcManager.getShopVillagers())
+        }
+        return set.toSet()
+    }
+
+    fun getVillagersUUID() = getShopVillagersUUID().toMutableSet().plus(getUpgradeVillagersUUID()).toSet()
+
+    fun getUpgradeVillagersUUID(): Set<UUID> {
+        val set = mutableSetOf<UUID>()
+        for (game in games.values) {
+            set.addAll(game.npcManager.getUpgradeVillagersUUID())
+        }
+        return set.toSet()
+    }
+
+    fun removeVillager(villager: UUID) {
+        for (game in games.values) {
+            game.npcManager.removeVillager(villager)
+        }
+    }
+
+    fun getShopVillagersUUID(): Set<UUID> {
+        val set = mutableSetOf<UUID>()
+        for (game in games.values) {
+            set.addAll(game.npcManager.getShopVillagersUUID())
+        }
+        return set.toSet()
     }
 
     fun getRunningGames(): Map<String, BedwarsGame> {

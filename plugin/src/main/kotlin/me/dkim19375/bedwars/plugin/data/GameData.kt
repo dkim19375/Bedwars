@@ -28,7 +28,7 @@ data class GameData(
         if (plugin.gameManager.getGame(world) != null) {
             return
         }
-        plugin.gameManager.addGame(world.name, BedwarsGame(plugin, this))
+        plugin.gameManager.addGame(BedwarsGame(plugin, this))
     }
 
     override fun serialize(): Map<String, Any> = mapOf(

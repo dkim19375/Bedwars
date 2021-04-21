@@ -20,6 +20,10 @@ fun ItemStack.getNBT(): NBTCompound {
     return NBTItem(this)
 }
 
+fun <T : Entity> T.addAI() {
+    getVanillaNBT().setInteger("NoAI", 0)
+}
+
 fun <T : Entity> T.removeAI() {
     getVanillaNBT().setInteger("NoAI", 1)
 }

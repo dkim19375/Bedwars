@@ -32,7 +32,7 @@ enum class Team(val color: DyeColor, val displayName: String) : ConfigurationSer
         fun fromString(str: String?): Team? {
             str ?: return null
             return try {
-                valueOf(str)
+                valueOf(str.toUpperCase())
             } catch (_: IllegalArgumentException) {
                 return null
             }
