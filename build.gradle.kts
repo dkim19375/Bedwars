@@ -2,6 +2,7 @@
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
     id("com.github.johnrengelman.shadow") version "6.1.0"
@@ -25,6 +26,7 @@ tasks {
         relocate("kotlin", "$basePackage.kotlin")
         relocate("me.mattstudios.mfgui", "$basePackage.mfgui")
         relocate("me.dkim19375.itemmovedetectionlib", "$basePackage.itemmovedetectionlib")
+        relocate("me.katsumag.itemactionslib", "$basePackage.itemactionslib")
         finalizedBy("copyFileToServer")
     }
 }
