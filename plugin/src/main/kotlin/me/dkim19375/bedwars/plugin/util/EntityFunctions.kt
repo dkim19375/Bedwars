@@ -2,7 +2,6 @@ package me.dkim19375.bedwars.plugin.util
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.HelpMessage
-import me.dkim19375.bedwars.plugin.data.SerializablePair
 import me.dkim19375.bedwars.plugin.enumclass.Permission
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
@@ -102,7 +101,7 @@ fun Player.playSound(sound: Sound, volume: Float = 1.0f, pitch: Float = 1.0f) {
 }
 
 fun LivingEntity.getLookingAt(distance: Double = 4.0): LivingEntity? {
-    var closest: SerializablePair<LivingEntity, Double>? = null
+    var closest: Pair<LivingEntity, Double>? = null
     for (entity in getNearbyEntities(distance, distance, distance)) {
         if (entity !is LivingEntity) {
             continue
@@ -112,11 +111,11 @@ fun LivingEntity.getLookingAt(distance: Double = 4.0): LivingEntity? {
         }
         val entityDistance = location.distance(entity.location)
         if (closest == null) {
-            closest = SerializablePair(entity, entityDistance)
+            closest = Pair(entity, entityDistance)
             continue
         }
         if (closest.second > entityDistance) {
-            closest = SerializablePair(entity, entityDistance)
+            closest = Pair(entity, entityDistance)
         }
     }
     return closest?.first

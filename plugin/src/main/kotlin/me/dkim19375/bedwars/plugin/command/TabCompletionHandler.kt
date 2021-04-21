@@ -40,7 +40,7 @@ class TabCompletionHandler(private val plugin: BedwarsPlugin) : TabCompleter {
             return emptyList()
         }
         val game = plugin.gameManager.getGame(gameName) ?: return Team.values().map(Team::displayName)
-        return game.data.teams.keys.map(Team::displayName)
+        return game.data.teams.map { data -> data.team.displayName }
     }
 
     private fun getMissingTeams(sender: CommandSender, game: String): List<String> {

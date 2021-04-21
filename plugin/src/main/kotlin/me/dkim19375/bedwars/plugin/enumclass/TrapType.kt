@@ -1,7 +1,5 @@
 package me.dkim19375.bedwars.plugin.enumclass
 
-import me.dkim19375.bedwars.plugin.data.SerializablePair
-import me.dkim19375.bedwars.plugin.util.serializedPairMapOf
 import org.bukkit.Material
 import org.bukkit.potion.PotionEffectType
 
@@ -16,13 +14,13 @@ enum class TrapType(
         "Its a trap!",
         8 * 20,
         Material.TRIPWIRE_HOOK,
-        effects = serializedPairMapOf(SerializablePair(PotionEffectType.BLINDNESS, 1), SerializablePair(PotionEffectType.SLOW, 1))
+        effects = mapOf(Pair(PotionEffectType.BLINDNESS, 1), Pair(PotionEffectType.SLOW, 1))
     ),
     COUNTER_OFFENSIVE(
         "Counter Offensive",
         10 * 20,
         Material.FEATHER,
-        effects = serializedPairMapOf(SerializablePair(PotionEffectType.SPEED, 1), SerializablePair(PotionEffectType.JUMP, 2))
+        effects = mapOf(Pair(PotionEffectType.SPEED, 1), Pair(PotionEffectType.JUMP, 2))
     ),
     ALARM(
         "Alarm",
@@ -33,6 +31,6 @@ enum class TrapType(
         "Mining Fatigue",
         10 * 20,
         Material.IRON_PICKAXE,
-        effects = serializedPairMapOf(SerializablePair(PotionEffectType.SLOW_DIGGING, 1))
+        effects = mapOf(Pair(PotionEffectType.SLOW_DIGGING, 1))
     )
 }

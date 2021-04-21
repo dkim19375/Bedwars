@@ -172,7 +172,7 @@ class GameManager(private val plugin: BedwarsPlugin) {
 
     fun getPlayerInGame(player: UUID): String? {
         getGames().forEach { (name, game) ->
-            if (game.getTeamOfPlayer(player) != null) {
+            if (game.getPlayersInGame().contains(player)) {
                 return name
             }
         }

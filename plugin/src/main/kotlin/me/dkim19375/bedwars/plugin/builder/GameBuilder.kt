@@ -15,7 +15,7 @@ class GameBuilder(
     var world: World,
     var minPlayers: Int = 2,
     var maxPlayers: Int = 8,
-    var teams: MutableMap<Team, TeamData> = mutableMapOf(),
+    var teams: MutableSet<TeamData> = mutableSetOf(),
     val shopVillagers: MutableSet<UUID> = mutableSetOf(),
     val upgradeVillagers: MutableSet<UUID> = mutableSetOf(),
     var spawners: MutableSet<SpawnerData> = mutableSetOf(),

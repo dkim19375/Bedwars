@@ -39,7 +39,8 @@ class ScoreboardManager(private val plugin: BedwarsPlugin) : AssembleAdapter, Li
         if (game.state != GameState.STARTED) return list
         list.add("Time: ${ChatColor.GREEN}${Delay.fromTime(game.time).seconds.formatTime()}")
         list.add(" ")
-        for (team in game.data.teams.keys) {
+        for (data in game.data.teams) {
+            val team = data.team
             val stringBuilder = StringBuilder(team.color.formatText(team.name[0].toString().toUpperCase()))
             stringBuilder.append(" ${ChatColor.WHITE}${team.displayName}: ")
             if (game.getPlayersInTeam(team).isEmpty()) {

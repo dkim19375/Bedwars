@@ -1,6 +1,7 @@
 package me.dkim19375.bedwars.plugin.util
 
-import me.dkim19375.bedwars.plugin.data.SerializablePair
+import me.dkim19375.bedwars.plugin.data.TeamData
+import me.dkim19375.bedwars.plugin.enumclass.Team
 
 
 fun <V> Map<String, V>.getKeyFromStr(key: String): String? {
@@ -22,14 +23,6 @@ fun <T> List<T>.getSafe(index: Int): T? {
     return get(index)
 }
 
-fun <K, V> serializedPairMapOf(vararg pairs: SerializablePair<K, V>): Map<K, V> {
-    val newPairs = mutableListOf<Pair<K, V>>()
-    for (pair in pairs) {
-        newPairs.add(pair.toPair())
-    }
-    return mapOf(*newPairs.toTypedArray())
-}
-
 fun <V> Map<String, V>.getIgnoreCase(other: String): V? {
     for (entry in entries) {
         if (entry.key.equals(other, ignoreCase = true)) {
@@ -37,6 +30,26 @@ fun <V> Map<String, V>.getIgnoreCase(other: String): V? {
         }
     }
     return null
+}
+
+fun Set<TeamData>.containsTeam(team: Team): Boolean = getTeam(team) != null
+
+fun Set<TeamData>.getTeam(team: Team): TeamData? {
+    for (data in this) {
+        if (data.team == team) {
+            return data
+        }
+    }
+    return null
+}
+
+fun MutableSet<TeamData>.removeTeam(team: Team) {
+    removeIf { d -> d.team == team }
+}
+
+fun MutableSet<TeamData>.setData(data: TeamData) {
+    removeTeam(data.team)
+    add(data)
 }
 
 fun Collection<String>.containsIgnoreCase(value: String): Boolean {

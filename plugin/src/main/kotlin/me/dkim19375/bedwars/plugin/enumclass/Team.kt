@@ -10,25 +10,13 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable
 import org.bukkit.inventory.ItemStack
 import org.bukkit.material.Colorable
 
-enum class Team(val color: DyeColor, val displayName: String) : ConfigurationSerializable {
+enum class Team(val color: DyeColor, val displayName: String) {
     RED(DyeColor.RED, "Red"),
     YELLOW(DyeColor.YELLOW, "Yellow"),
     GREEN(DyeColor.LIME, "Green"),
     BLUE(DyeColor.LIGHT_BLUE, "Blue");
 
-    override fun serialize(): MutableMap<String, Any> {
-        return mutableMapOf(
-            "name" to name
-        )
-    }
-
     companion object {
-        @Suppress("unused")
-        @JvmStatic
-        fun deserialize(map: MutableMap<String, Any>): Team {
-            return valueOf(map["name"] as String)
-        }
-
         fun fromString(str: String?): Team? {
             str ?: return null
             return try {

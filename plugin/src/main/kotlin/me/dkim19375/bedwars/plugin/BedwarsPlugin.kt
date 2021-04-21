@@ -5,8 +5,10 @@ import de.tr7zw.nbtinjector.NBTInjector
 import io.github.thatkawaiisam.assemble.Assemble
 import me.dkim19375.bedwars.plugin.command.MainCommand
 import me.dkim19375.bedwars.plugin.command.TabCompletionHandler
-import me.dkim19375.bedwars.plugin.data.*
-import me.dkim19375.bedwars.plugin.enumclass.Team
+import me.dkim19375.bedwars.plugin.data.BedData
+import me.dkim19375.bedwars.plugin.data.GameData
+import me.dkim19375.bedwars.plugin.data.SpawnerData
+import me.dkim19375.bedwars.plugin.data.TeamData
 import me.dkim19375.bedwars.plugin.listener.*
 import me.dkim19375.bedwars.plugin.manager.*
 import me.dkim19375.dkim19375core.ConfigFile
@@ -31,8 +33,6 @@ class BedwarsPlugin : CoreJavaPlugin() {
     lateinit var assemble: Assemble
         private set
     private val serializable = listOf(
-        SerializablePair::class.java,
-        Team::class.java,
         TeamData::class.java,
         BedData::class.java,
         SpawnerData::class.java,

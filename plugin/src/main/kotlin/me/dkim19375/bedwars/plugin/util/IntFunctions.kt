@@ -14,8 +14,6 @@ fun Int?.zeroNonNull(): Int {
     return this?: 0
 }
 
-fun Int.formatTime() = toLong().formatTime()
-
 fun Long.formatTime(): String {
     val minutes = this / 60
     var seconds = (this % 60).toString()

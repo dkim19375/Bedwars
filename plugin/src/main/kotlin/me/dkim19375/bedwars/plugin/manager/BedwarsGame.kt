@@ -9,6 +9,7 @@ import me.dkim19375.bedwars.plugin.enumclass.Team
 import me.dkim19375.bedwars.plugin.enumclass.formatWithColors
 import me.dkim19375.bedwars.plugin.util.getCombinedValues
 import me.dkim19375.bedwars.plugin.util.getPlayers
+import me.dkim19375.bedwars.plugin.util.getTeam
 import me.dkim19375.bedwars.plugin.util.sendOtherTitle
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -21,6 +22,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.util.*
+import kotlin.io.path.absolutePathString
 
 @Suppress("JoinDeclarationAndAssignment", "MemberVisibilityCanBePrivate")
 class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
@@ -77,15 +79,15 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         for (uuid in playersInLobby.shuffled()) {
             val player = Bukkit.getPlayer(uuid) ?: continue
             val teamData = teams[i % teams.size]
-            val team = teamData.first
+            val team = teamData.team
             player.playerListName = player.name.formatWithColors(team.color)
             val set = players.getOrDefault(team, mutableSetOf())
             set.add(player.uniqueId)
             players[team] = set
             i++
         }
-        for (team in teams) {
-            beds[team.first] = true
+        for (teamData in teams) {
+            beds[teamData.team] = true
         }
         time = System.currentTimeMillis()
         spawnerManager.start()
@@ -211,7 +213,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     fun playerKilled(player: Player) {
         val team = getTeamOfPlayer(player) ?: return
         if (beds.getOrDefault(team, false)) {
-            val teamData = data.teams[team] ?: return
+            val teamData = data.teams.getTeam(team) ?: return
             player.inventory.clear()
             player.gameMode = GameMode.SPECTATOR
             player.teleport(data.spec)
@@ -291,10 +293,12 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         val folder = data.world.worldFolder
         val originalCreator = WorldCreator(data.world.name).copy(data.world)
         Bukkit.unloadWorld(data.world, true)
-        val savedWorld = Paths.get(Bukkit.getWorldContainer().absolutePath, data.world.name).toFile()
         Bukkit.getScheduler().runTaskAsynchronously(plugin) {
-            savedWorld.delete()
-            Files.copy(folder.toPath(), savedWorld.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            folder.delete()
+            val path = Paths.get(plugin.dataFolder.absolutePath, "worlds")
+            path.toFile().mkdirs()
+            Paths.get(path.toFile().absolutePath, data.world.name).toFile().delete()
+            Files.copy(folder.toPath(), path, StandardCopyOption.REPLACE_EXISTING)
             Bukkit.getScheduler().runTask(plugin, originalCreator::createWorld)
         }
     }
@@ -310,7 +314,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         val dir = Paths.get(plugin.dataFolder.absolutePath, "worlds", data.world.name).toFile()
         if (!dir.exists()) {
             // Something went wrong here
-            throw RuntimeException("The directory for the world: ${data.world.name} doesn't exist! (${dir.absolutePath})")
+            throw IllegalStateException("The directory for the world: ${data.world.name} doesn't exist! (${dir.absolutePath})")
         }
         state = GameState.REGENERATING_WORLD
         val folder = data.world.worldFolder
