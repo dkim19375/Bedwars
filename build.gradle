@@ -1,0 +1,106 @@
+//file:noinspection SpellCheckingInspection
+plugins {
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
+    id 'org.jetbrains.kotlin.jvm' version '1.4.32'
+    id 'java-library'
+}
+
+final String basePackage = "me.dkim19375.bedwars"
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+shadowJar {
+    relocate("me.dkim19375.dkim19375core", "${basePackage}.dkim19375core")
+    relocate("net.kyori.adventure", "${basePackage}.adventure")
+    relocate("kotlin", "${basePackage}.kotlin")
+    relocate("me.mattstudios.mfgui", "${basePackage}.mfgui")
+    relocate("me.dkim19375.itemmovedetectionlib", "${basePackage}.itemmovedetectionlib")
+    relocate("me.katsumag.itemactionslib", "${basePackage}.itemactionslib")
+}
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+    maven { url = 'https://jitpack.io' }
+    maven { url = 'https://repo.dmulloy2.net/nexus/repository/public/' }
+    maven { url = 'https://repo.mattstudios.me/artifactory/public' }
+    maven { url = 'https://repo.codemc.org/repository/maven-public/' }
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+dependencies {
+    for (Project project : subprojects) {
+        implementation project
+    }
+}
+
+//noinspection GroovyUnusedAssignment
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
+compileJava.options.encoding 'UTF-8'
+
+group 'me.dkim19375'
+version '1.0.0'
+
+subprojects {
+    apply plugin: "java"
+    apply plugin: "org.jetbrains.kotlin.jvm"
+    apply plugin: "com.github.johnrengelman.shadow"
+
+    group = 'me.dkim19375'
+    version = parent.version
+
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
+
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
+
+    compileKotlin {
+        kotlinOptions.jvmTarget = "1.8"
+    }
+
+    repositories {
+        mavenCentral()
+        maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
+        maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+        maven { url = 'https://jitpack.io' }
+        maven { url = 'https://repo.dmulloy2.net/nexus/repository/public/' }
+        maven { url = 'https://repo.mattstudios.me/artifactory/public' }
+        maven { url = 'https://repo.codemc.org/repository/maven-public/' }
+        flatDir {
+            dirs 'libs'
+        }
+    }
+
+    dependencies {
+        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.32")
+        implementation("com.github.dkim19375:dkim19375Core:2.6.1")
+        implementation("me.mattstudios.utils:matt-framework-gui:2.0.3.3")
+        implementation("net.kyori:adventure-api:4.7.0")
+        implementation("net.kyori:adventure-text-serializer-legacy:4.7.0")
+        implementation("net.kyori:adventure-text-serializer-gson:4.7.0")
+        implementation("net.kyori:adventure-platform-bukkit:+")
+        implementation("com.github.dkim19375:ItemMoveDetectionLib:1.0.1")
+        // implementation("de.tr7zw:item-nbt-api:2.7.1")
+        compileOnly("de.tr7zw:item-nbt-api-plugin:2.7.1")
+        compileOnly("com.comphenix.protocol:ProtocolLib:4.6.0")
+        compileOnly("org.jetbrains:annotations:20.1.0")
+        implementation(fileTree("../libs"))
+        // https://github.com/katsumag/ItemActionsLib
+        // https://github.com/ThatKawaiiSam/Assemble
+    }
+}
+
+task copyFile(type: Copy) {
+    new File('../.TestServers/1.8/plugins/' + project.name + '-' + project.version + '-all.jar').delete()
+    from('build/libs/' + project.name + '-' + project.version + '-all.jar')
+    into('../.TestServers/1.8/plugins')
+    include('*.jar')
+}
+
+shadowJar.finalizedBy copyFile
