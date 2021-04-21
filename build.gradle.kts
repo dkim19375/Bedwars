@@ -91,10 +91,6 @@ dependencies {
     }
 }
 
-tasks.processResources {
-    expand("pluginVersion" to project.version)
-}
-
 tasks.register<Copy>("copyFileToServer") {
     File("../.TestServers/1.8/plugins/" + project.name + "-" + project.version + "-all.jar").delete()
     from("build/libs/" + project.name + "-" + project.version + "-all.jar")

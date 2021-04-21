@@ -43,7 +43,6 @@ class BedwarsPlugin : CoreJavaPlugin() {
         ConfigurationSerialization.registerClass(SpawnerData::class.java)
         ConfigurationSerialization.registerClass(GameData::class.java)
         NBTInjector.inject()
-        assemble.boards
         log("Successfully loaded (not enabled) ${description.name} v${description.version} in ${System.currentTimeMillis() - before}ms!")
     }
 

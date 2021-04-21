@@ -53,7 +53,8 @@ fun CommandSender.showHelpMessage(label: String, page: Int = 1) = showHelpMessag
 
 fun CommandSender.showHelpMessage(label: String, error: String?, page: Int = 1) {
     sendMessage("${ChatColor.DARK_BLUE}------------------------------------------------")
-    sendMessage("${ChatColor.GREEN}Bedwars Help Page: $page/${getMaxHelpPages()}  <> = required  [] = optional")
+    sendMessage("${ChatColor.GREEN}Bedwars v${JavaPlugin.getPlugin(BedwarsPlugin::class.java).description.version} " +
+            "Help Page: $page/${getMaxHelpPages()}  <> = required  [] = optional")
     val newCommands = commands.filter { msg -> hasPermission(msg.permission) }
     for (i in ((page - 1) * 7) until page * 7) {
         sendHelpMsgFormatted(label, newCommands[i])
@@ -106,13 +107,13 @@ fun LivingEntity.getLookingAt(distance: Double = 4.0): LivingEntity? {
         if (!isLookingAt(entity)) {
             continue
         }
-        val distance = location.distance(entity.location)
+        val entityDistance = location.distance(entity.location)
         if (closest == null) {
-            closest = Pair(entity, distance)
+            closest = Pair(entity, entityDistance)
             continue
         }
-        if (closest.second > distance) {
-            closest = Pair(entity, distance)
+        if (closest.second > entityDistance) {
+            closest = Pair(entity, entityDistance)
         }
     }
     return closest?.first
