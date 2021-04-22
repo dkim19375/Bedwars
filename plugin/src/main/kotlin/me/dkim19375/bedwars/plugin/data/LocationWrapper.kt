@@ -10,7 +10,7 @@ class LocationWrapper(loc: Location) {
     val world: World = loc.world
 
     @Suppress("MemberVisibilityCanBePrivate")
-    fun getLocation() = Location(world, x.toDouble(), y.toDouble(), z.toDouble())
+    fun getLocation() = Location(world, x.toDouble() + 0.5, y.toDouble(), z.toDouble() + 0.5)
 
     fun getDistance(other: LocationWrapper): Double = getDistance(other.getLocation())
 

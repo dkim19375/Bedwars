@@ -90,9 +90,9 @@ class BedwarsPlugin : CoreJavaPlugin() {
             BlockBreakListener(this), PlayerQuitListener(this), PlayerDeathListener(this),
             EntityDamageListener(this), ItemTransferListener(this), DamageByOtherListener(this),
             PotionConsumeListener(this), InventoryClickListener(this), PlayerDropItemListener(this),
-            PlayerTeleportListener(this), PlayerInventoryListener(this), PlayerItemDamageListener(this),
+            PlayerInventoryListener(this), PlayerItemDamageListener(this),
             PlayerCoordsChangeListener(this), EntityDamageByEntityListener(this), CraftItemListener(this),
-            scoreboardManager
+            PlayerInteractListener(this), scoreboardManager
         )
     }
 

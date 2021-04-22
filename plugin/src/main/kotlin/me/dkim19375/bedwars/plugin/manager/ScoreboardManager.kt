@@ -28,7 +28,6 @@ class ScoreboardManager(private val plugin: BedwarsPlugin) : ScoreboardHandler, 
     }
 
     override fun getTitle(player: Player): String {
-        plugin.gameManager.getGame(player) ?: return ""
         return "${ChatColor.YELLOW}${ChatColor.BOLD}BED WARS"
     }
 
@@ -39,12 +38,14 @@ class ScoreboardManager(private val plugin: BedwarsPlugin) : ScoreboardHandler, 
         if (game.state == GameState.LOBBY || game.state == GameState.STARTING) {
             entry.next("Map: ${ChatColor.GREEN}${game.data.world.name}")
                 .next("Players: ${ChatColor.GREEN}${game.playersInLobby.size}/${game.data.maxPlayers}")
-            if (game.task != null) {
+            if (game.state == GameState.STARTING) {
                 entry.blank()
-                    .next("Starting in ${ChatColor.GREEN}${game.countdown / 20}s")
+                    .next("Starting in ${ChatColor.GREEN}${game.countdown}s")
             }
             return entry.blank()
                 .next("Min Players: ${ChatColor.GREEN}${game.data.minPlayers}")
+                .blank()
+                .next("Max Players: ${ChatColor.GREEN}${game.data.maxPlayers}")
                 .blank()
                 .build()
         }

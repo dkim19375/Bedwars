@@ -11,24 +11,28 @@ compileKotlin {
 }
 
 shadowJar {
-    relocate("me.dkim19375.dkim19375core", "${basePackage}.dkim19375core")
-    relocate("net.kyori.adventure", "${basePackage}.adventure")
     relocate("kotlin", "${basePackage}.kotlin")
+    relocate("com.google.gson", "${basePackage}.gson")
     relocate("me.mattstudios.mfgui", "${basePackage}.mfgui")
-    relocate("me.dkim19375.itemmovedetectionlib", "${basePackage}.itemmovedetectionlib")
-    relocate("me.katsumag.itemactionslib", "${basePackage}.itemactionslib")
     relocate("org.apache.commons", "${basePackage}.apache-commons")
+    relocate("net.kyori.adventure", "${basePackage}.kyori.adventure")
     relocate("me.tigerhix.lib.scoreboard", "${basePackage}.scoreboard")
+    relocate("net.kyori.examination", "${basePackage}.kyori.examination")
+    relocate("me.dkim19375.dkim19375core", "${basePackage}.dkim19375core")
+    relocate("me.katsumag.itemactionslib", "${basePackage}.itemactionslib")
+    relocate("org.jetbrains.annotations", "${basePackage}.annotations.jetbrains")
+    relocate("org.intellij.lang.annotations", "${basePackage}.annotations.intellij")
+    relocate("me.dkim19375.itemmovedetectionlib", "${basePackage}.itemmovedetectionlib")
 }
 
 repositories {
     mavenCentral()
-    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
-    maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
     maven { url = 'https://jitpack.io' }
-    maven { url = 'https://repo.dmulloy2.net/nexus/repository/public/' }
     maven { url = 'https://repo.mattstudios.me/artifactory/public' }
     maven { url = 'https://repo.codemc.org/repository/maven-public/' }
+    maven { url = 'https://repo.dmulloy2.net/nexus/repository/public/' }
+    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
     flatDir {
         dirs 'libs'
     }
@@ -66,31 +70,32 @@ subprojects {
 
     repositories {
         mavenCentral()
-        maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
-        maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
         maven { url = 'https://jitpack.io' }
-        maven { url = 'https://repo.dmulloy2.net/nexus/repository/public/' }
         maven { url = 'https://repo.mattstudios.me/artifactory/public' }
         maven { url = 'https://repo.codemc.org/repository/maven-public/' }
+        maven { url = 'https://repo.dmulloy2.net/nexus/repository/public/' }
+        maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
+        maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
         flatDir {
             dirs 'libs'
         }
     }
 
     dependencies {
-        implementation('org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.32')
-        implementation('com.github.dkim19375:dkim19375Core:2.6.1')
-        implementation('me.mattstudios.utils:matt-framework-gui:2.0.3.3')
-        implementation('net.kyori:adventure-api:4.7.0')
-        implementation('net.kyori:adventure-text-serializer-legacy:4.7.0')
-        implementation('net.kyori:adventure-text-serializer-gson:4.7.0')
-        implementation('net.kyori:adventure-platform-bukkit:+')
-        implementation('com.github.dkim19375:ItemMoveDetectionLib:1.0.1')
         implementation('commons-io:commons-io:2.8.0')
+        implementation('net.kyori:adventure-api:4.7.0')
+        implementation('net.kyori:adventure-platform-bukkit:+')
+        implementation('com.github.dkim19375:dkim19375Core:2.6.1')
+        implementation('net.kyori:adventure-text-serializer-gson:4.7.0')
+        implementation('org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.32')
+        implementation('me.mattstudios.utils:matt-framework-gui:2.0.3.3')
+        implementation('com.github.dkim19375:ItemMoveDetectionLib:1.0.1')
+        implementation('net.kyori:adventure-text-serializer-legacy:4.7.0')
         // implementation('de.tr7zw:item-nbt-api:2.7.1')
         compileOnly('de.tr7zw:item-nbt-api-plugin:2.7.1')
-        compileOnly('com.comphenix.protocol:ProtocolLib:4.6.0')
         compileOnly('org.jetbrains:annotations:20.1.0')
+        compileOnly('com.comphenix.protocol:ProtocolLib:4.6.0')
+
         implementation(fileTree('../libs'))
         // https://github.com/katsumag/ItemActionsLib
         // https://github.com/TigerHix/ScoreboardLib

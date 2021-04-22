@@ -46,6 +46,11 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
 
     init {
         npcManager.disableAI()
+        Bukkit.getScheduler().runTaskTimer(plugin, {
+            for (player in getPlayersInGame().getPlayers()) {
+                player.foodLevel = 20
+            }
+        }, 20L, 20L)
     }
 
     fun start(force: Boolean): Result {
@@ -89,6 +94,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         for (teamData in teams) {
             beds[teamData.team] = true
         }
+        state = GameState.STARTED
         time = System.currentTimeMillis()
         spawnerManager.start()
     }
@@ -103,7 +109,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         forceStop()
     }
 
-    fun forceStop() {
+    fun forceStop(whenDone: Runnable? = null) {
         getPlayersInGame().getPlayers().forEach(this::leavePlayer)
         players.clear()
         playersInLobby.clear()
@@ -117,8 +123,10 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         placedBlocks.clear()
         revertBack()
         beforeData.clear()
-        regenerateMap()
-        state = GameState.LOBBY
+        regenerateMap {
+            state = GameState.LOBBY
+            whenDone?.run()
+        }
     }
 
     private fun revertBack() {
@@ -189,7 +197,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         )
         plugin.scoreboardManager.getScoreboard(player).activate()
         if (playersInLobby.size >= data.minPlayers) {
-            start(false)
+            println("BEDWARS GAME START STATUS: ${start(false).message}")
         }
         return Result.SUCCESS
     }
@@ -320,7 +328,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         return players.getOrDefault(team, setOf())
     }
 
-    fun regenerateMap() {
+    fun regenerateMap(whenDone: Runnable? = null) {
         if (state != GameState.STOPPED) {
             return
         }
@@ -347,7 +355,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             FileUtils.copyDirectory(dir, folder)
             Bukkit.getScheduler().runTask(plugin) {
                 data.copy(world = originalCreator.createWorld()).save(plugin)
-                state = GameState.STOPPED
+                whenDone?.run()
             }
         }
     }

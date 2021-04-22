@@ -2,6 +2,8 @@ package me.dkim19375.bedwars.plugin.listener
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.LocationWrapper
+import me.dkim19375.bedwars.plugin.enumclass.GameState
+import me.dkim19375.bedwars.plugin.util.getBedFeet
 import me.dkim19375.bedwars.plugin.util.getBedHead
 import me.dkim19375.bedwars.plugin.util.getWrapper
 import org.bukkit.ChatColor
@@ -15,6 +17,10 @@ class BlockBreakListener(private val plugin: BedwarsPlugin) : Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private fun BlockBreakEvent.onBreak() {
         val game = plugin.gameManager.getGame(player) ?: return
+        if (game.state == GameState.LOBBY || game.state == GameState.STARTING) {
+            isCancelled = true
+            return
+        }
         if (block.type == Material.BED_BLOCK || block.type == Material.BED) {
             val team = game.getTeamOfPlayer(player)?: return
             val location = block.getBedHead()
@@ -25,6 +31,9 @@ class BlockBreakListener(private val plugin: BedwarsPlugin) : Listener {
                 isCancelled = true
                 return
             }
+            isCancelled = true
+            block.type = Material.AIR
+            block.state.update()
             game.bedBreak(bed.team, player)
             return
         }

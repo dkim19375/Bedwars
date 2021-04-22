@@ -116,3 +116,15 @@ fun Block.getBedHead(): Location {
     val direction = data.facing
     return getRelative(direction).location
 }
+
+fun Block.getBedFeet(): Location {
+    val data = state.data
+    if (data !is Bed) {
+        return location
+    }
+    if (!data.isHeadOfBed) {
+        return location
+    }
+    val direction = data.facing
+    return getRelative(direction.oppositeFace).location
+}

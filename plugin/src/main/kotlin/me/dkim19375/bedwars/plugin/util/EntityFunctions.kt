@@ -2,6 +2,7 @@ package me.dkim19375.bedwars.plugin.util
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.HelpMessage
+import me.dkim19375.bedwars.plugin.enumclass.ErrorMessages
 import me.dkim19375.bedwars.plugin.enumclass.Permission
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
@@ -82,7 +83,11 @@ private fun CommandSender.sendHelpMsgFormatted(label: String, message: HelpMessa
 
 fun List<UUID>.getPlayers() = map(Bukkit::getPlayer).filter(Objects::nonNull)
 
-fun Set<UUID>.getPlayers() = map(Bukkit::getPlayer).filter(Objects::nonNull)
+fun Set<UUID>.getPlayers() = map(Bukkit::getPlayer).filter(Objects::nonNull).toSet()
+
+fun Set<Player>.getUsernames() = map(Player::getName).toSet()
+
+fun CommandSender.sendMessage(message: ErrorMessages) = sendMessage(message.message)
 
 fun Player.getItemAmount(type: Material): Int {
     var amount = 0
