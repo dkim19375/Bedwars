@@ -2,13 +2,12 @@
 plugins {
     id 'com.github.johnrengelman.shadow' version '6.1.0'
     id 'org.jetbrains.kotlin.jvm' version '1.4.32'
-    id 'java-library'
 }
 
-final String basePackage = "me.dkim19375.bedwars"
+final String basePackage = 'me.dkim19375.bedwars.libs'
 
 compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = '1.8'
 }
 
 shadowJar {
@@ -18,6 +17,8 @@ shadowJar {
     relocate("me.mattstudios.mfgui", "${basePackage}.mfgui")
     relocate("me.dkim19375.itemmovedetectionlib", "${basePackage}.itemmovedetectionlib")
     relocate("me.katsumag.itemactionslib", "${basePackage}.itemactionslib")
+    relocate("org.apache.commons", "${basePackage}.apache-commons")
+    relocate("me.tigerhix.lib.scoreboard", "${basePackage}.scoreboard")
 }
 
 repositories {
@@ -47,9 +48,8 @@ group 'me.dkim19375'
 version '1.0.0'
 
 subprojects {
-    apply plugin: "java"
-    apply plugin: "org.jetbrains.kotlin.jvm"
-    apply plugin: "com.github.johnrengelman.shadow"
+    apply plugin: 'org.jetbrains.kotlin.jvm'
+    apply plugin: 'com.github.johnrengelman.shadow'
 
     group = 'me.dkim19375'
     version = parent.version
@@ -61,7 +61,7 @@ subprojects {
     }
 
     compileKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = '1.8'
     }
 
     repositories {
@@ -78,21 +78,22 @@ subprojects {
     }
 
     dependencies {
-        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.32")
-        implementation("com.github.dkim19375:dkim19375Core:2.6.1")
-        implementation("me.mattstudios.utils:matt-framework-gui:2.0.3.3")
-        implementation("net.kyori:adventure-api:4.7.0")
-        implementation("net.kyori:adventure-text-serializer-legacy:4.7.0")
-        implementation("net.kyori:adventure-text-serializer-gson:4.7.0")
-        implementation("net.kyori:adventure-platform-bukkit:+")
-        implementation("com.github.dkim19375:ItemMoveDetectionLib:1.0.1")
-        // implementation("de.tr7zw:item-nbt-api:2.7.1")
-        compileOnly("de.tr7zw:item-nbt-api-plugin:2.7.1")
-        compileOnly("com.comphenix.protocol:ProtocolLib:4.6.0")
-        compileOnly("org.jetbrains:annotations:20.1.0")
-        implementation(fileTree("../libs"))
+        implementation('org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.32')
+        implementation('com.github.dkim19375:dkim19375Core:2.6.1')
+        implementation('me.mattstudios.utils:matt-framework-gui:2.0.3.3')
+        implementation('net.kyori:adventure-api:4.7.0')
+        implementation('net.kyori:adventure-text-serializer-legacy:4.7.0')
+        implementation('net.kyori:adventure-text-serializer-gson:4.7.0')
+        implementation('net.kyori:adventure-platform-bukkit:+')
+        implementation('com.github.dkim19375:ItemMoveDetectionLib:1.0.1')
+        implementation('commons-io:commons-io:2.8.0')
+        // implementation('de.tr7zw:item-nbt-api:2.7.1')
+        compileOnly('de.tr7zw:item-nbt-api-plugin:2.7.1')
+        compileOnly('com.comphenix.protocol:ProtocolLib:4.6.0')
+        compileOnly('org.jetbrains:annotations:20.1.0')
+        implementation(fileTree('../libs'))
         // https://github.com/katsumag/ItemActionsLib
-        // https://github.com/ThatKawaiiSam/Assemble
+        // https://github.com/TigerHix/ScoreboardLib
     }
 }
 

@@ -49,8 +49,8 @@ data class GameData(
         fun deserialize(map: Map<String, Any>): GameData {
             return GameData(
                 Bukkit.getWorld(map["world"] as String),
-                Integer.valueOf(map["min-players"] as String),
-                Integer.valueOf(map["max-players"] as String),
+                map["min-players"] as Int,
+                map["max-players"] as Int,
                 (map["teams"] as List<TeamData>).toSet(),
                 (map["shop-villagers"] as List<String>).map(String::toUUID).filter(Objects::nonNull).map { i -> i!! }
                     .toSet(),

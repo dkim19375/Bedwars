@@ -11,6 +11,7 @@ import me.dkim19375.bedwars.plugin.util.getCombinedValues
 import me.dkim19375.bedwars.plugin.util.getPlayers
 import me.dkim19375.bedwars.plugin.util.getTeam
 import me.dkim19375.bedwars.plugin.util.sendOtherTitle
+import org.apache.commons.io.FileUtils
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.GameMode
@@ -18,16 +19,13 @@ import org.bukkit.WorldCreator
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.scheduler.BukkitTask
-import java.nio.file.Files
 import java.nio.file.Paths
-import java.nio.file.StandardCopyOption
 import java.util.*
-import kotlin.io.path.absolutePathString
 
 @Suppress("JoinDeclarationAndAssignment", "MemberVisibilityCanBePrivate")
 class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     var state = GameState.LOBBY
-    var countdown = 10 * 20
+    var countdown = 10
     var time: Long = 0
     val players = mutableMapOf<Team, MutableSet<UUID>>()
     val playersInLobby = mutableSetOf<UUID>()
@@ -56,6 +54,8 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             return result
         }
         state = GameState.STARTING
+        countdown = 10
+        println("Game ${data.world.name} is starting!")
         task = object : BukkitRunnable() {
             override fun run() {
                 if (countdown < 1) {
@@ -123,7 +123,8 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
 
     private fun revertBack() {
         for (uuid in getPlayersInGame().toSet()) {
-            revertPlayer(uuid)
+            val player = Bukkit.getPlayer(uuid)?: continue
+            revertPlayer(player)
         }
     }
 
@@ -181,12 +182,12 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         }
         playersInLobby.add(player.uniqueId)
         broadcast("${player.displayName}${ChatColor.GREEN} has joined the game! ${playersInLobby.size}/${data.maxPlayers}")
-        player.gameMode = GameMode.CREATIVE
         val lobby = plugin.dataFileManager.getLobby()
         beforeData[player.uniqueId] = PlayerData.getPlayerAndReset(
             player,
             if (plugin.config.getBoolean("use-main-lobby") && lobby != null) lobby else data.lobby
         )
+        plugin.scoreboardManager.getScoreboard(player).activate()
         if (playersInLobby.size >= data.minPlayers) {
             start(false)
         }
@@ -242,14 +243,14 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         leavePlayer(player)
     }
 
-    fun revertPlayer(uuid: UUID) {
-        val player = Bukkit.getPlayer(uuid) ?: return
-        val data = beforeData[uuid] ?: return
+    fun revertPlayer(player: Player) {
+        plugin.scoreboardManager.getScoreboard(player).deactivate()
+        val data = beforeData[player.uniqueId] ?: return
         data.apply(player)
     }
 
     fun leavePlayer(player: Player) {
-        revertPlayer(player.uniqueId)
+        revertPlayer(player)
         if (state == GameState.LOBBY || state == GameState.STARTING) {
             if (!playersInLobby.contains(player.uniqueId)) {
                 return
@@ -264,7 +265,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         }
         if (state == GameState.STARTED) {
             val team = getTeamOfPlayer(player) ?: return
-            revertPlayer(player.uniqueId)
+            revertPlayer(player)
             player.playerListName = player.displayName
             broadcast("${player.displayName.formatWithColors(team.color)}${ChatColor.RED} has left the game!")
             update()
@@ -290,15 +291,27 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     fun saveMap() {
+        for (uuid in getPlayersInGame()) {
+            val player = Bukkit.getPlayer(uuid)?: continue
+            leavePlayer(player)
+        }
+        for (player in data.world.players) {
+            player.teleport(Bukkit.getWorld("world").spawnLocation)
+        }
         val folder = data.world.worldFolder
         val originalCreator = WorldCreator(data.world.name).copy(data.world)
-        Bukkit.unloadWorld(data.world, true)
+        if (!Bukkit.unloadWorld(data.world, true)) {
+            throw RuntimeException("Could not unload world!")
+        }
         Bukkit.getScheduler().runTaskAsynchronously(plugin) {
             folder.delete()
-            val path = Paths.get(plugin.dataFolder.absolutePath, "worlds")
+            val path = Paths.get(plugin.dataFolder.absolutePath, "worlds", data.world.name)
             path.toFile().mkdirs()
-            Paths.get(path.toFile().absolutePath, data.world.name).toFile().delete()
-            Files.copy(folder.toPath(), path, StandardCopyOption.REPLACE_EXISTING)
+            val file = Paths.get(path.toFile().absolutePath, data.world.name).toFile()
+            if (file.exists()) {
+                FileUtils.forceDelete(Paths.get(path.toFile().absolutePath, data.world.name).toFile())
+            }
+            FileUtils.copyDirectory(folder, path.toFile())
             Bukkit.getScheduler().runTask(plugin, originalCreator::createWorld)
         }
     }
@@ -316,13 +329,22 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             // Something went wrong here
             throw IllegalStateException("The directory for the world: ${data.world.name} doesn't exist! (${dir.absolutePath})")
         }
+        for (uuid in getPlayersInGame()) {
+            val player = Bukkit.getPlayer(uuid)?: continue
+            leavePlayer(player)
+        }
+        for (player in data.world.players) {
+            player.teleport(Bukkit.getWorld("world").spawnLocation)
+        }
         state = GameState.REGENERATING_WORLD
         val folder = data.world.worldFolder
         val originalCreator = WorldCreator(data.world.name).copy(data.world)
-        Bukkit.unloadWorld(data.world, true)
+        if (!Bukkit.unloadWorld(data.world, true)) {
+            throw RuntimeException("Could not unload world!")
+        }
         Bukkit.getScheduler().runTaskAsynchronously(plugin) {
-            folder.delete()
-            Files.copy(dir.toPath(), folder.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            FileUtils.forceDelete(folder)
+            FileUtils.copyDirectory(dir, folder)
             Bukkit.getScheduler().runTask(plugin) {
                 data.copy(world = originalCreator.createWorld()).save(plugin)
                 state = GameState.STOPPED
@@ -356,12 +378,12 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         update()
     }
 
-    enum class Result {
-        SUCCESS,
-        GAME_RUNNING,
-        GAME_IN_WORLD,
-        NOT_ENOUGH_PLAYERS,
-        REGENERATING_WORLD,
-        TOO_MANY_PLAYERS
+    enum class Result(val message: String) {
+        SUCCESS("Successful!"),
+        GAME_RUNNING("The game is currently running!"),
+        GAME_IN_WORLD("The game is in the same world!"),
+        NOT_ENOUGH_PLAYERS("Not enough players!"),
+        REGENERATING_WORLD("The game world is regenerating!"),
+        TOO_MANY_PLAYERS("Too many players!")
     }
 }

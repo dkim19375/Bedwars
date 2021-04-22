@@ -1,44 +1,58 @@
 package me.dkim19375.bedwars.plugin.manager
 
-import io.github.thatkawaiisam.assemble.AssembleAdapter
-import io.github.thatkawaiisam.assemble.events.AssembleBoardCreateEvent
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.enumclass.formatText
 import me.dkim19375.bedwars.plugin.util.Delay
 import me.dkim19375.bedwars.plugin.util.formatTime
+import me.tigerhix.lib.scoreboard.ScoreboardLib
+import me.tigerhix.lib.scoreboard.common.EntryBuilder
+import me.tigerhix.lib.scoreboard.type.Entry
+import me.tigerhix.lib.scoreboard.type.Scoreboard
+import me.tigerhix.lib.scoreboard.type.ScoreboardHandler
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
-import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import java.util.*
 
-class ScoreboardManager(private val plugin: BedwarsPlugin) : AssembleAdapter, Listener {
+class ScoreboardManager(private val plugin: BedwarsPlugin) : ScoreboardHandler, Listener {
+    private val scoreboards = mutableMapOf<UUID, Scoreboard>()
+
+    fun getScoreboard(player: Player): Scoreboard {
+        return scoreboards.getOrPut(player.uniqueId) {
+            val board = ScoreboardLib.createScoreboard(player)
+            board.handler = this
+            board.updateInterval = 1L
+            return board
+        }
+    }
 
     override fun getTitle(player: Player): String {
-        plugin.gameManager.getGame(player)?: return ""
+        plugin.gameManager.getGame(player) ?: return ""
         return "${ChatColor.YELLOW}${ChatColor.BOLD}BED WARS"
     }
 
-    override fun getLines(player: Player): MutableList<String> {
-        val game = plugin.gameManager.getGame(player)?: return mutableListOf()
-        val list = mutableListOf<String>()
-        list.add(" ")
+    override fun getEntries(player: Player): List<Entry>? {
+        val game = plugin.gameManager.getGame(player) ?: return null
+        val entry = EntryBuilder()
+        entry.blank()
         if (game.state == GameState.LOBBY || game.state == GameState.STARTING) {
-            list.add("Map: ${ChatColor.GREEN}${game.data.world.name}")
-            list.add("Players: ${ChatColor.GREEN}${game.playersInLobby.size}/${game.data.maxPlayers}")
+            entry.next("Map: ${ChatColor.GREEN}${game.data.world.name}")
+                .next("Players: ${ChatColor.GREEN}${game.playersInLobby.size}/${game.data.maxPlayers}")
             if (game.task != null) {
-                list.add(" ")
-                list.add("Starting in ${ChatColor.GREEN}${game.countdown / 20}s")
+                entry.blank()
+                    .next("Starting in ${ChatColor.GREEN}${game.countdown / 20}s")
             }
-            list.add(" ")
-            list.add("Min Players: ${ChatColor.GREEN}${game.data.minPlayers}")
-            list.add(" ")
-            return list
+            return entry.blank()
+                .next("Min Players: ${ChatColor.GREEN}${game.data.minPlayers}")
+                .blank()
+                .build()
         }
-        if (game.state != GameState.STARTED) return list
-        list.add("Time: ${ChatColor.GREEN}${Delay.fromTime(game.time).seconds.formatTime()}")
-        list.add(" ")
+        if (game.state != GameState.STARTED) {
+            return entry.build()
+        }
+        entry.next("Time: ${ChatColor.GREEN}${Delay.fromTime(game.time).seconds.formatTime()}")
+            .blank()
         for (data in game.data.teams) {
             val team = data.team
             val stringBuilder = StringBuilder(team.color.formatText(team.name[0].toString().toUpperCase()))
@@ -57,14 +71,6 @@ class ScoreboardManager(private val plugin: BedwarsPlugin) : AssembleAdapter, Li
                 stringBuilder.append(" ${ChatColor.GRAY}YOU")
             }
         }
-        return list
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    private fun AssembleBoardCreateEvent.onCreate() {
-        val game = plugin.gameManager.getGame(player)
-        if (game == null) {
-            isCancelled = true
-        }
+        return entry.build()
     }
 }

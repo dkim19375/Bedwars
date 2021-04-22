@@ -228,8 +228,27 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 sender.sendMessage("${ChatColor.GREEN}Successfully stopped the game!")
                 return true
             }
+            "start" -> {
+                if (!sender.hasPermission(Permission.START)) {
+                    sender.sendMessage(ErrorMessages.NO_PERMISSION.message)
+                    return true
+                }
+                @Suppress("DuplicatedCode")
+                val game = plugin.gameManager.getGame(args[1])
+                if (game == null) {
+                    sender.sendMessage(ErrorMessages.INVALID_GAME.message)
+                    return true
+                }
+                val result = game.start(true)
+                if (result == BedwarsGame.Result.SUCCESS) {
+                    sender.sendMessage("${ChatColor.GREEN}Successfully started the game!")
+                    return true
+                }
+                sender.sendMessage("${ChatColor.RED}Error while starting the game: ${result.message}")
+                return true
+            }
             "edit" -> {
-                val game = hasPermissionAndValidGame(sender, args) ?: return true
+                val game = hasPermissionAndValidGame(sender, args, editing = true) ?: return true
                 if (game.state != GameState.STOPPED) {
                     sender.sendMessage("${ChatColor.RED}The game is still running! do /$label stop ${game.data.world.name} to stop it!")
                     return true
@@ -578,7 +597,8 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
     private fun hasPermissionAndValidGame(
         sender: CommandSender,
         args: Array<out String>,
-        showMsgForGame: Boolean = true
+        showMsgForGame: Boolean = true,
+        editing: Boolean = false
     ): BedwarsGame? {
         if (!sender.hasPermission(Permission.SETUP)) {
             sender.sendMessage(ErrorMessages.NO_PERMISSION.message)
@@ -596,7 +616,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
             sender.sendMessage(ErrorMessages.INVALID_GAME.message)
             return null
         }
-        if (!game.isEditing()) {
+        if (!game.isEditing() && !editing) {
             sender.sendMessage(ErrorMessages.NOT_EDIT_MODE.message)
             return null
         }

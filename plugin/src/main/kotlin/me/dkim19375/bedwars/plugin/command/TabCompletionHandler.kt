@@ -16,7 +16,7 @@ class TabCompletionHandler(private val plugin: BedwarsPlugin) : TabCompleter {
     private val completesListMap: HashMultimap<String, String> = HashMultimap.create()
 
     init {
-        add("core", "help", "list", "join", "quickjoin", "leave", "reload", "create", "delete", "save", "stop", "setup")
+        add("core", "help", "list", "join", "quickjoin", "leave", "reload", "create", "delete", "save", "stop", "setup", "start")
         add("spawners", "iron", "gold", "diamond", "emerald")
         add("colors", *Team.values().map(Team::displayName).toTypedArray())
         add("setup", "lobby", "spec", "minplayers", "maxplayers", "shop", "upgrades", "spawner", "team", "bed", "ready", "spec", "finish")

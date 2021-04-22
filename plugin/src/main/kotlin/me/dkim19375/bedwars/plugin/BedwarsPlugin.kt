@@ -2,7 +2,6 @@ package me.dkim19375.bedwars.plugin
 
 import com.comphenix.protocol.ProtocolLibrary
 import de.tr7zw.nbtinjector.NBTInjector
-import io.github.thatkawaiisam.assemble.Assemble
 import me.dkim19375.bedwars.plugin.command.MainCommand
 import me.dkim19375.bedwars.plugin.command.TabCompletionHandler
 import me.dkim19375.bedwars.plugin.data.BedData
@@ -14,6 +13,7 @@ import me.dkim19375.bedwars.plugin.manager.*
 import me.dkim19375.dkim19375core.ConfigFile
 import me.dkim19375.dkim19375core.CoreJavaPlugin
 import me.dkim19375.itemmovedetectionlib.ItemMoveDetectionLib
+import me.tigerhix.lib.scoreboard.ScoreboardLib
 import org.bukkit.configuration.serialization.ConfigurationSerialization
 import org.bukkit.event.Listener
 
@@ -30,8 +30,6 @@ class BedwarsPlugin : CoreJavaPlugin() {
         private set
     lateinit var packetManager: PacketManager
         private set
-    lateinit var assemble: Assemble
-        private set
     private val serializable = listOf(
         TeamData::class.java,
         BedData::class.java,
@@ -44,6 +42,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
         val before = System.currentTimeMillis()
         serializable.forEach(ConfigurationSerialization::registerClass)
         NBTInjector.inject()
+        ScoreboardLib.setPluginInstance(this)
         log("Successfully loaded (not enabled) ${description.name} v${description.version} in ${System.currentTimeMillis() - before}ms!")
     }
 
@@ -79,8 +78,6 @@ class BedwarsPlugin : CoreJavaPlugin() {
         gameManager = GameManager(this)
         scoreboardManager = ScoreboardManager(this)
         packetManager = PacketManager(this)
-        assemble = Assemble(this, scoreboardManager)
-        assemble.ticks = 5
     }
 
     private fun registerCommands() {

@@ -29,6 +29,7 @@ val commands = listOf(
     HelpMessage("create", "Create a new bedwars game", Permission.SETUP),
     HelpMessage("delete <name>", "Delete a bedwars game", Permission.SETUP),
     HelpMessage("save <name>", "Save a bedwars game", Permission.SETUP),
+    HelpMessage("stop <name>", "Start a bedwars game", Permission.START),
     HelpMessage("stop <name>", "Stop a bedwars game", Permission.STOP),
     HelpMessage("edit <name>", "Prevents a bedwars game from being started (used when editing)", Permission.SETUP),
     HelpMessage("setup <name> ready", "Detects if the game can be saved", Permission.SETUP),
