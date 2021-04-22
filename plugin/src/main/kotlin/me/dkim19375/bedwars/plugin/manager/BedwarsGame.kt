@@ -146,7 +146,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         if (plugin.gameManager.isGameRunning(data.world)) {
             return Result.GAME_IN_WORLD
         }
-        if (!force && players.values.size < data.minPlayers) {
+        if (!force && playersInLobby.size < data.minPlayers) {
             return Result.NOT_ENOUGH_PLAYERS
         }
         if (state == GameState.REGENERATING_WORLD) {

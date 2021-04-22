@@ -38,9 +38,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                     return true
                 }
                 val game: BedwarsGame
-                val isInGame: Boolean
                 if (args.size > 1) {
-                    isInGame = false
                     val g = plugin.gameManager.getGame(args[1])
                     if (g == null) {
                         sender.sendMessage(ErrorMessages.INVALID_GAME)
@@ -48,7 +46,6 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                     }
                     game = g
                 } else {
-                    isInGame = true
                     val g = plugin.gameManager.getGame(sender)
                     if (g == null) {
                         sender.sendMessage(ErrorMessages.INVALID_GAME)
@@ -56,7 +53,13 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                     }
                     game = g
                 }
-                sender.sendMessage("Is in lobby OR game: ${if (isInGame) "Yes" else "No"}")
+                sender.sendMessage(
+                    "Is in lobby OR game: ${
+                        if (game.playersInLobby.plus(game.players.values.getCombinedValues())
+                                .contains(sender.uniqueId)
+                        ) "Yes" else "No"
+                    }"
+                )
                 sender.sendMessage("Game name: ${game.data.world.name}")
                 sender.sendMessage("Players: ${game.getPlayersInGame().size}")
                 sender.sendMessage("State: ${game.state.name}")
