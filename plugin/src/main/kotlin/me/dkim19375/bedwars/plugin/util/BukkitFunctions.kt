@@ -5,10 +5,13 @@ import me.dkim19375.bedwars.plugin.enumclass.ArmorType
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.entity.Entity
+import org.bukkit.entity.Item
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
 import org.bukkit.material.Bed
 import java.util.*
@@ -134,6 +137,13 @@ fun Location?.getSafeDistance(other: Location?): Double {
     } catch (_: IllegalArgumentException) {
         Double.MAX_VALUE
     }
+}
+
+fun World.dropItemStraight(location: Location, itemStack: ItemStack): Item {
+    val item = dropItem(location, itemStack)
+    item.velocity.x = item.velocity.x / 10.0
+    item.velocity.z = item.velocity.z / 10.0
+    return item
 }
 
 fun Block.getBedFeet(): Location {

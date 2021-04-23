@@ -35,12 +35,7 @@ fun <V> Map<String, V>.getIgnoreCase(other: String): V? {
 fun Set<TeamData>.containsTeam(team: Team): Boolean = getTeam(team) != null
 
 fun Set<TeamData>.getTeam(team: Team): TeamData? {
-    for (data in this) {
-        if (data.team == team) {
-            return data
-        }
-    }
-    return null
+    return firstOrNull { d -> d.team == team }
 }
 
 fun MutableSet<TeamData>.removeTeam(team: Team) {
@@ -80,10 +75,10 @@ fun <T> List<T>.convertToString(): List<String> {
 }
 
 fun <T> T.containsAny(vararg element: List<T>): Boolean {
-    this?: return false
+    this ?: return false
     element.forEach { tList ->
         for (t in tList) {
-            t?: continue
+            t ?: continue
             if (equals(t)) {
                 return true
             }

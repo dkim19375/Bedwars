@@ -94,6 +94,14 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         for (teamData in teams) {
             beds[teamData.team] = true
         }
+        for (entry in players.entries) {
+            val team = entry.key
+            val players = entry.value.getPlayers()
+            val spawn = (data.teams.getTeam(team) ?: continue).spawn
+            for (player in players) {
+                player.teleport(spawn)
+            }
+        }
         state = GameState.STARTED
         time = System.currentTimeMillis()
         spawnerManager.start()
@@ -131,7 +139,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
 
     private fun revertBack() {
         for (uuid in getPlayersInGame().toSet()) {
-            val player = Bukkit.getPlayer(uuid)?: continue
+            val player = Bukkit.getPlayer(uuid) ?: continue
             revertPlayer(player)
         }
     }
@@ -302,7 +310,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
 
     fun saveMap() {
         for (uuid in getPlayersInGame()) {
-            val player = Bukkit.getPlayer(uuid)?: continue
+            val player = Bukkit.getPlayer(uuid) ?: continue
             leavePlayer(player)
         }
         for (player in data.world.players) {
@@ -340,7 +348,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             throw IllegalStateException("The directory for the world: ${data.world.name} doesn't exist! (${dir.absolutePath})")
         }
         for (uuid in getPlayersInGame()) {
-            val player = Bukkit.getPlayer(uuid)?: continue
+            val player = Bukkit.getPlayer(uuid) ?: continue
             leavePlayer(player)
         }
         for (player in data.world.players) {
