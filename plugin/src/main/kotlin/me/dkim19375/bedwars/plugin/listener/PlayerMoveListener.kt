@@ -1,6 +1,7 @@
 package me.dkim19375.bedwars.plugin.listener
 
 import me.dkim19375.bedwars.plugin.event.PlayerCoordsChangeEvent
+import me.dkim19375.bedwars.plugin.util.getSafeDistance
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -10,7 +11,7 @@ class PlayerMoveListener : Listener {
     @EventHandler
     private fun PlayerMoveEvent.onMove() {
         try {
-            if (from.distance(to) > 0) {
+            if (from.getSafeDistance(to) > 0) {
                 val event = PlayerCoordsChangeEvent(player, from, to, isCancelled)
                 Bukkit.getPluginManager().callEvent(event)
                 isCancelled = event.isCancelled

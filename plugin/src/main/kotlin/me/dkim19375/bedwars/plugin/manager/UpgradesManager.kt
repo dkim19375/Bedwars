@@ -5,6 +5,7 @@ import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.enumclass.Team
 import me.dkim19375.bedwars.plugin.enumclass.TrapType
 import me.dkim19375.bedwars.plugin.enumclass.formatWithColors
+import me.dkim19375.bedwars.plugin.util.getSafeDistance
 import me.dkim19375.bedwars.plugin.util.isArmor
 import me.dkim19375.bedwars.plugin.util.isWeapon
 import me.dkim19375.bedwars.plugin.util.sendTitle
@@ -59,7 +60,7 @@ class UpgradesManager(private val plugin: BedwarsPlugin, val game: BedwarsGame) 
                     continue
                 }
                 game.data.beds.firstOrNull { d ->
-                    team == d.team && d.location.distance(player.location) < 8
+                    team == d.team && d.location.getSafeDistance(player.location) < 8
                 } ?: continue
                 player.addPotionEffect(PotionEffect(PotionEffectType.REGENERATION, 80, 1))
             }
@@ -113,7 +114,7 @@ class UpgradesManager(private val plugin: BedwarsPlugin, val game: BedwarsGame) 
         val teamOfPlayer = game.getTeamOfPlayer(player) ?: return
         val bedData = game.data.beds.firstOrNull { d ->
             teamOfPlayer != d.team
-            d.location.distance(player.location) < 8
+            d.location.getSafeDistance(player.location) < 8
         } ?: return
         val team = bedData.team
         val trap = firstTrap[team] ?: return
@@ -145,7 +146,7 @@ class UpgradesManager(private val plugin: BedwarsPlugin, val game: BedwarsGame) 
         val teamOfPlayer = game.getTeamOfPlayer(player) ?: return false
         game.data.beds.firstOrNull { d ->
             teamOfPlayer != d.team
-            d.location.distance(player.location) < 8
+            d.location.getSafeDistance(player.location) < 8
         } ?: return false
         val time = times[player.uniqueId] ?: return true
         if (System.currentTimeMillis() - time > 30000) {

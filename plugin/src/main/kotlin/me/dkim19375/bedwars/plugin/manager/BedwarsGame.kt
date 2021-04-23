@@ -110,7 +110,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     fun forceStop(whenDone: Runnable? = null) {
-        getPlayersInGame().getPlayers().forEach(this::leavePlayer)
+        getPlayersInGame().getPlayers().forEach { p -> leavePlayer(p, false) }
         players.clear()
         playersInLobby.clear()
         task?.cancel()
@@ -257,7 +257,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         data.apply(player)
     }
 
-    fun leavePlayer(player: Player) {
+    fun leavePlayer(player: Player, update: Boolean = true) {
         revertPlayer(player)
         if (state == GameState.LOBBY || state == GameState.STARTING) {
             if (!playersInLobby.contains(player.uniqueId)) {
@@ -276,7 +276,9 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             revertPlayer(player)
             player.playerListName = player.displayName
             broadcast("${player.displayName.formatWithColors(team.color)}${ChatColor.RED} has left the game!")
-            update()
+            if (update) {
+                update()
+            }
             return
         }
     }

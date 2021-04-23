@@ -115,7 +115,7 @@ fun LivingEntity.getLookingAt(distance: Double = 4.0): LivingEntity? {
         if (!isLookingAt(entity)) {
             continue
         }
-        val entityDistance = location.distance(entity.location)
+        val entityDistance = location.getSafeDistance(entity.location)
         if (closest == null) {
             closest = Pair(entity, entityDistance)
             continue

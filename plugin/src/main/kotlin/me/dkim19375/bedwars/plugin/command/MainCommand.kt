@@ -458,7 +458,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                         }
                         var closestSpawner: Pair<SpawnerData, Double>? = null
                         for (spawner in editor.data.spawners) {
-                            val distance = spawner.location.distance(sender.location)
+                            val distance = spawner.location.getSafeDistance(sender.location)
                             if (distance > 5) {
                                 continue
                             }

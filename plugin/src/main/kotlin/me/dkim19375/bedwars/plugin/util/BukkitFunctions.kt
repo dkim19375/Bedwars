@@ -117,6 +117,25 @@ fun Block.getBedHead(): Location {
     return getRelative(direction).location
 }
 
+fun Location?.getSafeDistance(other: Location?): Double {
+    this ?: return Double.MAX_VALUE
+    other ?: return Double.MAX_VALUE
+    if (world.name != other.world.name) {
+        return Double.MAX_VALUE
+    }
+    return try {
+        distance(
+            if (world.uid != other.world.uid) {
+                Location(world, other.x, other.y, other.z, other.yaw, other.pitch)
+            } else {
+                other
+            }
+        )
+    } catch (_: IllegalArgumentException) {
+        Double.MAX_VALUE
+    }
+}
+
 fun Block.getBedFeet(): Location {
     val data = state.data
     if (data !is Bed) {
