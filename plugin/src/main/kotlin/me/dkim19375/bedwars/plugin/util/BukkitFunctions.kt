@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
 import org.bukkit.material.Bed
 import java.util.*
+import kotlin.math.abs
 
 private val entities = mutableMapOf<UUID, Entity>()
 
@@ -109,6 +110,15 @@ fun Material.isWeapon() = when (this) {
 }
 
 fun Location.getWrapper() = LocationWrapper(this)
+
+fun Location.getOppositeYaw(): Location {
+    val clone = clone()
+    clone.yaw = clone.yaw - 180
+    if (clone.yaw < 0) {
+        clone.yaw = 360 - abs(clone.yaw)
+    }
+    return clone
+}
 
 fun Block.getBedHead(): Location {
     val data = state.data

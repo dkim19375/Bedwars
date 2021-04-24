@@ -670,6 +670,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 return
             }
             villagers.add(entity.uniqueId)
+            entity.teleport(sender.location.getOppositeYaw())
             editor.save()
             for (villager in villagers) {
                 val e = villager.getEntity() ?: continue
