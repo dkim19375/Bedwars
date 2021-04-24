@@ -1,2 +1,4 @@
 rootProject.name = "Bedwars"
 include(":plugin")
+include 'Test'
+

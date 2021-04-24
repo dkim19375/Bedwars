@@ -39,7 +39,7 @@ fun Set<TeamData>.getTeam(team: Team): TeamData? {
     return firstOrNull { d -> d.team == team }
 }
 
-fun <T> List<T>.filterNonNull(): List<T> = filter(Objects::nonNull)
+fun <T> List<T?>.filterNonNull(): List<T> = filter(Objects::nonNull).map { t -> t!! }
 
 fun MutableSet<TeamData>.removeTeam(team: Team) {
     removeIf { d -> d.team == team }

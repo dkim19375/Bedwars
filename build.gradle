@@ -93,7 +93,6 @@ subprojects {
         compileOnly('de.tr7zw:item-nbt-api-plugin:2.7.1')
         compileOnly('org.jetbrains:annotations:20.1.0')
         compileOnly('com.comphenix.protocol:ProtocolLib:4.6.0')
-
         implementation(fileTree('../libs'))
         // https://github.com/katsumag/ItemActionsLib
         // https://github.com/TigerHix/ScoreboardLib

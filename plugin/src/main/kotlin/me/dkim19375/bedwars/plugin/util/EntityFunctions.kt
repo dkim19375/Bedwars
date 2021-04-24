@@ -13,6 +13,7 @@ import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.permissions.Permissible
@@ -42,13 +43,21 @@ val commands = listOf(
     HelpMessage("setup <name> shop add", "Set the villager being looked at as a shop", Permission.SETUP),
     HelpMessage("setup <name> shop remove", "Removes the villager being looked at as a shop", Permission.SETUP),
     HelpMessage("setup <name> upgrades add", "Set the villager being looked at as an upgrade shop", Permission.SETUP),
-    HelpMessage("setup <name> upgrades remove", "Removes the villager being looked at as an upgrade shop", Permission.SETUP),
+    HelpMessage(
+        "setup <name> upgrades remove",
+        "Removes the villager being looked at as an upgrade shop",
+        Permission.SETUP
+    ),
     HelpMessage("setup <name> spawner add <iron/gold/diamond/emerald>", "Add a spawner", Permission.SETUP),
     HelpMessage("setup <name> spawner remove", "Removes a spawner within 5 blocks", Permission.SETUP),
     HelpMessage("setup <name> team", "Get the current teams", Permission.SETUP),
     HelpMessage("setup <name> team add <color>", "Create a team, with the spawn at your location", Permission.SETUP),
     HelpMessage("setup <name> team remove <color>", "Remove a team", Permission.SETUP),
-    HelpMessage("setup <name> bed add <color>", "Set the bed of the team color of the bed you are standing on", Permission.SETUP),
+    HelpMessage(
+        "setup <name> bed add <color>",
+        "Set the bed of the team color of the bed you are standing on",
+        Permission.SETUP
+    ),
     HelpMessage("setup <name> bed remove <color>", "Unsets the bed of the team color", Permission.SETUP),
 )
 
@@ -56,11 +65,13 @@ fun CommandSender.showHelpMessage(label: String, page: Int = 1) = showHelpMessag
 
 fun CommandSender.showHelpMessage(label: String, error: String?, page: Int = 1) {
     sendMessage("${ChatColor.DARK_BLUE}------------------------------------------------")
-    sendMessage("${ChatColor.GREEN}Bedwars v${JavaPlugin.getPlugin(BedwarsPlugin::class.java).description.version} " +
-            "Help Page: $page/${getMaxHelpPages()}  <> = required  [] = optional")
+    sendMessage(
+        "${ChatColor.GREEN}Bedwars v${JavaPlugin.getPlugin(BedwarsPlugin::class.java).description.version} " +
+                "Help Page: $page/${getMaxHelpPages()}  <> = required  [] = optional"
+    )
     val newCommands = commands.filter { msg -> hasPermission(msg.permission) }
     for (i in ((page - 1) * 7) until page * 7) {
-        val cmd = newCommands.getSafe(i)?: continue
+        val cmd = newCommands.getSafe(i) ?: continue
         sendHelpMsgFormatted(label, cmd)
     }
     error?.let {
@@ -81,8 +92,6 @@ private fun CommandSender.sendHelpMsgFormatted(label: String, message: HelpMessa
     sendMessage("${ChatColor.AQUA}/$label ${message.arg} - ${ChatColor.GOLD}${message.description}")
 }
 
-fun List<UUID>.getPlayers(): List<Player> = map(Bukkit::getPlayer).filterNonNull()
-
 fun Set<UUID>.getPlayers(): Set<Player> = map(Bukkit::getPlayer).filterNonNull().toSet()
 
 fun Set<Player>.getUsernames() = map(Player::getName).toSet()
@@ -93,7 +102,7 @@ fun Player.getItemAmount(type: Material): Int {
     var amount = 0
     val inv = inventory.contents.toList()
     for (item in inv) {
-        item?: continue
+        item ?: continue
         if (item.type == type) {
             amount += item.amount
         }
@@ -108,31 +117,7 @@ fun Player.playSound(sound: Sound, volume: Float = 0.7f, pitch: Float = 1.0f) {
 }
 
 fun LivingEntity.getLookingAt(distance: Double = 4.0): LivingEntity? {
-    var closest: Pair<LivingEntity, Double>? = null
-    for (entity in getNearbyEntities(distance, distance, distance)) {
-        if (entity !is LivingEntity) {
-            continue
-        }
-        if (!isLookingAt(entity)) {
-            continue
-        }
-        val entityDistance = location.getSafeDistance(entity.location)
-        if (closest == null) {
-            closest = Pair(entity, entityDistance)
-            continue
-        }
-        if (closest.second > entityDistance) {
-            closest = Pair(entity, entityDistance)
-        }
-    }
-    return closest?.first
-}
-
-fun LivingEntity.isLookingAt(other: LivingEntity): Boolean {
-    val eye = eyeLocation
-    val toEntity = other.eyeLocation.toVector().subtract(eye.toVector())
-    val dot = toEntity.normalize().dot(eye.direction)
-    return dot > 0.99
+    return getTarget(getNearbyEntities(distance, distance, distance)) as? LivingEntity
 }
 
 fun Player.sendOtherTitle(
@@ -157,4 +142,29 @@ fun Player.sendTitle(
     val cTitle = Title.title(newTitle, newSubTitle, times)
     val audience = BukkitAudiences.create(JavaPlugin.getPlugin(BedwarsPlugin::class.java)).player(this)
     audience.showTitle(cTitle)
+}
+
+private fun <T : Entity> T.getTarget(
+    entities: Iterable<T>
+): T? {
+    var target: T? = null
+    val threshold = 1.0
+    for (other in entities) {
+        val n = other.location.toVector()
+            .subtract(location.toVector())
+        if (location.direction.normalize().crossProduct(n)
+                .lengthSquared() < threshold
+            && n.normalize().dot(
+                location.direction.normalize()
+            ) >= 0
+        ) {
+            if (target == null
+                || target.location.distanceSquared(
+                    location
+                ) > other.location
+                    .distanceSquared(location)
+            ) target = other
+        }
+    }
+    return target
 }

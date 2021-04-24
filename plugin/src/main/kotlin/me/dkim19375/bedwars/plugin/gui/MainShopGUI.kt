@@ -144,6 +144,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
     private fun givePlayerItem(item: MainShopItems) {
         if (player.inventory.hasArmor(ArmorType.fromMaterial(item.item.material))) {
             player.sendMessage("${ChatColor.RED}You already have this!")
+            player.playSound(Sound.NOTE_PLING, pitch = 2.0f)
             return
         }
         if (player.inventory.hasItem(item.item.material)) {

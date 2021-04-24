@@ -8,9 +8,11 @@ import me.dkim19375.bedwars.plugin.data.TeamData
 import me.dkim19375.bedwars.plugin.enumclass.*
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
 import me.dkim19375.bedwars.plugin.util.*
+import me.tigerhix.lib.scoreboard.type.Entry
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
+import org.bukkit.Sound
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -32,6 +34,48 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
         }
         @Suppress("LiftReturnOrAssignment")
         when (args[0].toLowerCase()) {
+            "board" -> {
+                if (sender !is Player) {
+                    sender.sendMessage(ErrorMessages.MUST_BE_PLAYER)
+                    return true
+                }
+                val entries = plugin.scoreboardManager.getEntries(sender)
+                if (entries.isNullOrEmpty()) {
+                    sender.sendMessage("${ChatColor.RED}Empty scoreboard!")
+                    return true
+                }
+                val list = entries.map(Entry::getName)
+                sender.sendMessage("${ChatColor.DARK_BLUE}------------------------------------------------")
+                sender.sendMessage(plugin.scoreboardManager.getTitle(sender))
+                sender.sendMessage("${ChatColor.DARK_GRAY}------------------------------------------------")
+                list.forEach(sender::sendMessage)
+                sender.sendMessage("${ChatColor.DARK_BLUE}------------------------------------------------")
+                return true
+            }
+            "sound" -> {
+                if (sender !is Player) {
+                    sender.sendMessage(ErrorMessages.MUST_BE_PLAYER)
+                    return true
+                }
+                if (args.size < 3) {
+                    sender.sendMessage(ErrorMessages.TOO_LITTLE_ARGS)
+                    return true
+                }
+                val sound: Sound = try {
+                    Sound.valueOf(args[1].toUpperCase())
+                } catch (_: IllegalArgumentException) {
+                    sender.sendMessage(ErrorMessages.INVALID_ARG)
+                    return true
+                }
+                val pitch: Float? = args[2].toFloatOrNull()
+                if (pitch == null) {
+                    sender.sendMessage(ErrorMessages.INVALID_ARG)
+                    return true
+                }
+                sender.playSound(sound, pitch = pitch)
+                sender.sendMessage("${ChatColor.GREEN}Played sound: ${sound.name} at pitch $pitch!")
+                return true
+            }
             "debug" -> {
                 if (sender !is Player) {
                     sender.sendMessage(ErrorMessages.MUST_BE_PLAYER)
