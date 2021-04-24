@@ -34,6 +34,25 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
         }
         @Suppress("LiftReturnOrAssignment")
         when (args[0].toLowerCase()) {
+            "item" -> {
+                if (sender !is Player) {
+                    sender.sendMessage(ErrorMessages.MUST_BE_PLAYER)
+                    return true
+                }
+                if (args.size < 2) {
+                    sender.sendMessage(ErrorMessages.TOO_LITTLE_ARGS)
+                    return true
+                }
+                val item = try {
+                    MainShopItems.valueOf(args[1].toUpperCase())
+                } catch (_: IllegalArgumentException) {
+                    sender.sendMessage(ErrorMessages.INVALID_ARG)
+                    return true
+                }
+                sender.inventory.addItem(item.item.toItemStack(plugin.gameManager.getTeamOfPlayer(sender)?.color))
+                sender.sendMessage("${ChatColor.GREEN}Successfully gave item!")
+                return true
+            }
             "board" -> {
                 if (sender !is Player) {
                     sender.sendMessage(ErrorMessages.MUST_BE_PLAYER)
@@ -97,6 +116,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                     }
                     game = g
                 }
+                sender.sendMessage("Test: ${plugin.gameManager.getGame(sender) != null}")
                 sender.sendMessage(
                     "Is in lobby OR game: ${
                         if (game.playersInLobby.plus(game.players.values.getCombinedValues())
@@ -207,7 +227,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 }
                 var maxGame: Pair<BedwarsGame, Int>? = null
                 for (game in plugin.gameManager.getGames().values) {
-                    if (game.state != GameState.LOBBY) {
+                    if (game.state != GameState.LOBBY && game.state != GameState.STARTING) {
                         continue
                     }
                     if (game.getPlayersInGame().size >= game.data.maxPlayers) {

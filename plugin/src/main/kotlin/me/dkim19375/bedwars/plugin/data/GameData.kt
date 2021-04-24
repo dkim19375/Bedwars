@@ -53,10 +53,8 @@ data class GameData(
                 map["min-players"] as Int,
                 map["max-players"] as Int,
                 (map["teams"] as List<TeamData>).toSet(),
-                (map["shop-villagers"] as List<String>).map(String::toUUID).filterNonNull().map { i -> i!! }
-                    .toSet(),
-                (map["upgrade-villagers"] as List<String>).map(String::toUUID).filterNonNull().map { i -> i!! }
-                    .toSet(),
+                (map["shop-villagers"] as List<String>).map(String::toUUID).filterNonNull().toSet(),
+                (map["upgrade-villagers"] as List<String>).map(String::toUUID).filterNonNull().toSet(),
                 (map["spawners"] as List<SpawnerData>).toSet(),
                 (map["beds"] as List<BedData>).toSet(),
                 map["spec"] as Location,

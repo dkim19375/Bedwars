@@ -2,6 +2,7 @@ package me.dkim19375.bedwars.plugin.util
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.HelpMessage
+import me.dkim19375.bedwars.plugin.enumclass.ArmorType
 import me.dkim19375.bedwars.plugin.enumclass.ErrorMessages
 import me.dkim19375.bedwars.plugin.enumclass.Permission
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
@@ -16,6 +17,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
+import org.bukkit.inventory.PlayerInventory
 import org.bukkit.permissions.Permissible
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.*
@@ -90,6 +92,34 @@ private fun CommandSender.sendHelpMsgFormatted(label: String, message: HelpMessa
         return
     }
     sendMessage("${ChatColor.AQUA}/$label ${message.arg} - ${ChatColor.GOLD}${message.description}")
+}
+
+fun PlayerInventory.containsArmor(): ArmorType? {
+    for (item in contents) {
+        val type = ArmorType.fromMaterial(item.type)
+        if (type != null) {
+            return type
+        }
+    }
+    return null
+}
+
+fun PlayerInventory.containsTool(): Boolean {
+    for (item in contents) {
+        if (item.type.isTool()) {
+            return true
+        }
+    }
+    return false
+}
+
+fun PlayerInventory.containsWeapon(): Boolean {
+    for (item in contents) {
+        if (item.type.isWeapon()) {
+            return true
+        }
+    }
+    return false
 }
 
 fun Set<UUID>.getPlayers(): Set<Player> = map(Bukkit::getPlayer).filterNonNull().toSet()

@@ -142,20 +142,29 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
     }
 
     private fun givePlayerItem(item: MainShopItems) {
-        if (player.inventory.hasArmor(ArmorType.fromMaterial(item.item.material))) {
-            player.sendMessage("${ChatColor.RED}You already have this!")
-            player.playSound(Sound.NOTE_PLING, pitch = 2.0f)
+        if (item.type == ItemType.ARMOR) {
+            if (player.inventory.hasArmor(ArmorType.fromMaterial(item.item.material))) {
+                player.sendMessage("${ChatColor.RED}You already have this!")
+                player.playSound(Sound.NOTE_PLING, pitch = 2.0f)
+                return
+            }
+            player.inventory.removeItem(ItemStack(item.costType.material, item.costAmount))
+            player.sendMessage("${ChatColor.GREEN}Successfully bought ${item.displayname}!")
+            val armorType = ArmorType.fromMaterial(item.item.material)?: return
+            player.inventory.boots = ItemStack(armorType.boots)
+            player.inventory.leggings = ItemStack(armorType.leggings)
             return
         }
-        if (player.inventory.hasItem(item.item.material)) {
+        if (player.inventory.hasItem(item.item.material) && (item.permanent || item.defaultOnSpawn)) {
             player.sendMessage("${ChatColor.RED}You already have this!")
+            player.playSound(Sound.NOTE_PLING, pitch = 2.0f)
             return
         }
         player.inventory.removeItem(ItemStack(item.costType.material, item.costAmount))
         val team = plugin.gameManager.getTeamOfPlayer(player)
         player.sendMessage("${ChatColor.GREEN}Successfully bought ${item.displayname}!")
         if (team == null) {
-            player.inventory.addItem(item.item.toItemStack())
+            player.inventory.addItem(item.item.toItemStack(team?.color))
             return
         }
         player.inventory.addItem(item.item.toItemStack(team.color))

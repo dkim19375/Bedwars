@@ -16,6 +16,7 @@ data class PlayerData(
         player.inventory.contents = inventory
         player.enderChest.contents = enderChest
         player.teleport(location)
+        player.activePotionEffects.forEach { e -> player.removePotionEffect(e.type) }
     }
 
     companion object {

@@ -1,9 +1,12 @@
 package me.dkim19375.bedwars.plugin.enumclass
 
+import me.dkim19375.bedwars.plugin.data.Potion
+import me.dkim19375.bedwars.plugin.util.ItemWrapper
+import me.dkim19375.bedwars.plugin.util.getWrapper
 import org.bukkit.ChatColor
 import org.bukkit.DyeColor
+import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
-import org.bukkit.material.Colorable
 
 enum class Team(val color: DyeColor, val chatColor: ChatColor, val displayName: String) {
     RED(DyeColor.RED, ChatColor.RED, "Red"),
@@ -23,15 +26,9 @@ enum class Team(val color: DyeColor, val chatColor: ChatColor, val displayName: 
     }
 }
 
+fun Team.getColored(material: Material): ItemStack = getColored(ItemStack(material))
+
 fun Team.getColored(item: ItemStack): ItemStack {
-    if (item.clone().itemMeta is Colorable) {
-        val newItem = item.clone()
-        newItem.itemMeta?.let {
-            (it as Colorable).color = color
-            newItem.itemMeta = it
-        }
-        return newItem
-    }
-    @Suppress("DEPRECATION")
-    return ItemStack(item.type, item.amount, color.data.toShort())
+    val wrapper = item.getWrapper()
+    return wrapper.toItemStack(color)
 }

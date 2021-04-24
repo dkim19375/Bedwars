@@ -1,20 +1,20 @@
 package me.dkim19375.bedwars.plugin.util
 
+import me.dkim19375.bedwars.plugin.data.Potion
+import me.dkim19375.bedwars.plugin.enumclass.MainShopItems
+import me.dkim19375.bedwars.plugin.gui.MainShopGUI
 import org.bukkit.DyeColor
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
+import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.material.Colorable
-import org.bukkit.potion.Potion
 import org.bukkit.potion.PotionType
 
 data class ItemWrapper (
     val material: Material, val amount: Int, val potionType: PotionType? = null,
     val potionAmplifier: Int = 1, val enchants: List<Enchantment> = listOf()
 ) {
-    fun toItemStack(): ItemStack = toItemStack(null)
-
     fun toItemStack(color: DyeColor?): ItemStack {
         if (potionType == null) {
             val item: ItemStack
@@ -25,7 +25,12 @@ data class ItemWrapper (
                 if (color == null) {
                     item = ItemStack(material, amount)
                 } else {
-                    item = ItemStack(material, amount, color.data.toShort())
+                    val type = MainShopItems.getByMaterial(material)
+                    if (type != null && type.type == MainShopGUI.ItemType.BLOCKS) {
+                        item = ItemStack(material, amount, color.data.toShort())
+                    } else {
+                        item = ItemStack(material, amount)
+                    }
                 }
             }
             enchants.forEach { e ->
@@ -37,6 +42,7 @@ data class ItemWrapper (
                 if (it is Colorable) {
                     it.color = color
                 }
+                it.addItemFlags(*ItemFlag.values())
                 item.itemMeta = it
             }
             return item
@@ -48,6 +54,10 @@ data class ItemWrapper (
             if (e.canEnchantItem(item)) {
                 item.addEnchantment(e, 1)
             }
+        }
+        item.itemMeta?.let { meta ->
+            meta.addItemFlags(*ItemFlag.values())
+            item.itemMeta = meta
         }
         return item
     }

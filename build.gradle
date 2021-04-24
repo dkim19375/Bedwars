@@ -23,6 +23,7 @@ shadowJar {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven { url = 'https://jitpack.io' }
     maven { url = 'https://repo.mattstudios.me/artifactory/public' }

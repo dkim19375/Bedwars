@@ -1,6 +1,7 @@
 package me.dkim19375.bedwars.plugin.util
 
 import me.dkim19375.bedwars.plugin.data.LocationWrapper
+import me.dkim19375.bedwars.plugin.data.Potion
 import me.dkim19375.bedwars.plugin.enumclass.ArmorType
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -84,6 +85,14 @@ fun Material.isArmor() = when (this) {
     Material.DIAMOND_LEGGINGS -> true
     Material.DIAMOND_BOOTS -> true
     else -> false
+}
+
+fun ItemStack.getWrapper(): ItemWrapper {
+    val potion = Potion.fromItemStack(this)
+    if (potion != null) {
+        return ItemWrapper(type, amount, potion.type, potion.level - 1, enchantments.keys.toList())
+    }
+    return ItemWrapper(type, amount, null, 1, enchantments.keys.toList())
 }
 
 fun Material.isTool() = when (this) {

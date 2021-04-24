@@ -22,7 +22,7 @@ class EntityDamageByEntityListener(private val plugin: BedwarsPlugin) : Listener
         if (damager.uniqueId !in entities) {
             return
         }
-        damage = finalDamage * 0.2
+        damage = finalDamage * 0.1
         entities.remove(damager.uniqueId)
     }
 }

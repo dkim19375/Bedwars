@@ -4,18 +4,13 @@ import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.GameData
 import me.dkim19375.bedwars.plugin.data.LocationWrapper
 import me.dkim19375.bedwars.plugin.data.PlayerData
-import me.dkim19375.bedwars.plugin.enumclass.GameState
-import me.dkim19375.bedwars.plugin.enumclass.Team
-import me.dkim19375.bedwars.plugin.util.getCombinedValues
-import me.dkim19375.bedwars.plugin.util.getPlayers
-import me.dkim19375.bedwars.plugin.util.getTeam
-import me.dkim19375.bedwars.plugin.util.sendOtherTitle
+import me.dkim19375.bedwars.plugin.enumclass.*
+import me.dkim19375.bedwars.plugin.gui.MainShopGUI
+import me.dkim19375.bedwars.plugin.util.*
 import org.apache.commons.io.FileUtils
-import org.bukkit.Bukkit
-import org.bukkit.ChatColor
-import org.bukkit.GameMode
-import org.bukkit.WorldCreator
+import org.bukkit.*
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.scheduler.BukkitTask
 import java.nio.file.Paths
@@ -60,6 +55,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         state = GameState.STARTING
         countdown = 10
         println("Game ${data.world.name} is starting!")
+        task?.cancel()
         task = object : BukkitRunnable() {
             override fun run() {
                 if (countdown < 1) {
@@ -104,6 +100,26 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         state = GameState.STARTED
         time = System.currentTimeMillis()
         spawnerManager.start()
+        for (entry in players.entries) {
+            val team = entry.key
+            val players = entry.value.getPlayers()
+            for (player in players) {
+                player.inventory.helmet = team.getColored(ItemStack(Material.LEATHER_HELMET))
+                player.inventory.chestplate = team.getColored(ItemStack(Material.LEATHER_CHESTPLATE))
+                for (item in MainShopItems.values()) {
+                    if (!item.defaultOnSpawn) {
+                        continue
+                    }
+                    val armor = ArmorType.fromMaterial(item.item.material)
+                    if (armor != null) {
+                        player.inventory.leggings = team.getColored(armor.leggings)
+                        player.inventory.boots = team.getColored(armor.boots)
+                        continue
+                    }
+                    player.inventory.addItem(item.item.toItemStack(team.color))
+                }
+            }
+        }
     }
 
     fun stop(winner: Player?, team: Team) {
@@ -161,6 +177,15 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
 
     fun update() {
         if (state != GameState.STARTED) {
+            if (state != GameState.STARTING) {
+                return
+            }
+            if (playersInLobby.isNotEmpty()) {
+                return
+            }
+            state = GameState.LOBBY
+            task?.cancel()
+            task = null
             return
         }
         for (team in players.keys.toList()) {
@@ -173,7 +198,8 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             }
         }
         if (getPlayersInGame().isEmpty()) {
-            throw IllegalStateException("No players in game.. game is still active")
+            forceStop()
+            return
         }
         if (getPlayersInGame().size == 1) {
             val player = Bukkit.getPlayer(getPlayersInGame().first())
@@ -182,7 +208,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     fun addPlayer(player: Player): Result {
-        if (state != GameState.LOBBY) {
+        if (state != GameState.LOBBY && state != GameState.STARTING) {
             if (isRunning()) {
                 return Result.GAME_RUNNING
             }
@@ -273,20 +299,23 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             }
             return
         }
-        if (state == GameState.STARTED) {
-            val team = getTeamOfPlayer(player) ?: return
-            revertPlayer(player)
-            player.playerListName = player.displayName
-            broadcast("${team.chatColor}${player.displayName}${ChatColor.RED} has left the game!")
-            if (update) {
-                update()
-            }
+        if (state != GameState.STARTED) {
             return
         }
+        val team = getTeamOfPlayer(player) ?: return
+        revertPlayer(player)
+        player.playerListName = player.displayName
+        players.getOrDefault(team, mutableSetOf()).remove(player.uniqueId)
+        broadcast("${team.chatColor}${player.displayName}${ChatColor.RED} has left the game!")
+        if (update) {
+            update()
+        }
+        return
     }
 
     fun getPlayersInGame(): Set<UUID> = when (state) {
         GameState.LOBBY -> playersInLobby.toSet()
+        GameState.STARTING -> playersInLobby.toSet()
         GameState.STARTED -> players.values.getCombinedValues().toSet()
         else -> setOf()
     }
