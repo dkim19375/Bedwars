@@ -487,7 +487,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                                 val team = teamData.team
                                 val bed = editor.data.beds.firstOrNull { d -> d.team == team }
                                 sender.sendMessage(
-                                    "${team.displayName.formatWithColors(team.color)}${ChatColor.GOLD}: " +
+                                    "${team.chatColor}${team.displayName}${ChatColor.GOLD}: " +
                                             "Is bed set: ${(bed != null).getGreenOrRed()}" +
                                             if (bed != null) "Yes" else {
                                                 "No"
@@ -514,9 +514,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                             editor.data.teams.setData(TeamData(team, location))
                             editor.save()
                             sender.sendMessage(
-                                "${ChatColor.GREEN}Successfully created the team ${
-                                    team.displayName.capAndFormat().formatWithColors(team.color)
-                                }${ChatColor.GREEN}!"
+                                "${ChatColor.GREEN}Successfully created the team ${team.chatColor}${team.displayName.capAndFormat()}${ChatColor.GREEN}!"
                             )
                             return true
                         }
@@ -536,8 +534,8 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                         editor.data.teams.removeTeam(team)
                         editor.save()
                         sender.sendMessage(
-                            "${ChatColor.GREEN}Successfully removed the team ${
-                                team.displayName.capAndFormat().formatWithColors(team.color)
+                            "${ChatColor.GREEN}Successfully removed the team ${team.chatColor}${
+                                team.displayName.capAndFormat()
                             }${ChatColor.GREEN}!"
                         )
                         return true

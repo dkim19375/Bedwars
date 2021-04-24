@@ -81,9 +81,9 @@ private fun CommandSender.sendHelpMsgFormatted(label: String, message: HelpMessa
     sendMessage("${ChatColor.AQUA}/$label ${message.arg} - ${ChatColor.GOLD}${message.description}")
 }
 
-fun List<UUID>.getPlayers() = map(Bukkit::getPlayer).filter(Objects::nonNull)
+fun List<UUID>.getPlayers(): List<Player> = map(Bukkit::getPlayer).filterNonNull()
 
-fun Set<UUID>.getPlayers() = map(Bukkit::getPlayer).filter(Objects::nonNull).toSet()
+fun Set<UUID>.getPlayers(): Set<Player> = map(Bukkit::getPlayer).filterNonNull().toSet()
 
 fun Set<Player>.getUsernames() = map(Player::getName).toSet()
 
@@ -92,9 +92,10 @@ fun CommandSender.sendMessage(message: ErrorMessages) = sendMessage(message.mess
 fun Player.getItemAmount(type: Material): Int {
     var amount = 0
     val inv = inventory.contents.toList()
-    inv.forEach { item ->
+    for (item in inv) {
+        item?: continue
         if (item.type == type) {
-            amount++
+            amount += item.amount
         }
     }
     return amount
@@ -102,7 +103,7 @@ fun Player.getItemAmount(type: Material): Int {
 
 fun Permissible.hasPermission(permission: Permission) = hasPermission(permission.permission)
 
-fun Player.playSound(sound: Sound, volume: Float = 1.0f, pitch: Float = 1.0f) {
+fun Player.playSound(sound: Sound, volume: Float = 0.7f, pitch: Float = 1.0f) {
     playSound(location, sound, volume, pitch)
 }
 

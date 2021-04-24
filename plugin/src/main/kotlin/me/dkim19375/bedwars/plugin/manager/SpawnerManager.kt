@@ -46,7 +46,7 @@ class SpawnerManager(private val plugin: BedwarsPlugin, private val game: Bedwar
                     for (entity in entities) {
                         val itemEntity = entity as? Item?: continue
                         if (itemEntity.itemStack.type == item.itemStack.type) {
-                            amount++
+                            amount += itemEntity.itemStack.amount
                         }
                     }
                     if (amount > spawner.type.maxAmount) {

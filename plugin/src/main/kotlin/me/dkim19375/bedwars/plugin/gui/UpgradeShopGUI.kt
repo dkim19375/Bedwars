@@ -40,7 +40,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
     }
 
     private fun reset() {
-        for (i in 0..45) {
+        for (i in 0..44) {
             menu.removeItem(i)
         }
     }
@@ -48,7 +48,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
     private fun getTrapItemOnMainScreen(number: Int): GuiItem {
         val default =
             @Suppress("deprecation")
-            ItemBuilder.from(ItemStack(Material.STAINED_GLASS_PANE, number, DyeColor.SILVER.data.toShort()))
+            ItemBuilder.from(ItemStack(Material.STAINED_GLASS_PANE, number, DyeColor.GRAY.data.toShort()))
                 .setName("${ChatColor.RED}Trap #$number: No Trap!")
                 .setLore(
                     "${ChatColor.GRAY}The${
@@ -341,7 +341,6 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
     private fun onClick(type: UpgradeType) {
         val game = plugin.gameManager.getGame(player) ?: return
         val upgrades = game.upgradesManager
-        showMainScreen()
 
         when (type) {
             UpgradeType.SHARPNESS -> {
@@ -351,33 +350,40 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
                 player.inventory.removeItem(ItemStack(Material.DIAMOND, 4))
                 upgrades.sharpness.add(team)
                 sendUpgradeMessage("Sharpness", game)
+                showMainScreen()
                 return
             }
             UpgradeType.PROTECTION -> {
                 if (!verifyHasPurchase(upgrades.protection.getOrDefault(team, 0) >= 4)) {
+                    showMainScreen()
                     return
                 }
                 val level = upgrades.protection.getOrDefault(team, 0)
                 val cost = ProtectionLevel.fromInt(level + 1).cost
                 chargeUpgradable(upgrades.protection, cost, game, "Reinforced Armor")
+                showMainScreen()
                 return
             }
             UpgradeType.HASTE -> {
                 if (!verifyHasPurchase(upgrades.haste.getOrDefault(team, 0) >= 2)) {
+                    showMainScreen()
                     return
                 }
                 val level = upgrades.haste.getOrDefault(team, 0)
                 val cost = (level + 1) * 2
                 chargeUpgradable(upgrades.haste, cost, game, "Maniac Miner")
+                showMainScreen()
                 return
             }
             UpgradeType.HEAL_POOL -> {
+                showMainScreen()
                 if (!verifyItems(upgrades.healPool.contains(team), 1)) {
                     return
                 }
                 upgrades.healPool.add(team)
                 player.inventory.removeItem(ItemStack(Material.DIAMOND, 1))
                 sendUpgradeMessage("Heal Pool", game)
+                showMainScreen()
                 return
             }
         }

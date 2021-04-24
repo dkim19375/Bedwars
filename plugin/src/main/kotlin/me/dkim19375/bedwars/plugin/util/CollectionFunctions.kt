@@ -2,6 +2,7 @@ package me.dkim19375.bedwars.plugin.util
 
 import me.dkim19375.bedwars.plugin.data.TeamData
 import me.dkim19375.bedwars.plugin.enumclass.Team
+import java.util.*
 
 
 fun <V> Map<String, V>.getKeyFromStr(key: String): String? {
@@ -37,6 +38,8 @@ fun Set<TeamData>.containsTeam(team: Team): Boolean = getTeam(team) != null
 fun Set<TeamData>.getTeam(team: Team): TeamData? {
     return firstOrNull { d -> d.team == team }
 }
+
+fun <T> List<T>.filterNonNull(): List<T> = filter(Objects::nonNull)
 
 fun MutableSet<TeamData>.removeTeam(team: Team) {
     removeIf { d -> d.team == team }

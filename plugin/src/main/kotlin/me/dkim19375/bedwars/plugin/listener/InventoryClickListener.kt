@@ -12,11 +12,15 @@ class InventoryClickListener(private val plugin: BedwarsPlugin) : Listener {
     private fun InventoryClickEvent.onClick() {
         val game = plugin.gameManager.getGame(getPlayer())?: return
         game.upgradesManager.applyUpgrades(getPlayer())
-        if (currentItem.type.isArmor()) {
-            isCancelled = true
+        if (currentItem != null) {
+            if (currentItem.type.isArmor()) {
+                isCancelled = true
+            }
         }
-        if (cursor.type.isArmor()) {
-            isCancelled = true
+        if (cursor != null) {
+            if (cursor.type.isArmor()) {
+                isCancelled = true
+            }
         }
     }
 }

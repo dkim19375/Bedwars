@@ -3,6 +3,7 @@ package me.dkim19375.bedwars.plugin.listener
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.gui.MainShopGUI
 import me.dkim19375.bedwars.plugin.gui.UpgradeShopGUI
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Fireball
 import org.bukkit.event.EventHandler
@@ -25,7 +26,9 @@ class PlayerInteractListener(private val plugin: BedwarsPlugin) : Listener {
         val game = plugin.gameManager.getGame(player)?: return
         if (game.npcManager.getShopVillagersUUID().contains(rightClicked.uniqueId)) {
             isCancelled = true
-            MainShopGUI(player, plugin).showPlayer()
+            Bukkit.getScheduler().runTask(plugin) {
+                MainShopGUI(player, plugin).showPlayer()
+            }
             return
         }
         if (!game.npcManager.getUpgradeVillagersUUID().contains(rightClicked.uniqueId)) {
@@ -33,7 +36,9 @@ class PlayerInteractListener(private val plugin: BedwarsPlugin) : Listener {
         }
         val team = game.getTeamOfPlayer(player)?: return
         isCancelled = true
-        UpgradeShopGUI(player, team, plugin).showPlayer()
+        Bukkit.getScheduler().runTask(plugin) {
+            UpgradeShopGUI(player, team, plugin).showPlayer()
+        }
     }
 
     private fun PlayerInteractEvent.blockPrevention() {

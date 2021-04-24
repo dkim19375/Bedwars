@@ -12,7 +12,7 @@ import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.event.inventory.InventoryType
 
 class PlayerInventoryListener(private val plugin: BedwarsPlugin) : Listener {
-    @EventHandler
+    // @EventHandler
     private fun InventoryOpenEvent.onOpen() {
         val player = player as Player
         val game = plugin.gameManager.getGame(player)?: return

@@ -14,6 +14,7 @@ import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
+import java.util.*
 
 @Suppress("MemberVisibilityCanBePrivate")
 class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin) {
@@ -21,7 +22,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
     var isSettingQuickBuy = false
 
     private fun reset() {
-        for (i in 0..54) {
+        for (i in 0..53) {
             menu.removeItem(i)
         }
     }
@@ -39,12 +40,12 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
     private fun setTopRow() {
         menu.setItem(0, getGuiItem("${ChatColor.AQUA}Quick Buy", this::showQuickBuy, Material.NETHER_STAR))
         menu.setItem(2, getGuiItem("Blocks", this::showBlocks))
-        menu.setItem(3, getGuiItem("Melee", this::showMelee))
-        menu.setItem(4, getGuiItem("Armor", this::showArmor))
-        menu.setItem(5, getGuiItem("Tools", this::showTools))
-        menu.setItem(6, getGuiItem("Ranged", this::showRanged))
-        menu.setItem(7, getGuiItem("Potions", this::showPotions))
-        menu.setItem(8, getGuiItem("Utility", this::showUtility))
+        menu.setItem(3, getGuiItem("Melee", this::showMelee, Material.GOLD_SWORD))
+        menu.setItem(4, getGuiItem("Armor", this::showArmor, Material.CHAINMAIL_BOOTS))
+        menu.setItem(5, getGuiItem("Tools", this::showTools, Material.STONE_PICKAXE))
+        menu.setItem(6, getGuiItem("Ranged", this::showRanged, Material.BOW))
+        menu.setItem(7, getGuiItem("Potions", this::showPotions, Material.BREWING_STAND_ITEM))
+        menu.setItem(8, getGuiItem("Utility", this::showUtility, Material.TNT))
         val grayGlass = ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.GRAY.data.toShort())
         menu.filler.fillBetweenPoints(
             2, 1, 2, 9, ItemBuilder.from(grayGlass)
@@ -224,12 +225,15 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
         givePlayerItem(item)
     }
 
-    private fun showShopScreen(col: Int, name: String) {
+    private fun showShopScreen(col: Int, name: String, type: ItemType) {
         reset()
         setTopRow()
         putGreenGlass(col)
         for (item in MainShopItems.values()) {
             if (item.defaultOnSpawn) {
+                continue
+            }
+            if (item.type != type) {
                 continue
             }
             menu.setItem(item.slot, formatItem(item).asGuiItem {
@@ -248,7 +252,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
                     return@asGuiItem
                 }
                 if (item.permanent) {
-                    if (player.inventory.contents.any { i ->
+                    if (player.inventory.contents.filter(Objects::nonNull).any { i ->
                             i.type == item.item.material
                         }) {
                         player.sendMessage("${ChatColor.RED}You already have that item!")
@@ -262,7 +266,6 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
         menu.update()
     }
 
-    @Suppress("DEPRECATION")
     fun showQuickBuy() {
         reset()
         setTopRow()
@@ -275,31 +278,31 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
     }
 
     fun showBlocks() {
-        showShopScreen(2, "Blocks")
+        showShopScreen(2, "Blocks", ItemType.BLOCKS)
     }
 
     fun showMelee() {
-        showShopScreen(3, "Melee")
+        showShopScreen(3, "Melee", ItemType.MELEE)
     }
 
     fun showArmor() {
-        showShopScreen(4, "Armor")
+        showShopScreen(4, "Armor", ItemType.ARMOR)
     }
 
     fun showTools() {
-        showShopScreen(5, "Tools")
+        showShopScreen(5, "Tools", ItemType.TOOLS)
     }
 
     fun showRanged() {
-        showShopScreen(6, "Ranged")
+        showShopScreen(6, "Ranged", ItemType.RANGED)
     }
 
     fun showPotions() {
-        showShopScreen(7, "Potions")
+        showShopScreen(7, "Potions", ItemType.POTIONS)
     }
 
     fun showUtility() {
-        showShopScreen(8, "Utility")
+        showShopScreen(8, "Utility", ItemType.UTILITY)
     }
 
     enum class ItemType {

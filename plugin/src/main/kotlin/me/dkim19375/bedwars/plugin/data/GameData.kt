@@ -2,6 +2,7 @@ package me.dkim19375.bedwars.plugin.data
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
+import me.dkim19375.bedwars.plugin.util.filterNonNull
 import me.dkim19375.bedwars.plugin.util.toUUID
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -52,9 +53,9 @@ data class GameData(
                 map["min-players"] as Int,
                 map["max-players"] as Int,
                 (map["teams"] as List<TeamData>).toSet(),
-                (map["shop-villagers"] as List<String>).map(String::toUUID).filter(Objects::nonNull).map { i -> i!! }
+                (map["shop-villagers"] as List<String>).map(String::toUUID).filterNonNull().map { i -> i!! }
                     .toSet(),
-                (map["upgrade-villagers"] as List<String>).map(String::toUUID).filter(Objects::nonNull).map { i -> i!! }
+                (map["upgrade-villagers"] as List<String>).map(String::toUUID).filterNonNull().map { i -> i!! }
                     .toSet(),
                 (map["spawners"] as List<SpawnerData>).toSet(),
                 (map["beds"] as List<BedData>).toSet(),

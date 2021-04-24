@@ -4,11 +4,7 @@ import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.enumclass.Team
 import me.dkim19375.bedwars.plugin.enumclass.TrapType
-import me.dkim19375.bedwars.plugin.enumclass.formatWithColors
-import me.dkim19375.bedwars.plugin.util.getSafeDistance
-import me.dkim19375.bedwars.plugin.util.isArmor
-import me.dkim19375.bedwars.plugin.util.isWeapon
-import me.dkim19375.bedwars.plugin.util.sendTitle
+import me.dkim19375.bedwars.plugin.util.*
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.enchantments.Enchantment
@@ -49,9 +45,9 @@ class UpgradesManager(private val plugin: BedwarsPlugin, val game: BedwarsGame) 
             if (game.state != GameState.STARTED) {
                 return@runTaskTimer
             }
-            val players = game.getPlayersInGame().map(Bukkit::getPlayer).filter(Objects::nonNull)
+            val players = game.getPlayersInGame().map(Bukkit::getPlayer).filterNonNull()
             for (player in players) {
-                val team = game.getTeamOfPlayer(player)?: continue
+                val team = game.getTeamOfPlayer(player) ?: continue
                 val haste = haste[team]
                 if (haste != null) {
                     player.addPotionEffect(PotionEffect(PotionEffectType.FAST_DIGGING, 100, haste - 1))
@@ -135,7 +131,7 @@ class UpgradesManager(private val plugin: BedwarsPlugin, val game: BedwarsGame) 
             p.sendTitle("${ChatColor.RED}Your trap has been triggered!")
             p.sendMessage(
                 "${ChatColor.RED}${ChatColor.BOLD}${trap.displayName} trap set off${
-                    if (trap == TrapType.ALARM) " by ${player.name.formatWithColors(teamOfPlayer.color)}${ChatColor.RED}${ChatColor.BOLD}"
+                    if (trap == TrapType.ALARM) " by ${teamOfPlayer.chatColor}${player.name}${ChatColor.RED}${ChatColor.BOLD}"
                     else ""
                 }!"
             )

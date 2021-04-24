@@ -28,18 +28,27 @@ data class ItemWrapper (
                     item = ItemStack(material, amount, color.data.toShort())
                 }
             }
-            enchants.forEach { e -> item.addEnchantment(e, 1) }
+            enchants.forEach { e ->
+                if (e.canEnchantItem(item)) {
+                    item.addEnchantment(e, 1)
+                }
+            }
             item.itemMeta?.let {
-                val meta = it as Colorable
-                meta.color = color
-                item.itemMeta = meta as ItemMeta
+                if (it is Colorable) {
+                    it.color = color
+                }
+                item.itemMeta = it
             }
             return item
         }
         val potion = Potion(potionType, potionAmplifier - 1)
         potion.setHasExtendedDuration(false)
         val item = potion.toItemStack(amount)
-        enchants.forEach { e -> item.addEnchantment(e, 1) }
+        enchants.forEach { e ->
+            if (e.canEnchantItem(item)) {
+                item.addEnchantment(e, 1)
+            }
+        }
         return item
     }
 }

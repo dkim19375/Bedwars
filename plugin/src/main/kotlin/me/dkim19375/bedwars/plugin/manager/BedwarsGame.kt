@@ -6,7 +6,6 @@ import me.dkim19375.bedwars.plugin.data.LocationWrapper
 import me.dkim19375.bedwars.plugin.data.PlayerData
 import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.enumclass.Team
-import me.dkim19375.bedwars.plugin.enumclass.formatWithColors
 import me.dkim19375.bedwars.plugin.util.getCombinedValues
 import me.dkim19375.bedwars.plugin.util.getPlayers
 import me.dkim19375.bedwars.plugin.util.getTeam
@@ -85,7 +84,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             val player = Bukkit.getPlayer(uuid) ?: continue
             val teamData = teams[i % teams.size]
             val team = teamData.team
-            player.playerListName = player.name.formatWithColors(team.color)
+            player.playerListName = "${team.chatColor}${player.name}"
             val set = players.getOrDefault(team, mutableSetOf())
             set.add(player.uniqueId)
             players[team] = set
@@ -108,12 +107,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     fun stop(winner: Player?, team: Team) {
-        Bukkit.broadcastMessage(
-            "${
-                winner?.displayName?.formatWithColors(team.color)
-                    ?: team.displayName.formatWithColors(team.color)
-            } has won BedWars!"
-        )
+        Bukkit.broadcastMessage("${team.chatColor}${winner?.displayName ?: team.displayName} has won BedWars!")
         forceStop()
     }
 
@@ -205,7 +199,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         )
         plugin.scoreboardManager.getScoreboard(player).activate()
         if (playersInLobby.size >= data.minPlayers) {
-            println("BEDWARS GAME START STATUS: ${start(false).message}")
+            start(false).message
         }
         return Result.SUCCESS
     }
@@ -283,7 +277,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             val team = getTeamOfPlayer(player) ?: return
             revertPlayer(player)
             player.playerListName = player.displayName
-            broadcast("${player.displayName.formatWithColors(team.color)}${ChatColor.RED} has left the game!")
+            broadcast("${team.chatColor}${player.displayName}${ChatColor.RED} has left the game!")
             if (update) {
                 update()
             }
@@ -360,6 +354,9 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         if (!Bukkit.unloadWorld(data.world, true)) {
             throw RuntimeException("Could not unload world!")
         }
+        if (!plugin.isEnabled) {
+            return
+        }
         Bukkit.getScheduler().runTaskAsynchronously(plugin) {
             FileUtils.forceDelete(folder)
             FileUtils.copyDirectory(dir, folder)
@@ -382,16 +379,16 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         }
         if (player == null) {
             broadcast(
-                "${ChatColor.BOLD}BED DESTRUCTION > ${team.displayName.formatWithColors(team.color)}${ChatColor.GRAY}'s " +
+                "${ChatColor.BOLD}BED DESTRUCTION > ${team.chatColor}${team.displayName}${ChatColor.GRAY}'s " +
                         "bed was broken!"
             )
             return
         }
         val teamOfPlayer = getTeamOfPlayer(player) ?: return
         broadcast(
-            "${ChatColor.BOLD}BED DESTRUCTION > ${team.displayName.formatWithColors(team.color)}${ChatColor.GRAY}'s " +
+            "${ChatColor.BOLD}BED DESTRUCTION > ${team.displayName}${ChatColor.GRAY}'s " +
                     "bed was broken by " +
-                    "${player.displayName.formatWithColors(teamOfPlayer.color)}${ChatColor.GRAY}!"
+                    "${teamOfPlayer.chatColor}${player.displayName}${ChatColor.GRAY}!"
         )
         update()
     }

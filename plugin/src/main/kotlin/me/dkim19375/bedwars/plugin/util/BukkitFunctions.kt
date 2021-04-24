@@ -32,6 +32,7 @@ fun UUID.getEntity(): Entity? {
 
 fun PlayerInventory.hasArmor(vararg types: ArmorType?): Boolean {
     for (item in contents) {
+        item ?: continue
         if (ArmorType.fromMaterial(item.type).containsAny(types.toList())) {
             return true
         }
@@ -43,6 +44,7 @@ fun InventoryClickEvent.getPlayer() = view.player as Player
 
 fun PlayerInventory.hasItem(vararg types: Material?): Boolean {
     for (item in contents) {
+        item?: continue
         if (types.contains(item.type)) {
             return true
         }
@@ -141,8 +143,8 @@ fun Location?.getSafeDistance(other: Location?): Double {
 
 fun World.dropItemStraight(location: Location, itemStack: ItemStack): Item {
     val item = dropItem(location, itemStack)
-    item.velocity.x = item.velocity.x / 10.0
-    item.velocity.z = item.velocity.z / 10.0
+    item.velocity.x = 0.0
+    item.velocity.z = 0.0
     return item
 }
 

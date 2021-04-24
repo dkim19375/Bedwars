@@ -2,7 +2,6 @@ package me.dkim19375.bedwars.plugin.manager
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.enumclass.GameState
-import me.dkim19375.bedwars.plugin.enumclass.formatText
 import me.dkim19375.bedwars.plugin.util.Delay
 import me.dkim19375.bedwars.plugin.util.formatTime
 import me.tigerhix.lib.scoreboard.ScoreboardLib
@@ -56,8 +55,9 @@ class ScoreboardManager(private val plugin: BedwarsPlugin) : ScoreboardHandler, 
             .blank()
         for (data in game.data.teams) {
             val team = data.team
-            val stringBuilder = StringBuilder(team.color.formatText(team.name[0].toString().toUpperCase()))
-            stringBuilder.append(" ${ChatColor.WHITE}${team.displayName}: ")
+            val stringBuilder = StringBuilder(team.chatColor.toString())
+            stringBuilder.append(team.name[0].toString().toUpperCase())
+                .append(" ${ChatColor.WHITE}${team.displayName}: ")
             if (game.getPlayersInTeam(team).isEmpty()) {
                 stringBuilder.append("${ChatColor.RED}\u274C")
             } else {
