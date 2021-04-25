@@ -180,7 +180,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             if (state != GameState.STARTING) {
                 return
             }
-            if (playersInLobby.isNotEmpty()) {
+            if (playersInLobby.size >= data.minPlayers) {
                 return
             }
             state = GameState.LOBBY

@@ -13,10 +13,17 @@ import org.bukkit.potion.PotionType
 class PotionConsumeListener(private val plugin: BedwarsPlugin) : Listener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     private fun PlayerItemConsumeEvent.onEvent() {
-        if (item.type == Material.POTION && Potion.fromItemStack(item).type == PotionType.INVISIBILITY
-        ) {
+        if (item.type != Material.POTION) {
+            return
+        }
+        val potion = Potion.fromItemStack(item)
+        val type = potion.type.effectType
+        val game = plugin.gameManager.getGame(player) ?: return
+        if (potion.type == PotionType.INVISIBILITY) {
             val player: Player = player
             plugin.packetManager.hideArmor(player)
+            return
         }
+        if (type == PotionType.)
     }
 }

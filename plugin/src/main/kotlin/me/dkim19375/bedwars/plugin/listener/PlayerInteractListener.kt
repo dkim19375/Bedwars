@@ -3,6 +3,7 @@ package me.dkim19375.bedwars.plugin.listener
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.gui.MainShopGUI
 import me.dkim19375.bedwars.plugin.gui.UpgradeShopGUI
+import me.dkim19375.bedwars.plugin.util.default
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Fireball
@@ -23,7 +24,7 @@ class PlayerInteractListener(private val plugin: BedwarsPlugin) : Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private fun PlayerInteractAtEntityEvent.onInteractAtEntity() {
-        val game = plugin.gameManager.getGame(player)?: return
+        val game = plugin.gameManager.getGame(player) ?: return
         if (game.npcManager.getShopVillagersUUID().contains(rightClicked.uniqueId)) {
             isCancelled = true
             Bukkit.getScheduler().runTask(plugin) {
@@ -34,7 +35,7 @@ class PlayerInteractListener(private val plugin: BedwarsPlugin) : Listener {
         if (!game.npcManager.getUpgradeVillagersUUID().contains(rightClicked.uniqueId)) {
             return
         }
-        val team = game.getTeamOfPlayer(player)?: return
+        val team = game.getTeamOfPlayer(player) ?: return
         isCancelled = true
         Bukkit.getScheduler().runTask(plugin) {
             UpgradeShopGUI(player, team, plugin).showPlayer()
@@ -42,11 +43,19 @@ class PlayerInteractListener(private val plugin: BedwarsPlugin) : Listener {
     }
 
     private fun PlayerInteractEvent.blockPrevention() {
-        plugin.gameManager.getGame(player)?: return
-        if (listOf(Material.BED, Material.BED_BLOCK).contains(clickedBlock.type)
-            && action.name.startsWith("RIGHT")) {
-            isCancelled = true
+        plugin.gameManager.getGame(player) ?: return
+        if (!listOf(Material.BED, Material.BED_BLOCK).contains(clickedBlock.type)) {
+            return
         }
+        if (!action.name.startsWith("RIGHT")) {
+            return
+        }
+        if (player.isSneaking) {
+            if (player.itemInHand.type.default(Material.AIR) != Material.AIR) {
+                return
+            }
+        }
+        isCancelled = true
     }
 
     private fun PlayerInteractEvent.setupFireballs() {
