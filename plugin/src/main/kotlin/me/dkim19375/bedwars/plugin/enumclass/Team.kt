@@ -1,7 +1,5 @@
 package me.dkim19375.bedwars.plugin.enumclass
 
-import me.dkim19375.bedwars.plugin.data.Potion
-import me.dkim19375.bedwars.plugin.util.ItemWrapper
 import me.dkim19375.bedwars.plugin.util.getWrapper
 import org.bukkit.ChatColor
 import org.bukkit.DyeColor

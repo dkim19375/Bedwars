@@ -20,7 +20,9 @@ class ExplodeListeners(private val plugin: BedwarsPlugin) : Listener {
             isCancelled = true
             return
         }
+        println("before: ${blockList()}")
         removeBlocks(blockList(), game)
+        println("after: ${blockList()}")
     }
 
     private fun removeBlocks(blockList: MutableList<Block>, game: BedwarsGame) {

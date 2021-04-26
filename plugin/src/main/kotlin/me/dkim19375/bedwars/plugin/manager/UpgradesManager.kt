@@ -15,7 +15,7 @@ import org.bukkit.scheduler.BukkitTask
 import java.util.*
 
 @Suppress("MemberVisibilityCanBePrivate")
-class UpgradesManager(private val plugin: BedwarsPlugin, val game: BedwarsGame) {
+class UpgradesManager(plugin: BedwarsPlugin, val game: BedwarsGame) {
     val sharpness = mutableSetOf<Team>()
     val protection = mutableMapOf<Team, Int>()
     val haste = mutableMapOf<Team, Int>()
@@ -39,28 +39,34 @@ class UpgradesManager(private val plugin: BedwarsPlugin, val game: BedwarsGame) 
         times.clear()
     }
 
-    fun resetTask() {
-        task?.cancel()
-        task = Bukkit.getScheduler().runTaskTimer(plugin, {
+    init {
+        Bukkit.getScheduler().runTaskTimer(plugin, {
             if (game.state != GameState.STARTED) {
                 return@runTaskTimer
             }
-            val players = game.getPlayersInGame().map(Bukkit::getPlayer).filterNonNull()
+            val players = game.getPlayersInGame().getPlayers()
             for (player in players) {
-                val team = game.getTeamOfPlayer(player) ?: continue
-                val haste = haste[team]
-                if (haste != null) {
-                    player.addPotionEffect(PotionEffect(PotionEffectType.FAST_DIGGING, 100, haste - 1))
-                }
-                if (!healPool.contains(team)) {
-                    continue
-                }
-                game.data.beds.firstOrNull { d ->
-                    team == d.team && d.location.getSafeDistance(player.location) < 8
-                } ?: continue
-                player.addPotionEffect(PotionEffect(PotionEffectType.REGENERATION, 80, 1))
+                applyHaste(player)
+                applyHealPool(player)
             }
         }, 60L, 60L)
+    }
+
+    private fun applyHaste(player: Player) {
+        val team = game.getTeamOfPlayer(player) ?: return
+        val haste = haste[team] ?: return
+        player.addPotionEffect(PotionEffect(PotionEffectType.FAST_DIGGING, 100, haste - 1))
+    }
+
+    private fun applyHealPool(player: Player) {
+        val team = game.getTeamOfPlayer(player) ?: return
+        if (!healPool.contains(team)) {
+            return
+        }
+        game.data.beds.firstOrNull { d ->
+            team == d.team && d.location.getSafeDistance(player.location) < 8
+        } ?: return
+        player.addPotionEffect(PotionEffect(PotionEffectType.REGENERATION, 80, 1))
     }
 
     private fun applyToPlayer(player: Player, trap: TrapType) {
@@ -74,7 +80,6 @@ class UpgradesManager(private val plugin: BedwarsPlugin, val game: BedwarsGame) 
         val team = game.getTeamOfPlayer(player) ?: return
         val sharpness = sharpness.contains(team)
         val protection = protection[team]
-        if (!sharpness && protection == null) return
         for (item in player.inventory.contents) {
             if (item.type.isArmor() && protection != null) {
                 item.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, protection)
@@ -141,8 +146,7 @@ class UpgradesManager(private val plugin: BedwarsPlugin, val game: BedwarsGame) 
     fun canAlertTrap(player: Player): Boolean {
         val teamOfPlayer = game.getTeamOfPlayer(player) ?: return false
         game.data.beds.firstOrNull { d ->
-            teamOfPlayer != d.team
-            d.location.getSafeDistance(player.location) < 8
+            (teamOfPlayer != d.team) && (d.location.getSafeDistance(player.location) < 8)
         } ?: return false
         val time = times[player.uniqueId] ?: return true
         if (System.currentTimeMillis() - time > 30000) {

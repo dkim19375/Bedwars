@@ -5,7 +5,6 @@ import me.dkim19375.bedwars.plugin.data.GameData
 import me.dkim19375.bedwars.plugin.data.LocationWrapper
 import me.dkim19375.bedwars.plugin.data.PlayerData
 import me.dkim19375.bedwars.plugin.enumclass.*
-import me.dkim19375.bedwars.plugin.gui.MainShopGUI
 import me.dkim19375.bedwars.plugin.util.*
 import org.apache.commons.io.FileUtils
 import org.bukkit.*
@@ -56,6 +55,8 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         countdown = 10
         println("Game ${data.world.name} is starting!")
         task?.cancel()
+        plugin.scoreboardManager.update(this)
+        val game = this
         task = object : BukkitRunnable() {
             override fun run() {
                 if (countdown < 1) {
@@ -65,15 +66,19 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
                     return
                 }
                 broadcast("${ChatColor.GREEN}Starting in ${ChatColor.GOLD}$countdown")
+                plugin.scoreboardManager.update(game)
                 countdown--
             }
         }.runTaskTimer(plugin, 20L, 20L)
         return Result.SUCCESS
     }
 
+    fun getElapsedTime(): Long {
+        return Delay.fromTime(time).seconds
+    }
+
     private fun setupAfterStart() {
         update()
-        upgradesManager.resetTask()
         var i = 1
         val teams = data.teams.toList()
         for (uuid in playersInLobby.shuffled()) {
@@ -99,25 +104,13 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         }
         state = GameState.STARTED
         time = System.currentTimeMillis()
+        plugin.scoreboardManager.update(this)
         spawnerManager.start()
         for (entry in players.entries) {
             val team = entry.key
             val players = entry.value.getPlayers()
             for (player in players) {
-                player.inventory.helmet = team.getColored(ItemStack(Material.LEATHER_HELMET))
-                player.inventory.chestplate = team.getColored(ItemStack(Material.LEATHER_CHESTPLATE))
-                for (item in MainShopItems.values()) {
-                    if (!item.defaultOnSpawn) {
-                        continue
-                    }
-                    val armor = ArmorType.fromMaterial(item.item.material)
-                    if (armor != null) {
-                        player.inventory.leggings = team.getColored(armor.leggings)
-                        player.inventory.boots = team.getColored(armor.boots)
-                        continue
-                    }
-                    player.inventory.addItem(item.item.toItemStack(team.color))
-                }
+                giveItems(player, player.inventory.contents.toList(), team)
             }
         }
     }
@@ -223,7 +216,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             player,
             if (plugin.config.getBoolean("use-main-lobby") && lobby != null) lobby else data.lobby
         )
-        plugin.scoreboardManager.getScoreboard(player).activate()
+        plugin.scoreboardManager.getScoreboard(player, true) // activate
         if (playersInLobby.size >= data.minPlayers) {
             start(false).message
         }
@@ -247,40 +240,82 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         }
     }
 
-    fun playerKilled(player: Player) {
+    fun playerKilled(player: Player, inventory: List<ItemStack>) {
         val team = getTeamOfPlayer(player) ?: return
-        if (beds.getOrDefault(team, false)) {
-            val teamData = data.teams.getTeam(team) ?: return
-            player.inventory.clear()
-            player.gameMode = GameMode.SPECTATOR
-            player.teleport(data.spec)
-            object : BukkitRunnable() {
-                var countDown = 5
-                override fun run() {
-                    if (countDown <= 0) {
-                        player.teleport(teamData.spawn)
-                        player.gameMode = GameMode.SURVIVAL
-                        player.sendOtherTitle("${ChatColor.GREEN}Respawned!")
-                        cancel()
-                        return
-                    }
-                    player.sendOtherTitle(
-                        "${ChatColor.RED}You died!",
-                        "${ChatColor.YELLOW}Respawning in ${ChatColor.GREEN}$countDown",
-                        fadeIn = 0,
-                        stay = 25,
-                        fadeOut = 0
-                    )
-                    countDown--
-                }
-            }.runTaskTimer(plugin, 0L, 20L)
+        if (!beds.getOrDefault(team, false)) {
+            leavePlayer(player)
             return
         }
-        leavePlayer(player)
+        val teamData = data.teams.getTeam(team) ?: return
+        player.inventory.clear()
+        player.gameMode = GameMode.SPECTATOR
+        player.teleport(data.spec)
+        object : BukkitRunnable() {
+            var countDown = 5
+            override fun run() {
+                if (countDown <= 0) {
+                    player.teleport(teamData.spawn)
+                    player.gameMode = GameMode.SURVIVAL
+                    player.sendOtherTitle("${ChatColor.GREEN}Respawned!")
+                    giveItems(player, inventory, team)
+                    cancel()
+                    return
+                }
+                player.sendOtherTitle(
+                    "${ChatColor.RED}You died!",
+                    "${ChatColor.YELLOW}Respawning in ${ChatColor.GREEN}$countDown",
+                    fadeIn = 0,
+                    stay = 25,
+                    fadeOut = 0
+                )
+                countDown--
+            }
+        }.runTaskTimer(plugin, 0L, 20L)
+    }
+
+    fun giveItems(player: Player, items: List<ItemStack>?, team: Team) {
+        player.inventory.helmet = team.getColored(ItemStack(Material.LEATHER_HELMET))
+        player.inventory.chestplate = team.getColored(ItemStack(Material.LEATHER_CHESTPLATE))
+        player.inventory.addItem(MainShopItems.WOOD_SWORD.item.toItemStack(team.color))
+        for (item in MainShopItems.values()) {
+            if (!item.defaultOnSpawn && !item.permanent) {
+                if (item.item.material.isTool()) {
+                    if (item.item.material.name.endsWith("PICKAXE")) {
+                        player.inventory.addItem(MainShopItems.WOOD_PICK.item.toItemStack(team.color))
+                        continue
+                    }
+                    if (item.item.material.name.endsWith("AXE")) {
+                        player.inventory.addItem(MainShopItems.WOOD_AXE.item.toItemStack(team.color))
+                        continue
+                    }
+                }
+                continue
+            }
+            if (items != null && !item.defaultOnSpawn) {
+                if (!items.map(ItemStack::getType).contains(item.item.material)) {
+                    continue
+                }
+            }
+            val armor: ArmorType?
+            armor = if (items != null) {
+                ArmorType.fromMaterial((items.firstOrNull { i -> i.type.isArmor() } ?: item.item.toItemStack(
+                    team.color
+                )).type)
+            } else {
+                ArmorType.fromMaterial(item.item.material)
+            }
+            if (armor != null) {
+                player.inventory.leggings = team.getColored(armor.leggings)
+                player.inventory.boots = team.getColored(armor.boots)
+                continue
+            }
+            player.inventory.addItem(item.item.toItemStack(team.color))
+        }
+        upgradesManager.applyUpgrades(player)
     }
 
     fun revertPlayer(player: Player) {
-        plugin.scoreboardManager.getScoreboard(player).deactivate()
+        plugin.scoreboardManager.getScoreboard(player, false).deactivate()
         val data = beforeData[player.uniqueId] ?: return
         data.apply(player)
     }
@@ -292,6 +327,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
                 return
             }
             playersInLobby.remove(player.uniqueId)
+            plugin.scoreboardManager.update(this)
             broadcast("${player.displayName}${ChatColor.RED} has left the game! ${playersInLobby.size}/${data.maxPlayers}")
             if (playersInLobby.size < data.minPlayers) {
                 task?.cancel()
@@ -306,6 +342,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         revertPlayer(player)
         player.playerListName = player.displayName
         players.getOrDefault(team, mutableSetOf()).remove(player.uniqueId)
+        plugin.scoreboardManager.update(this)
         broadcast("${team.chatColor}${player.displayName}${ChatColor.RED} has left the game!")
         if (update) {
             update()
@@ -403,6 +440,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             return
         }
         beds[team] = false
+        plugin.scoreboardManager.update(this)
         getPlayersInTeam(team).getPlayers().forEach { p ->
             p.sendOtherTitle("${ChatColor.RED}BED DESTROYED!", "You will no longer respawn!")
         }

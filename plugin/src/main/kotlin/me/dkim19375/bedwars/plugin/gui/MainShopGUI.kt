@@ -142,6 +142,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
     }
 
     private fun givePlayerItem(item: MainShopItems) {
+        val game = plugin.gameManager.getGame(player) ?: return
         if (item.type == ItemType.ARMOR) {
             if (player.inventory.hasArmor(ArmorType.fromMaterial(item.item.material))) {
                 player.sendMessage("${ChatColor.RED}You already have this!")
@@ -153,6 +154,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
             val armorType = ArmorType.fromMaterial(item.item.material)?: return
             player.inventory.boots = ItemStack(armorType.boots)
             player.inventory.leggings = ItemStack(armorType.leggings)
+            game.upgradesManager.applyUpgrades(player)
             return
         }
         if (player.inventory.hasItem(item.item.material) && (item.permanent || item.defaultOnSpawn)) {
@@ -165,9 +167,11 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
         player.sendMessage("${ChatColor.GREEN}Successfully bought ${item.displayname}!")
         if (team == null) {
             player.inventory.addItem(item.item.toItemStack(team?.color))
+            game.upgradesManager.applyUpgrades(player)
             return
         }
         player.inventory.addItem(item.item.toItemStack(team.color))
+        game.upgradesManager.applyUpgrades(player)
     }
 
     private fun getBuySlots(): List<Int> {

@@ -1,6 +1,5 @@
 package me.dkim19375.bedwars.plugin.util
 
-import me.dkim19375.bedwars.plugin.data.Potion
 import me.dkim19375.bedwars.plugin.enumclass.MainShopItems
 import me.dkim19375.bedwars.plugin.gui.MainShopGUI
 import org.bukkit.DyeColor
@@ -9,6 +8,7 @@ import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.material.Colorable
+import org.bukkit.potion.Potion
 import org.bukkit.potion.PotionType
 
 data class ItemWrapper (
@@ -47,7 +47,7 @@ data class ItemWrapper (
             }
             return item
         }
-        val potion = Potion(potionType, potionAmplifier - 1)
+        val potion = Potion(potionType, if ((potionAmplifier - 1) > 2) 2 else (potionAmplifier - 1))
         potion.setHasExtendedDuration(false)
         val item = potion.toItemStack(amount)
         enchants.forEach { e ->

@@ -350,6 +350,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
                 player.inventory.removeItem(ItemStack(Material.DIAMOND, 4))
                 upgrades.sharpness.add(team)
                 sendUpgradeMessage("Sharpness", game)
+                game.upgradesManager.applyUpgrades(player)
                 showMainScreen()
                 return
             }
@@ -361,6 +362,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
                 val level = upgrades.protection.getOrDefault(team, 0)
                 val cost = ProtectionLevel.fromInt(level + 1).cost
                 chargeUpgradable(upgrades.protection, cost, game, "Reinforced Armor")
+                game.upgradesManager.applyUpgrades(player)
                 showMainScreen()
                 return
             }
@@ -372,6 +374,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
                 val level = upgrades.haste.getOrDefault(team, 0)
                 val cost = (level + 1) * 2
                 chargeUpgradable(upgrades.haste, cost, game, "Maniac Miner")
+                game.upgradesManager.applyUpgrades(player)
                 showMainScreen()
                 return
             }
@@ -383,6 +386,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
                 upgrades.healPool.add(team)
                 player.inventory.removeItem(ItemStack(Material.DIAMOND, 1))
                 sendUpgradeMessage("Heal Pool", game)
+                game.upgradesManager.applyUpgrades(player)
                 showMainScreen()
                 return
             }
@@ -425,7 +429,6 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
 
     private fun sendUpgradeMessage(upgrade: String, game: BedwarsGame) {
         player.playSound(Sound.NOTE_PLING)
-        player.sendMessage("${ChatColor.GREEN}Successfully purchased $upgrade!")
         for (uuid in game.getPlayersInTeam(team)) {
             val p = Bukkit.getPlayer(uuid) ?: continue
             p.sendMessage("${player.displayName} ${ChatColor.GREEN}has purchased $upgrade!")

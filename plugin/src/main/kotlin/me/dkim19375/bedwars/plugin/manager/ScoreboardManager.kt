@@ -1,29 +1,44 @@
 package me.dkim19375.bedwars.plugin.manager
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
+import me.dkim19375.bedwars.plugin.data.TeamData
 import me.dkim19375.bedwars.plugin.enumclass.GameState
-import me.dkim19375.bedwars.plugin.util.Delay
+import me.dkim19375.bedwars.plugin.enumclass.Team
 import me.dkim19375.bedwars.plugin.util.formatTime
+import me.dkim19375.bedwars.plugin.util.getPlayers
 import me.tigerhix.lib.scoreboard.ScoreboardLib
 import me.tigerhix.lib.scoreboard.common.EntryBuilder
 import me.tigerhix.lib.scoreboard.type.Entry
-import me.tigerhix.lib.scoreboard.type.Scoreboard
 import me.tigerhix.lib.scoreboard.type.ScoreboardHandler
+import me.tigerhix.lib.scoreboard.type.SimpleScoreboard
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 import java.util.*
 
 class ScoreboardManager(private val plugin: BedwarsPlugin) : ScoreboardHandler, Listener {
-    private val scoreboards = mutableMapOf<UUID, Scoreboard>()
+    private val scoreboards = mutableMapOf<UUID, SimpleScoreboard>()
 
-    fun getScoreboard(player: Player): Scoreboard {
+    fun getScoreboard(player: Player, activate: Boolean): SimpleScoreboard {
         return scoreboards.getOrPut(player.uniqueId) {
-            val board = ScoreboardLib.createScoreboard(player)
+            val board: SimpleScoreboard = ScoreboardLib.createScoreboard(player)
             board.handler = this
-            board.updateInterval = 1L
+            board.updateInterval = 10
+            board.update()
+            if (activate) {
+                board.activate()
+            }
             return board
         }
+    }
+
+    @Suppress("MemberVisibilityCanBePrivate")
+    fun update(player: Player) {
+        // getScoreboard(player, true).update()
+    }
+
+    fun update(game: BedwarsGame) {
+        game.getPlayersInGame().getPlayers().forEach { p -> update(p) }
     }
 
     override fun getTitle(player: Player): String {
@@ -33,6 +48,7 @@ class ScoreboardManager(private val plugin: BedwarsPlugin) : ScoreboardHandler, 
     override fun getEntries(player: Player): List<Entry>? {
         val game = plugin.gameManager.getGame(player) ?: return null
         val entry = EntryBuilder()
+        val list = mutableListOf<String>()
         entry.blank()
         if (game.state == GameState.LOBBY || game.state == GameState.STARTING) {
             entry.next("Map: ${ChatColor.GREEN}${game.data.world.name}")
@@ -51,7 +67,7 @@ class ScoreboardManager(private val plugin: BedwarsPlugin) : ScoreboardHandler, 
         if (game.state != GameState.STARTED) {
             return entry.build()
         }
-        entry.next("Time: ${ChatColor.GREEN}${Delay.fromTime(game.time).seconds.formatTime()}")
+        entry.next("Time: ${ChatColor.GREEN}${game.getElapsedTime().formatTime()}")
             .blank()
         for (data in game.data.teams) {
             val team = data.team
@@ -71,7 +87,9 @@ class ScoreboardManager(private val plugin: BedwarsPlugin) : ScoreboardHandler, 
             if (game.getPlayersInTeam(team).contains(player.uniqueId)) {
                 stringBuilder.append(" ${ChatColor.GRAY}YOU")
             }
+            entry.next(stringBuilder.toString())
         }
+        entry.blank()
         return entry.build()
     }
 }

@@ -1,7 +1,6 @@
 package me.dkim19375.bedwars.plugin.util
 
 import me.dkim19375.bedwars.plugin.data.LocationWrapper
-import me.dkim19375.bedwars.plugin.data.Potion
 import me.dkim19375.bedwars.plugin.enumclass.ArmorType
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -9,12 +8,14 @@ import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.entity.Entity
+import org.bukkit.entity.EntityType
 import org.bukkit.entity.Item
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
 import org.bukkit.material.Bed
+import org.bukkit.potion.Potion
 import java.util.*
 import kotlin.math.abs
 
@@ -90,7 +91,7 @@ fun Material.isArmor() = when (this) {
 fun ItemStack.getWrapper(): ItemWrapper {
     val potion = Potion.fromItemStack(this)
     if (potion != null) {
-        return ItemWrapper(type, amount, potion.type, potion.level - 1, enchantments.keys.toList())
+        return ItemWrapper(type, amount, potion.type, potion.level + 1, enchantments.keys.toList())
     }
     return ItemWrapper(type, amount, null, 1, enchantments.keys.toList())
 }
@@ -166,6 +167,8 @@ fun World.dropItemStraight(location: Location, itemStack: ItemStack): Item {
     item.velocity.z = 0.0
     return item
 }
+
+fun Location.dropItem(item: ItemStack): Item = world.dropItem(this, item)
 
 fun Block.getBedFeet(): Location {
     val data = state.data
