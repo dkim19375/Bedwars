@@ -80,7 +80,7 @@ class UpgradesManager(plugin: BedwarsPlugin, val game: BedwarsGame) {
         val team = game.getTeamOfPlayer(player) ?: return
         val sharpness = sharpness.contains(team)
         val protection = protection[team]
-        for (item in player.inventory.contents) {
+        for (item in player.inventory.contents.toList().filterNonNull()) {
             if (item.type.isArmor() && protection != null) {
                 item.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, protection)
             }

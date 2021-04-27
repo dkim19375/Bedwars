@@ -278,17 +278,18 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         player.inventory.chestplate = team.getColored(ItemStack(Material.LEATHER_CHESTPLATE))
         player.inventory.addItem(MainShopItems.WOOD_SWORD.item.toItemStack(team.color))
         for (item in MainShopItems.values()) {
-            if (!item.defaultOnSpawn && !item.permanent) {
-                if (item.item.material.isTool()) {
-                    if (item.item.material.name.endsWith("PICKAXE")) {
-                        player.inventory.addItem(MainShopItems.WOOD_PICK.item.toItemStack(team.color))
-                        continue
-                    }
-                    if (item.item.material.name.endsWith("AXE")) {
-                        player.inventory.addItem(MainShopItems.WOOD_AXE.item.toItemStack(team.color))
-                        continue
-                    }
+            if (item.item.material.isTool()) {
+                if (item.item.material.name.endsWith("PICKAXE")) {
+                    player.inventory.addItem(MainShopItems.WOOD_PICK.item.toItemStack(team.color))
+                    continue
                 }
+                if (item.item.material.name.endsWith("AXE")) {
+                    player.inventory.addItem(MainShopItems.WOOD_AXE.item.toItemStack(team.color))
+                    continue
+                }
+                continue
+            }
+            if (!item.defaultOnSpawn && !item.permanent) {
                 continue
             }
             if (items != null && !item.defaultOnSpawn) {
@@ -296,19 +297,9 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
                     continue
                 }
             }
-            val armor: ArmorType?
-            armor = if (items != null) {
-                ArmorType.fromMaterial((items.firstOrNull { i -> i.type.isArmor() } ?: item.item.toItemStack(
-                    team.color
-                )).type)
-            } else {
-                ArmorType.fromMaterial(item.item.material)
-            }
-            if (armor != null) {
-                player.inventory.leggings = team.getColored(armor.leggings)
-                player.inventory.boots = team.getColored(armor.boots)
-                continue
-            }
+            val armor = ArmorType.fromMaterial(items?.firstOrNull { i -> i.type.isArmor() }?.type) ?: ArmorType.LEATHER
+            player.inventory.leggings = team.getColored(armor.leggings)
+            player.inventory.boots = team.getColored(armor.boots)
             player.inventory.addItem(item.item.toItemStack(team.color))
         }
         upgradesManager.applyUpgrades(player)

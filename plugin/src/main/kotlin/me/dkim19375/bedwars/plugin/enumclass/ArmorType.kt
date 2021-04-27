@@ -9,7 +9,7 @@ enum class ArmorType(val boots: Material, val leggings: Material) {
     DIAMOND(Material.DIAMOND_BOOTS, Material.DIAMOND_LEGGINGS);
 
     companion object {
-        fun fromMaterial(mat: Material): ArmorType? {
+        fun fromMaterial(mat: Material?): ArmorType? {
             for (type in values()) {
                 if (listOf(type.boots, type.leggings).contains(mat)) {
                     return type

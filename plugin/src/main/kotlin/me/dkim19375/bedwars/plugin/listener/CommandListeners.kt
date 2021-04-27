@@ -13,7 +13,7 @@ import org.bukkit.event.server.ServerCommandEvent
 class CommandListeners(private val plugin: BedwarsPlugin) : Listener {
     private val commandRunningMsg = listOf(
         "${ChatColor.RED}A game is currently running! Please stop them, or else many problems WILL OCCUR!",
-        "${ChatColor.RED}Do /bedwars list and then /bedwars stop <game>!",
+        "${ChatColor.RED}Do /bedwars stop all to stop all the games!",
         "${ChatColor.RED}If you still want to stop the server, do /stop force (NOT RECOMMENDED!)"
     )
 

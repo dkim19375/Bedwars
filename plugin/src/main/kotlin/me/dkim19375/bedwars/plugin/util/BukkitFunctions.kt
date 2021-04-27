@@ -8,7 +8,6 @@ import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.entity.Entity
-import org.bukkit.entity.EntityType
 import org.bukkit.entity.Item
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -47,7 +46,7 @@ fun InventoryClickEvent.getPlayer() = view.player as Player
 
 fun PlayerInventory.hasItem(vararg types: Material?): Boolean {
     for (item in contents) {
-        item?: continue
+        item ?: continue
         if (types.contains(item.type)) {
             return true
         }
@@ -89,7 +88,11 @@ fun Material.isArmor() = when (this) {
 }
 
 fun ItemStack.getWrapper(): ItemWrapper {
-    val potion = Potion.fromItemStack(this)
+    val potion = try {
+        Potion.fromItemStack(this)
+    } catch (_: IllegalArgumentException) {
+        null
+    }
     if (potion != null) {
         return ItemWrapper(type, amount, potion.type, potion.level + 1, enchantments.keys.toList())
     }

@@ -48,7 +48,6 @@ class ScoreboardManager(private val plugin: BedwarsPlugin) : ScoreboardHandler, 
     override fun getEntries(player: Player): List<Entry>? {
         val game = plugin.gameManager.getGame(player) ?: return null
         val entry = EntryBuilder()
-        val list = mutableListOf<String>()
         entry.blank()
         if (game.state == GameState.LOBBY || game.state == GameState.STARTING) {
             entry.next("Map: ${ChatColor.GREEN}${game.data.world.name}")
@@ -75,7 +74,7 @@ class ScoreboardManager(private val plugin: BedwarsPlugin) : ScoreboardHandler, 
             stringBuilder.append(team.name[0].toString().toUpperCase())
                 .append(" ${ChatColor.WHITE}${team.displayName}: ")
             if (game.getPlayersInTeam(team).isEmpty()) {
-                stringBuilder.append("${ChatColor.RED}\u274C")
+                stringBuilder.append("${ChatColor.RED}${ChatColor.BOLD}\u3024")
             } else {
                 val bed = game.beds[team]
                 if (bed == null || bed == false) {
