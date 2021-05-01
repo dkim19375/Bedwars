@@ -87,32 +87,29 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
                 return default
             }
         } ?: return default
+        val lore = when (trapType) {
+            TrapType.ALARM -> alarmLore
+            TrapType.COUNTER_OFFENSIVE -> counterOffensiveLore
+            TrapType.ITS_A_TRAP -> itsATrapLore
+            TrapType.MINER_FATIGUE -> fatigueLore
+        }.plus(
+            listOf(
+                " ",
+                "${ChatColor.GRAY}The${
+                    when (number) {
+                        1 -> " first"
+                        2 -> " second"
+                        3 -> " third"
+                        else -> ""
+                    }
+                } enemy to walk",
+                "${ChatColor.GRAY}into your base will trigger",
+                "${ChatColor.GRAY}this trap!"
+            )
+        )
         return ItemBuilder.from(ItemStack(trapType.material, number))
             .setName("${ChatColor.GREEN}Trap #$number: ${trapType.displayName} Trap")
-            .setLore(
-                "${
-                    when (trapType) {
-                        TrapType.ALARM -> alarmLore
-                        TrapType.COUNTER_OFFENSIVE -> counterOffensiveLore
-                        TrapType.ITS_A_TRAP -> itsATrapLore
-                        TrapType.MINER_FATIGUE -> fatigueLore
-                    }.combine(
-                        listOf(
-                            " ",
-                            "${ChatColor.GRAY}The${
-                                when (number) {
-                                    1 -> " first"
-                                    2 -> " second"
-                                    3 -> " third"
-                                    else -> ""
-                                }
-                            } enemy to walk",
-                            "${ChatColor.GRAY}into your base will trigger",
-                            "${ChatColor.GRAY}this trap!"
-                        )
-                    )
-                }"
-            )
+            .setLore(lore)
             .asGuiItem { event ->
                 event.isCancelled = true
                 showMainScreen()
@@ -317,7 +314,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
         type: TrapType
     ): GuiItem = ItemBuilder.from(material)
         .setName("$${ChatColor.RED}$name")
-        .setLore(firstLore.combine(getCostList(cost, hasEnough)))
+        .setLore(firstLore.plus(getCostList(cost, hasEnough)))
         .asGuiItem {
             it.isCancelled = true
             onTrapClick(type)
@@ -428,7 +425,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
     }
 
     private fun sendUpgradeMessage(upgrade: String, game: BedwarsGame) {
-        player.playSound(Sound.NOTE_PLING)
+        player.playSound(Sound.NOTE_PLING, pitch = 7.0f)
         for (uuid in game.getPlayersInTeam(team)) {
             val p = Bukkit.getPlayer(uuid) ?: continue
             p.sendMessage("${player.displayName} ${ChatColor.GREEN}has purchased $upgrade!")

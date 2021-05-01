@@ -5,10 +5,12 @@ import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.enumclass.Team
 import me.dkim19375.bedwars.plugin.enumclass.TrapType
 import me.dkim19375.bedwars.plugin.util.*
+import me.dkim19375.dkim19375core.function.filterNonNull
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemFlag
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import org.bukkit.scheduler.BukkitTask
@@ -64,7 +66,7 @@ class UpgradesManager(plugin: BedwarsPlugin, val game: BedwarsGame) {
             return
         }
         game.data.beds.firstOrNull { d ->
-            team == d.team && d.location.getSafeDistance(player.location) < 8
+            team == d.team && d.location.getSafeDistance(player.location) < 7
         } ?: return
         player.addPotionEffect(PotionEffect(PotionEffectType.REGENERATION, 80, 1))
     }
@@ -80,7 +82,8 @@ class UpgradesManager(plugin: BedwarsPlugin, val game: BedwarsGame) {
         val team = game.getTeamOfPlayer(player) ?: return
         val sharpness = sharpness.contains(team)
         val protection = protection[team]
-        for (item in player.inventory.contents.toList().filterNonNull()) {
+        for (item in player.inventory.getAllContents().toList().filterNonNull()) {
+            item.itemMeta?.removeItemFlags(*ItemFlag.values())
             if (item.type.isArmor() && protection != null) {
                 item.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, protection)
             }
@@ -112,6 +115,9 @@ class UpgradesManager(plugin: BedwarsPlugin, val game: BedwarsGame) {
     }
 
     fun triggerTrap(player: Player) {
+        if (!game.upgradesManager.canAlertTrap(player)) {
+            return
+        }
         val teamOfPlayer = game.getTeamOfPlayer(player) ?: return
         val bedData = game.data.beds.firstOrNull { d ->
             teamOfPlayer != d.team
@@ -146,7 +152,9 @@ class UpgradesManager(plugin: BedwarsPlugin, val game: BedwarsGame) {
     fun canAlertTrap(player: Player): Boolean {
         val teamOfPlayer = game.getTeamOfPlayer(player) ?: return false
         game.data.beds.firstOrNull { d ->
-            (teamOfPlayer != d.team) && (d.location.getSafeDistance(player.location) < 8)
+            (teamOfPlayer != d.team) &&
+                    (d.location.getSafeDistance(player.location) < 7) &&
+                    (firstTrap.containsKey(d.team))
         } ?: return false
         val time = times[player.uniqueId] ?: return true
         if (System.currentTimeMillis() - time > 30000) {

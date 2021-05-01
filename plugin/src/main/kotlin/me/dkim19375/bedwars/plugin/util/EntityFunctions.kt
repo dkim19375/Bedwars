@@ -1,22 +1,25 @@
 package me.dkim19375.bedwars.plugin.util
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
-import me.dkim19375.bedwars.plugin.data.HelpMessage
 import me.dkim19375.bedwars.plugin.enumclass.ArmorType
 import me.dkim19375.bedwars.plugin.enumclass.ErrorMessages
 import me.dkim19375.bedwars.plugin.enumclass.Permission
+import me.dkim19375.dkim19375core.data.HelpMessage
+import me.dkim19375.dkim19375core.function.filterNonNull
+import me.dkim19375.dkim19375core.function.showHelpMessage
+import me.dkim19375.dkim19375core.javaplugin.CoreJavaPlugin
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.kyori.adventure.title.Title
 import net.kyori.adventure.util.Ticks
 import org.bukkit.Bukkit
-import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
 import org.bukkit.permissions.Permissible
 import org.bukkit.plugin.java.JavaPlugin
@@ -24,74 +27,77 @@ import java.util.*
 import kotlin.math.ceil
 
 val commands = listOf(
-    HelpMessage("help [page]", "Show this help menu", Permission.HELP),
-    HelpMessage("list", "List bedwars maps and games", Permission.LIST),
-    HelpMessage("join <name>", "Join a bedwars game", Permission.JOIN),
-    HelpMessage("quickjoin", "Quickly a bedwars game", Permission.JOIN),
-    HelpMessage("leave", "Leave a bedwars game", Permission.LEAVE),
-    HelpMessage("reload", "Reload the plugin's config files", Permission.RELOAD),
-    HelpMessage("create", "Create a new bedwars game", Permission.SETUP),
-    HelpMessage("delete <name>", "Delete a bedwars game", Permission.SETUP),
-    HelpMessage("save <name>", "Save a bedwars game", Permission.SETUP),
-    HelpMessage("stop <name>", "Start a bedwars game", Permission.START),
-    HelpMessage("stop <name>", "Stop a bedwars game", Permission.STOP),
-    HelpMessage("edit <name>", "Prevents a bedwars game from being started (used when editing)", Permission.SETUP),
-    HelpMessage("setup <name> ready", "Detects if the game can be saved", Permission.SETUP),
-    HelpMessage("setup <name> finish", "Finishes a game setup, also saves it", Permission.SETUP),
-    HelpMessage("setup <name> lobby", "Set the lobby location", Permission.SETUP),
-    HelpMessage("setup <name> spec", "Set the spectator spot", Permission.SETUP),
-    HelpMessage("setup <name> minplayers [min]", "Set the minimum players", Permission.SETUP),
-    HelpMessage("setup <name> maxplayers [max]", "Set the maximum players", Permission.SETUP),
-    HelpMessage("setup <name> shop add", "Set the villager being looked at as a shop", Permission.SETUP),
-    HelpMessage("setup <name> shop remove", "Removes the villager being looked at as a shop", Permission.SETUP),
-    HelpMessage("setup <name> upgrades add", "Set the villager being looked at as an upgrade shop", Permission.SETUP),
+    HelpMessage("help [page]", "Show this help menu", Permission.HELP.permission),
+    HelpMessage("list", "List bedwars maps and games", Permission.LIST.permission),
+    HelpMessage("join <name>", "Join a bedwars game", Permission.JOIN.permission),
+    HelpMessage("quickjoin", "Quickly a bedwars game", Permission.JOIN.permission),
+    HelpMessage("leave", "Leave a bedwars game", Permission.LEAVE.permission),
+    HelpMessage("reload", "Reload the plugin's config files", Permission.RELOAD.permission),
+    HelpMessage("create", "Create a new bedwars game", Permission.SETUP.permission),
+    HelpMessage("delete <name>", "Delete a bedwars game", Permission.SETUP.permission),
+    HelpMessage("save <name>", "Save a bedwars game", Permission.SETUP.permission),
+    HelpMessage("stop <name>", "Start a bedwars game", Permission.START.permission),
+    HelpMessage("stop <name>", "Stop a bedwars game", Permission.STOP.permission),
+    HelpMessage(
+        "edit <name>",
+        "Prevents a bedwars game from being started (used when editing.permission)",
+        Permission.SETUP.permission
+    ),
+    HelpMessage("setup <name> ready", "Detects if the game can be saved", Permission.SETUP.permission),
+    HelpMessage("setup <name> finish", "Finishes a game setup, also saves it", Permission.SETUP.permission),
+    HelpMessage("setup <name> lobby", "Set the lobby location", Permission.SETUP.permission),
+    HelpMessage("setup <name> spec", "Set the spectator spot", Permission.SETUP.permission),
+    HelpMessage("setup <name> minplayers [min]", "Set the minimum players", Permission.SETUP.permission),
+    HelpMessage("setup <name> maxplayers [max]", "Set the maximum players", Permission.SETUP.permission),
+    HelpMessage("setup <name> shop add", "Set the villager being looked at as a shop", Permission.SETUP.permission),
+    HelpMessage(
+        "setup <name> shop remove",
+        "Removes the villager being looked at as a shop",
+        Permission.SETUP.permission
+    ),
+    HelpMessage(
+        "setup <name> upgrades add",
+        "Set the villager being looked at as an upgrade shop",
+        Permission.SETUP.permission
+    ),
     HelpMessage(
         "setup <name> upgrades remove",
         "Removes the villager being looked at as an upgrade shop",
         Permission.SETUP
+            .permission
     ),
-    HelpMessage("setup <name> spawner add <iron/gold/diamond/emerald>", "Add a spawner", Permission.SETUP),
-    HelpMessage("setup <name> spawner remove", "Removes a spawner within 5 blocks", Permission.SETUP),
-    HelpMessage("setup <name> team", "Get the current teams", Permission.SETUP),
-    HelpMessage("setup <name> team add <color>", "Create a team, with the spawn at your location", Permission.SETUP),
-    HelpMessage("setup <name> team remove <color>", "Remove a team", Permission.SETUP),
+    HelpMessage("setup <name> spawner add <iron/gold/diamond/emerald>", "Add a spawner", Permission.SETUP.permission),
+    HelpMessage("setup <name> spawner remove", "Removes a spawner within 5 blocks", Permission.SETUP.permission),
+    HelpMessage("setup <name> team", "Get the current teams", Permission.SETUP.permission),
+    HelpMessage(
+        "setup <name> team add <color>",
+        "Create a team, with the spawn at your location",
+        Permission.SETUP.permission
+    ),
+    HelpMessage("setup <name> team remove <color>", "Remove a team", Permission.SETUP.permission),
     HelpMessage(
         "setup <name> bed add <color>",
         "Set the bed of the team color of the bed you are standing on",
         Permission.SETUP
+            .permission
     ),
-    HelpMessage("setup <name> bed remove <color>", "Unsets the bed of the team color", Permission.SETUP),
+    HelpMessage("setup <name> bed remove <color>", "Unsets the bed of the team color", Permission.SETUP.permission),
 )
 
-fun CommandSender.showHelpMessage(label: String, page: Int = 1) = showHelpMessage(label, null, page)
+fun CommandSender.showHelpMsg(label: String, page: Int = 1) = showHelpMsg(label, null, page)
 
-fun CommandSender.showHelpMessage(label: String, error: String?, page: Int = 1) {
-    sendMessage("${ChatColor.DARK_BLUE}------------------------------------------------")
-    sendMessage(
-        "${ChatColor.GREEN}Bedwars v${JavaPlugin.getPlugin(BedwarsPlugin::class.java).description.version} " +
-                "Help Page: $page/${getMaxHelpPages()}  <> = required  [] = optional"
+fun CommandSender.showHelpMsg(label: String, error: ErrorMessages) = showHelpMsg(label, error.message)
+
+fun CommandSender.showHelpMsg(label: String, error: String?, page: Int = 1) {
+    showHelpMessage(
+        label, error, page, commands,
+        JavaPlugin.getProvidingPlugin(BedwarsPlugin::class.java) as CoreJavaPlugin
     )
-    val newCommands = commands.filter { msg -> hasPermission(msg.permission) }
-    for (i in ((page - 1) * 7) until page * 7) {
-        val cmd = newCommands.getSafe(i) ?: continue
-        sendHelpMsgFormatted(label, cmd)
-    }
-    error?.let {
-        sendMessage("${ChatColor.RED}$it")
-    }
-    sendMessage("${ChatColor.DARK_BLUE}------------------------------------------------")
 }
 
 fun Permissible.getMaxHelpPages(): Int {
     val newCommands = commands.filter { msg -> hasPermission(msg.permission) }
     return ceil(newCommands.size.toDouble() / 7.0).toInt()
-}
-
-private fun CommandSender.sendHelpMsgFormatted(label: String, message: HelpMessage) {
-    if (!hasPermission(message.permission)) {
-        return
-    }
-    sendMessage("${ChatColor.AQUA}/$label ${message.arg} - ${ChatColor.GOLD}${message.description}")
 }
 
 fun PlayerInventory.containsArmor(): ArmorType? {
@@ -142,8 +148,12 @@ fun Player.getItemAmount(type: Material): Int {
 
 fun Permissible.hasPermission(permission: Permission) = hasPermission(permission.permission)
 
-fun Player.playSound(sound: Sound, volume: Float = 0.7f, pitch: Float = 1.0f) {
+fun Player.playSound(sound: Sound, volume: Float = 0.85f, pitch: Float = 1.0f) {
     playSound(location, sound, volume, pitch)
+}
+
+fun PlayerInventory.getAllContents(): Array<ItemStack?> {
+    return contents.plus(armorContents)
 }
 
 fun LivingEntity.getLookingAt(distance: Double = 4.0): LivingEntity? {

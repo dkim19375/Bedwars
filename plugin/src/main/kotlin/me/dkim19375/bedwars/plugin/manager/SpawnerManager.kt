@@ -5,7 +5,8 @@ import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.enumclass.SpawnerType
 import me.dkim19375.bedwars.plugin.util.Delay
 import me.dkim19375.bedwars.plugin.util.dropItemStraight
-import org.bukkit.entity.EntityType
+import org.bukkit.Bukkit
+import org.bukkit.Location
 import org.bukkit.entity.Item
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
@@ -26,7 +27,6 @@ class SpawnerManager(private val plugin: BedwarsPlugin, private val game: Bedwar
                     return
                 }
                 val types = mutableSetOf<SpawnerType>()
-
                 for (type in SpawnerType.values()) {
                     if (getTimeUntilNextDrop(type).millis <= 0) {
                         types.add(type)
@@ -39,7 +39,10 @@ class SpawnerManager(private val plugin: BedwarsPlugin, private val game: Bedwar
                     if (!types.contains(spawner.type)) {
                         continue
                     }
-                    val loc = spawner.location
+                    val loc = Location(Bukkit.getWorld(spawner.location.world.name),
+                        spawner.location.x,
+                        spawner.location.y,
+                        spawner.location.z)
                     val item = loc.world.dropItemStraight(loc, ItemStack(spawner.type.material))
                     val entities = item.getNearbyEntities(4.0, 4.0, 4.0)
                     var amount = 1

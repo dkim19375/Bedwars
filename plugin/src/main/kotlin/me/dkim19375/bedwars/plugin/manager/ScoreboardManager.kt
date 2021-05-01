@@ -1,9 +1,7 @@
 package me.dkim19375.bedwars.plugin.manager
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
-import me.dkim19375.bedwars.plugin.data.TeamData
 import me.dkim19375.bedwars.plugin.enumclass.GameState
-import me.dkim19375.bedwars.plugin.enumclass.Team
 import me.dkim19375.bedwars.plugin.util.formatTime
 import me.dkim19375.bedwars.plugin.util.getPlayers
 import me.tigerhix.lib.scoreboard.ScoreboardLib
@@ -54,7 +52,7 @@ class ScoreboardManager(private val plugin: BedwarsPlugin) : ScoreboardHandler, 
                 .next("Players: ${ChatColor.GREEN}${game.playersInLobby.size}/${game.data.maxPlayers}")
             if (game.state == GameState.STARTING) {
                 entry.blank()
-                    .next("Starting in ${ChatColor.GREEN}${game.countdown}s")
+                    .next("Starting in ${ChatColor.GREEN}${game.countdown + 1}s")
             }
             return entry.blank()
                 .next("Min Players: ${ChatColor.GREEN}${game.data.minPlayers}")
@@ -78,7 +76,7 @@ class ScoreboardManager(private val plugin: BedwarsPlugin) : ScoreboardHandler, 
             } else {
                 val bed = game.beds[team]
                 if (bed == null || bed == false) {
-                    stringBuilder.append("${ChatColor.RED}${game.getPlayersInTeam(team)}")
+                    stringBuilder.append("${ChatColor.GREEN}${game.getPlayersInTeam(team).size}")
                 } else {
                     stringBuilder.append("${ChatColor.GREEN}\u2714")
                 }

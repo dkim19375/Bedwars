@@ -3,6 +3,7 @@ package me.dkim19375.bedwars.plugin.util
 class Delay private constructor(time: Long) : Cloneable {
     val millis: Long = time
     val seconds: Long = time / 1000
+    @Suppress("unused")
     val ticks: Long = time / 50
 
     @Suppress("unused", "MemberVisibilityCanBePrivate")

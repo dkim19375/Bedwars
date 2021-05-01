@@ -1,7 +1,8 @@
 package me.dkim19375.bedwars.plugin.util
 
-import me.dkim19375.bedwars.plugin.data.LocationWrapper
+import me.dkim19375.bedwars.plugin.data.ItemWrapper
 import me.dkim19375.bedwars.plugin.enumclass.ArmorType
+import me.dkim19375.dkim19375core.data.LocationWrapper
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -110,6 +111,7 @@ fun Material.isTool() = when (this) {
     Material.IRON_AXE -> true
     Material.DIAMOND_PICKAXE -> true
     Material.DIAMOND_AXE -> true
+    Material.SHEARS -> true
     else -> false
 }
 

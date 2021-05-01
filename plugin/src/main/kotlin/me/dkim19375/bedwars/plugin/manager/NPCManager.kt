@@ -2,7 +2,6 @@ package me.dkim19375.bedwars.plugin.manager
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.GameData
-import me.dkim19375.bedwars.plugin.util.combine
 import me.dkim19375.bedwars.plugin.util.getEntity
 import me.dkim19375.bedwars.plugin.util.removeAI
 import org.bukkit.entity.Villager
@@ -12,8 +11,21 @@ class NPCManager(
     private val plugin: BedwarsPlugin, private val gameData: GameData
 ) {
     fun disableAI() {
-        val villagers = getShopVillagers().toList().combine(getUpgradeVillagers().toList())
-        villagers.forEach(Villager::removeAI)
+        val villagers = getShopVillagers().toList().plus(getUpgradeVillagers().toList())
+        for (villager in villagers) {
+            villager.removeAI()
+            if (getShopVillagersUUID().contains(villager.uniqueId)) {
+                villager.customName = "Shop"
+                villager.isCustomNameVisible = true
+                continue
+            }
+            if (getUpgradeVillagersUUID().contains(villager.uniqueId)) {
+                villager.customName = "Upgrades"
+                villager.isCustomNameVisible = true
+                continue
+            }
+            villager.customName = null
+        }
     }
 
     fun removeVillager(villager: UUID) {

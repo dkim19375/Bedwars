@@ -14,16 +14,6 @@ fun <V> Map<String, V>.getKeyFromStr(key: String): String? {
     return null
 }
 
-fun <T> List<T>.getSafe(index: Int): T? {
-    if (index >= size) {
-        return null
-    }
-    if (index < 0) {
-        return null
-    }
-    return get(index)
-}
-
 fun <V> Map<String, V>.getIgnoreCase(other: String): V? {
     for (entry in entries) {
         if (entry.key.equals(other, ignoreCase = true)) {
@@ -38,8 +28,6 @@ fun Set<TeamData>.containsTeam(team: Team): Boolean = getTeam(team) != null
 fun Set<TeamData>.getTeam(team: Team): TeamData? {
     return firstOrNull { d -> d.team == team }
 }
-
-fun <T> List<T?>.filterNonNull(): List<T> = filter(Objects::nonNull).map { t -> t!! }
 
 fun MutableSet<TeamData>.removeTeam(team: Team) {
     removeIf { d -> d.team == team }
@@ -62,21 +50,6 @@ fun <T> MutableCollection<MutableSet<T>>.getCombinedValues(): List<T> {
     return newList
 }
 
-fun <K, V> Map<K, V>.getKeyByValue(value: V): K? {
-    for (entry in this.entries) {
-        val k = entry.key ?: continue
-        val v = entry.value ?: continue
-        if (v == value) {
-            return k
-        }
-    }
-    return null
-}
-
-fun <T> List<T>.convertToString(): List<String> {
-    return map { item -> item.toString() }
-}
-
 fun <T> T.containsAny(vararg element: List<T>): Boolean {
     this ?: return false
     element.forEach { tList ->
@@ -97,12 +70,4 @@ fun <T> List<T>.containsAny(vararg element: T): Boolean {
         }
     }
     return false
-}
-
-fun <T> List<T>.combine(other: List<T>): List<T> {
-    return plus(other).toList()
-}
-
-fun <T> Array<T>.combine(other: Array<T>): Array<T> {
-    return plus(other).clone()
 }

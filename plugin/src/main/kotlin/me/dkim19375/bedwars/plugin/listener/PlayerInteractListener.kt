@@ -16,7 +16,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 
 class PlayerInteractListener(private val plugin: BedwarsPlugin) : Listener {
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST)
     private fun PlayerInteractEvent.onInteract() {
         blockPrevention()
         setupFireballs()
@@ -44,6 +44,7 @@ class PlayerInteractListener(private val plugin: BedwarsPlugin) : Listener {
 
     private fun PlayerInteractEvent.blockPrevention() {
         plugin.gameManager.getGame(player) ?: return
+        clickedBlock ?: return
         if (!listOf(Material.BED, Material.BED_BLOCK).contains(clickedBlock.type)) {
             return
         }
@@ -59,23 +60,24 @@ class PlayerInteractListener(private val plugin: BedwarsPlugin) : Listener {
     }
 
     private fun PlayerInteractEvent.setupFireballs() {
-        if (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK) return
+        if (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK) {
+            return
+        }
         if (player.itemInHand.type != Material.FIREBALL) {
             return
         }
+        if (player.isSneaking && action == Action.RIGHT_CLICK_BLOCK) {
+            return
+        }
         isCancelled = true
-        player.itemInHand = ItemStack(Material.AIR)
-        val defaultBall = player.launchProjectile(Fireball::class.java)
-        defaultBall.yield = 0F
-        val defaultVelocity = defaultBall.velocity
-        defaultBall.remove()
-        val velocity = defaultVelocity.multiply(1.6)
-        val newLoc = player.getLineOfSight(setOf(), 2)[1].location
-            .setDirection(player.location.direction)
-
-        val fireball = player.world.spawn(newLoc, defaultBall.javaClass)
+        if (player.itemInHand.amount == 1) {
+            player.itemInHand = ItemStack(Material.AIR)
+        } else {
+            player.itemInHand = ItemStack(player.itemInHand.type, player.itemInHand.amount - 1)
+        }
+        val fireball = player.launchProjectile(Fireball::class.java)
         fireball.setIsIncendiary(true)
-        fireball.velocity = velocity
+        fireball.yield = 2.5f
         plugin.gameManager.explosives[fireball.uniqueId] = player.uniqueId
     }
 }

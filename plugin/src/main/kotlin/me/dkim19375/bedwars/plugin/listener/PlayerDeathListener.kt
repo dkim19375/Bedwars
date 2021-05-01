@@ -15,6 +15,7 @@ class PlayerDeathListener(private val plugin: BedwarsPlugin) : Listener {
         if (game.state != GameState.STARTED) {
             return
         }
+        val location = entity.location.clone()
         entity.spigot().respawn() // auto respawn
         droppedExp = 0
         val originalDrops = drops.toList()
@@ -23,8 +24,9 @@ class PlayerDeathListener(private val plugin: BedwarsPlugin) : Listener {
         newDrops.removeIf { item ->
             !listOf(Material.IRON_INGOT, Material.GOLD_INGOT, Material.DIAMOND, Material.EMERALD).contains(item.type)
         }
-        val location = entity.location.clone()
-        newDrops.forEach { drop -> location.dropItem(drop) }
+        val killer = entity.killer
+        killer?.inventory?.addItem(*newDrops.toTypedArray())
+        killer ?: newDrops.forEach { drop -> location.dropItem(drop) }
         game.playerKilled(entity, originalDrops)
     }
 }

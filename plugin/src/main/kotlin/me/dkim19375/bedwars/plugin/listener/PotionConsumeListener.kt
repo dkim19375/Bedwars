@@ -1,6 +1,7 @@
 package me.dkim19375.bedwars.plugin.listener
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -9,7 +10,6 @@ import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.potion.Potion
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
-import org.bukkit.potion.PotionType
 
 class PotionConsumeListener(private val plugin: BedwarsPlugin) : Listener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
@@ -21,7 +21,10 @@ class PotionConsumeListener(private val plugin: BedwarsPlugin) : Listener {
         val potionType = potion.type ?: return
         val type = potionType.effectType
         plugin.gameManager.getGame(player) ?: return
-        if (potionType == PotionType.INVISIBILITY) {
+        Bukkit.getScheduler().runTask(plugin) {
+            player.inventory.remove(Material.GLASS_BOTTLE)
+        }
+        if (type == PotionEffectType.INVISIBILITY) {
             player.addPotionEffect(PotionEffect(type, 600, 0), true)
             plugin.packetManager.hideArmor(player)
             return

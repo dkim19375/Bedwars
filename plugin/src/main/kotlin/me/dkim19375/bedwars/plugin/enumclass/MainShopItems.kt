@@ -1,7 +1,7 @@
 package me.dkim19375.bedwars.plugin.enumclass
 
 import me.dkim19375.bedwars.plugin.gui.MainShopGUI
-import me.dkim19375.bedwars.plugin.util.ItemWrapper
+import me.dkim19375.bedwars.plugin.data.ItemWrapper
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.potion.PotionType

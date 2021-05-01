@@ -2,10 +2,12 @@ package me.dkim19375.bedwars.plugin.manager
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.GameData
-import me.dkim19375.bedwars.plugin.data.LocationWrapper
 import me.dkim19375.bedwars.plugin.data.PlayerData
 import me.dkim19375.bedwars.plugin.enumclass.*
+import me.dkim19375.bedwars.plugin.gui.MainShopGUI
 import me.dkim19375.bedwars.plugin.util.*
+import me.dkim19375.dkim19375core.data.LocationWrapper
+import me.dkim19375.dkim19375core.function.filterNonNull
 import org.apache.commons.io.FileUtils
 import org.bukkit.*
 import org.bukkit.entity.Player
@@ -110,7 +112,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             val team = entry.key
             val players = entry.value.getPlayers()
             for (player in players) {
-                giveItems(player, player.inventory.contents.toList(), team)
+                giveItems(player, null, team)
             }
         }
     }
@@ -273,34 +275,65 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         }.runTaskTimer(plugin, 0L, 20L)
     }
 
-    fun giveItems(player: Player, items: List<ItemStack>?, team: Team) {
+    fun giveItems(player: Player, items: List<ItemStack?>?, team: Team) {
+        val newItems: List<ItemStack>? = items?.filterNonNull()
+        val armor: ArmorType =
+            ArmorType.fromMaterial(newItems?.firstOrNull { i -> ArmorType.fromMaterial(i.type) != null }?.type)
+                ?: ArmorType.LEATHER
+        player.inventory.addItem(MainShopItems.WOOD_SWORD.item.toItemStack(team.color))
         player.inventory.helmet = team.getColored(ItemStack(Material.LEATHER_HELMET))
         player.inventory.chestplate = team.getColored(ItemStack(Material.LEATHER_CHESTPLATE))
-        player.inventory.addItem(MainShopItems.WOOD_SWORD.item.toItemStack(team.color))
+        player.inventory.leggings = team.getColored(ItemStack(armor.leggings))
+        player.inventory.boots = team.getColored(ItemStack(armor.boots))
+        var addPick = false
+        var addAxe = false
+        var addShears = false
+
+        for (item in newItems.default(listOf())) {
+            if (item.type.isTool()) {
+                if (item.type.name.endsWith("PICKAXE")) {
+                    addPick = true
+                    continue
+                }
+                if (item.type.name.endsWith("AXE")) {
+                    addAxe = true
+                    continue
+                }
+                if (item.type == Material.SHEARS) {
+                    addShears = true
+                    continue
+                }
+                continue
+            }
+        }
         for (item in MainShopItems.values()) {
             if (item.item.material.isTool()) {
-                if (item.item.material.name.endsWith("PICKAXE")) {
-                    player.inventory.addItem(MainShopItems.WOOD_PICK.item.toItemStack(team.color))
-                    continue
-                }
-                if (item.item.material.name.endsWith("AXE")) {
-                    player.inventory.addItem(MainShopItems.WOOD_AXE.item.toItemStack(team.color))
-                    continue
-                }
                 continue
             }
             if (!item.defaultOnSpawn && !item.permanent) {
                 continue
             }
-            if (items != null && !item.defaultOnSpawn) {
-                if (!items.map(ItemStack::getType).contains(item.item.material)) {
+            if (item.type == MainShopGUI.ItemType.MELEE) {
+                continue
+            }
+            if (newItems != null && !item.defaultOnSpawn) {
+                if (!newItems.map(ItemStack::getType).contains(item.item.material)) {
                     continue
                 }
             }
-            val armor = ArmorType.fromMaterial(items?.firstOrNull { i -> i.type.isArmor() }?.type) ?: ArmorType.LEATHER
-            player.inventory.leggings = team.getColored(armor.leggings)
-            player.inventory.boots = team.getColored(armor.boots)
+            if (item.type == MainShopGUI.ItemType.ARMOR) {
+                continue
+            }
             player.inventory.addItem(item.item.toItemStack(team.color))
+        }
+        if (addPick) {
+            player.inventory.addItem(MainShopItems.WOOD_PICK.item.toItemStack(team.color))
+        }
+        if (addAxe) {
+            player.inventory.addItem(MainShopItems.WOOD_AXE.item.toItemStack(team.color))
+        }
+        if (addShears) {
+            player.inventory.addItem(MainShopItems.SHEARS.item.toItemStack(team.color))
         }
         upgradesManager.applyUpgrades(player)
     }
@@ -444,7 +477,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         }
         val teamOfPlayer = getTeamOfPlayer(player) ?: return
         broadcast(
-            "${ChatColor.BOLD}BED DESTRUCTION > ${team.displayName}${ChatColor.GRAY}'s " +
+            "${ChatColor.BOLD}BED DESTRUCTION > ${team.chatColor}${team.displayName}${ChatColor.GRAY}'s " +
                     "bed was broken by " +
                     "${teamOfPlayer.chatColor}${player.displayName}${ChatColor.GRAY}!"
         )

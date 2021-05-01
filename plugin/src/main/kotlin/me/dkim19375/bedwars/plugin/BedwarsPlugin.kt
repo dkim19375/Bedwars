@@ -10,12 +10,11 @@ import me.dkim19375.bedwars.plugin.data.SpawnerData
 import me.dkim19375.bedwars.plugin.data.TeamData
 import me.dkim19375.bedwars.plugin.listener.*
 import me.dkim19375.bedwars.plugin.manager.*
-import me.dkim19375.dkim19375core.ConfigFile
-import me.dkim19375.dkim19375core.CoreJavaPlugin
+import me.dkim19375.dkim19375core.config.ConfigFile
+import me.dkim19375.dkim19375core.javaplugin.CoreJavaPlugin
 import me.dkim19375.itemmovedetectionlib.ItemMoveDetectionLib
 import me.tigerhix.lib.scoreboard.ScoreboardLib
 import org.bukkit.configuration.serialization.ConfigurationSerialization
-import org.bukkit.event.Listener
 
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -30,6 +29,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
         private set
     lateinit var packetManager: PacketManager
         private set
+
     private val serializable = listOf(
         TeamData::class.java,
         BedData::class.java,
@@ -43,7 +43,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
         serializable.forEach(ConfigurationSerialization::registerClass)
         NBTInjector.inject()
         ScoreboardLib.setPluginInstance(this)
-        log("Successfully loaded (not enabled) ${description.name} v${description.version} in ${System.currentTimeMillis() - before}ms!")
+        logger.info("Successfully loaded (not enabled) ${description.name} v${description.version} in ${System.currentTimeMillis() - before}ms!")
     }
 
     override fun onEnable() {
@@ -54,7 +54,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
         registerListeners()
         reloadConfig()
         packetManager.addListeners()
-        log("Successfully enabled ${description.name} v${description.version} in ${System.currentTimeMillis() - before}ms!")
+        logger.info("Successfully enabled ${description.name} v${description.version} in ${System.currentTimeMillis() - before}ms!")
     }
 
     override fun onDisable() {
@@ -85,7 +85,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
     }
 
     private fun registerListeners() {
-        registerListeners(
+        registerListener(
             PlayerMoveListener(), ExplodeListeners(this), BlockPlaceListener(this),
             BlockBreakListener(this), PlayerQuitListener(this), PlayerDeathListener(this),
             EntityDamageListener(this), ItemTransferListener(this), DamageByOtherListener(this),
@@ -95,6 +95,4 @@ class BedwarsPlugin : CoreJavaPlugin() {
             PlayerInteractListener(this), scoreboardManager
         )
     }
-
-    private fun registerListeners(vararg listeners: Listener) = listeners.forEach(this::registerListener)
 }

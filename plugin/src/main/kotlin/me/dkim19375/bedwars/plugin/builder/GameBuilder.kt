@@ -5,7 +5,6 @@ import me.dkim19375.bedwars.plugin.data.GameData
 import me.dkim19375.bedwars.plugin.data.SpawnerData
 import me.dkim19375.bedwars.plugin.data.TeamData
 import me.dkim19375.bedwars.plugin.enumclass.BuildError
-import me.dkim19375.bedwars.plugin.enumclass.Team
 import org.bukkit.Location
 import org.bukkit.World
 import java.util.*

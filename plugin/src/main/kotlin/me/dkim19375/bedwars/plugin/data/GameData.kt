@@ -2,8 +2,8 @@ package me.dkim19375.bedwars.plugin.data
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
-import me.dkim19375.bedwars.plugin.util.filterNonNull
-import me.dkim19375.bedwars.plugin.util.toUUID
+import me.dkim19375.dkim19375core.function.filterNonNull
+import me.dkim19375.dkim19375core.function.toUUID
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.World
