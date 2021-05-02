@@ -51,13 +51,13 @@ class UpgradesManager(plugin: BedwarsPlugin, val game: BedwarsGame) {
                 applyHaste(player)
                 applyHealPool(player)
             }
-        }, 60L, 60L)
+        }, 50L, 50L)
     }
 
     private fun applyHaste(player: Player) {
         val team = game.getTeamOfPlayer(player) ?: return
         val haste = haste[team] ?: return
-        player.addPotionEffect(PotionEffect(PotionEffectType.FAST_DIGGING, 100, haste - 1))
+        player.addPotionEffect(PotionEffect(PotionEffectType.FAST_DIGGING, 120, haste - 1))
     }
 
     private fun applyHealPool(player: Player) {
@@ -68,7 +68,7 @@ class UpgradesManager(plugin: BedwarsPlugin, val game: BedwarsGame) {
         game.data.beds.firstOrNull { d ->
             team == d.team && d.location.getSafeDistance(player.location) < 7
         } ?: return
-        player.addPotionEffect(PotionEffect(PotionEffectType.REGENERATION, 80, 1))
+        player.addPotionEffect(PotionEffect(PotionEffectType.REGENERATION, 120, 0))
     }
 
     private fun applyToPlayer(player: Player, trap: TrapType) {

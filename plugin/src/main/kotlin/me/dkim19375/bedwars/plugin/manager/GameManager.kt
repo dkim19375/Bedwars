@@ -21,8 +21,7 @@ class GameManager(private val plugin: BedwarsPlugin) {
     private val games = mutableMapOf<String, BedwarsGame>()
     val builders = mutableMapOf<String, GameBuilder>()
     val invisPlayers = mutableSetOf<UUID>()
-    val explosives = mutableMapOf<UUID, UUID>()
-    //                        explosive  player
+    private val explosives = mutableMapOf<UUID, UUID>()
 
     init {
         Bukkit.getScheduler().runTaskTimer(plugin, {
@@ -60,21 +59,15 @@ class GameManager(private val plugin: BedwarsPlugin) {
         }
     }
 
-    fun startGame(game: String, force: Boolean) {
-        if (isGameRunning(game)) {
-            return
-        }
-        val bwGame = games[game] ?: return
-        bwGame.start(force)
+    fun addExplosive(entityUUID: UUID, player: Player) = addExplosive(entityUUID, player.uniqueId)
+
+    fun addExplosive(entityUUID: UUID, player: UUID) {
+        explosives[entityUUID] = player
     }
 
-    fun forceStopGame(game: String) {
-        if (!isGameRunning(game)) {
-            return
-        }
-        val bwGame = games[game] ?: return
-        bwGame.forceStop()
-    }
+    fun removeExplosive(entityUUID: UUID) = explosives.remove(entityUUID)
+
+    fun getExplosives() = explosives.toMap()
 
     fun isGameRunning(game: String): Boolean {
         return (games[games.getKeyFromStr(game)] ?: return false).isRunning()

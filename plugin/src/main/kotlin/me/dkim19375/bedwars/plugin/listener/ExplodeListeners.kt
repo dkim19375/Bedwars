@@ -3,7 +3,6 @@ package me.dkim19375.bedwars.plugin.listener
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
 import me.dkim19375.bedwars.plugin.util.getWrapper
-import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Entity
@@ -17,13 +16,13 @@ class ExplodeListeners(private val plugin: BedwarsPlugin) : Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     private fun EntityExplodeEvent.onExplode() {
-        val uuid = if (plugin.gameManager.explosives[entity.uniqueId] == null) {
+        val explosives = plugin.gameManager.getExplosives()
+        val uuid = if (explosives[entity.uniqueId] == null) {
             ((entity as? Projectile)?.shooter as? Entity)?.uniqueId
         } else {
-            plugin.gameManager.explosives[entity.uniqueId]
+            explosives[entity.uniqueId]
         } ?: return
-        Bukkit.broadcastMessage("explosives: ${plugin.gameManager.explosives.keys}")
-        plugin.gameManager.explosives.remove(entity.uniqueId)
+        plugin.gameManager.removeExplosive(entity.uniqueId)
         val game = plugin.gameManager.getGame(uuid)
         if (game == null) {
             isCancelled = true

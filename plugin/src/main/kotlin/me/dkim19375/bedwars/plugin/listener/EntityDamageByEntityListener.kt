@@ -1,7 +1,7 @@
 package me.dkim19375.bedwars.plugin.listener
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
-import org.bukkit.entity.*
+import org.bukkit.entity.EntityType
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -18,11 +18,10 @@ class EntityDamageByEntityListener(private val plugin: BedwarsPlugin) : Listener
         if (damager.type != EntityType.PRIMED_TNT && damager.type != EntityType.FIREBALL) {
             return
         }
-        val entities = plugin.gameManager.explosives.keys
+        val entities = plugin.gameManager.getExplosives().keys
         if (damager.uniqueId !in entities) {
             return
         }
         damage = finalDamage * 0.1
-        entities.remove(damager.uniqueId)
     }
 }

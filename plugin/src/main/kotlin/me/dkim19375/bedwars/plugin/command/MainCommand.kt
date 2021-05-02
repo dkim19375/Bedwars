@@ -35,6 +35,38 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
         }
         @Suppress("LiftReturnOrAssignment")
         when (args[0].toLowerCase()) {
+            "heal-pool" -> {
+                if (!check(sender, command, label, args, 1, Permission.SETUP, true)) {
+                    return true
+                }
+                val player = sender as Player
+                val game = plugin.gameManager.getGame(player)
+                if (game == null) {
+                    sender.sendMessage(ErrorMessages.INVALID_GAME)
+                    return true
+                }
+                val team = game.getTeamOfPlayer(player)
+                if (team == null) {
+                    sender.sendMessage(ErrorMessages.INVALID_TEAM)
+                    return true
+                }
+                if (!game.upgradesManager.healPool.contains(team)) {
+                    sender.sendMessage("Doesn't have heal pool")
+                    return true
+                }
+                var has = false
+                for (d in game.data.beds) {
+                    sender.sendMessage("Team: ${d.team.name}, is same: ${team == d.team}, " +
+                            "distance: ${d.location.getSafeDistance(player.location) < 7}. " +
+                            "Overall: ${team == d.team && d.location.getSafeDistance(player.location) < 7}")
+                    if (team == d.team && d.location.getSafeDistance(player.location) < 7) {
+                        has = true
+                    }
+                }
+                sender.sendMessage(" ")
+                sender.sendMessage("${ChatColor.AQUA}Overall: $has")
+                return true
+            }
             "inv" -> {
                 if (!check(sender, command, label, args, 1, Permission.SETUP, true)) {
                     return true

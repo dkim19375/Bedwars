@@ -27,7 +27,6 @@ class BlockPlaceListener(private val plugin: BedwarsPlugin) : Listener {
         loc.z += Random.nextDouble(-OFFSET, OFFSET)
         tnt.teleport(loc)
         tnt.fuseTicks = 80
-        plugin.gameManager.explosives[tnt.uniqueId] = player.uniqueId
-        Bukkit.broadcastMessage("set tnt: ${tnt.uniqueId}")
+        plugin.gameManager.addExplosive(tnt.uniqueId, player)
     }
 }
