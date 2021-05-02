@@ -8,8 +8,6 @@ import me.dkim19375.bedwars.plugin.data.TeamData
 import me.dkim19375.bedwars.plugin.enumclass.*
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
 import me.dkim19375.bedwars.plugin.util.*
-import me.dkim19375.dkim19375core.function.filterNonNull
-import me.tigerhix.lib.scoreboard.type.Entry
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -35,105 +33,6 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
         }
         @Suppress("LiftReturnOrAssignment")
         when (args[0].toLowerCase()) {
-            "heal-pool" -> {
-                if (!check(sender, command, label, args, 1, Permission.SETUP, true)) {
-                    return true
-                }
-                val player = sender as Player
-                val game = plugin.gameManager.getGame(player)
-                if (game == null) {
-                    sender.sendMessage(ErrorMessages.INVALID_GAME)
-                    return true
-                }
-                val team = game.getTeamOfPlayer(player)
-                if (team == null) {
-                    sender.sendMessage(ErrorMessages.INVALID_TEAM)
-                    return true
-                }
-                if (!game.upgradesManager.healPool.contains(team)) {
-                    sender.sendMessage("Doesn't have heal pool")
-                    return true
-                }
-                var has = false
-                for (d in game.data.beds) {
-                    sender.sendMessage("Team: ${d.team.name}, is same: ${team == d.team}, " +
-                            "distance: ${d.location.getSafeDistance(player.location) < 7}. " +
-                            "Overall: ${team == d.team && d.location.getSafeDistance(player.location) < 7}")
-                    if (team == d.team && d.location.getSafeDistance(player.location) < 7) {
-                        has = true
-                    }
-                }
-                sender.sendMessage(" ")
-                sender.sendMessage("${ChatColor.AQUA}Overall: $has")
-                return true
-            }
-            "inv" -> {
-                if (!check(sender, command, label, args, 1, Permission.SETUP, true)) {
-                    return true
-                }
-                val player = sender as Player
-                val inv = player.inventory
-                player.sendMessage("contents: ${inv.contents.toList().filterNonNull()}")
-                player.sendMessage("armorContents: ${inv.armorContents.toList().filterNonNull()}")
-                player.sendMessage("all: ${inv.getAllContents().toList().filterNonNull()}")
-                return true
-            }
-            "listname" -> {
-                if (!check(sender, command, label, args, 1, Permission.SETUP, true)) {
-                    return true
-                }
-                val player = sender as Player
-                val game = plugin.gameManager.getGame(player)
-                if (game == null) {
-                    sender.showHelpMsg(label, ErrorMessages.INVALID_GAME)
-                    return true
-                }
-                val team = game.getTeamOfPlayer(player)
-                if (team == null) {
-                    sender.showHelpMsg(label, "${ChatColor.RED}You must be in a team!")
-                    return true
-                }
-                if (args.size < 2) {
-                    player.sendMessage("List name: ${player.playerListName}")
-                    return true
-                }
-                player.playerListName = if (args[1] == "null") null else args[1]
-                player.sendMessage("List name set to: ${team.chatColor}${if (args[1] == "null") null else args[1]}")
-                return true
-            }
-            "item" -> {
-                if (!check(sender, command, label, args, 2, Permission.SETUP, true)) {
-                    return true
-                }
-                val player = sender as Player
-                val item = try {
-                    MainShopItems.valueOf(args[1].toUpperCase())
-                } catch (_: IllegalArgumentException) {
-                    player.sendMessage(ErrorMessages.INVALID_ARG)
-                    return true
-                }
-                player.inventory.addItem(item.item.toItemStack(plugin.gameManager.getTeamOfPlayer(player)?.color))
-                player.sendMessage("${ChatColor.GREEN}Successfully gave item!")
-                return true
-            }
-            "board" -> {
-                if (!check(sender, command, label, args, 1, Permission.SETUP, true)) {
-                    return true
-                }
-                val player = sender as Player
-                val entries = plugin.scoreboardManager.getEntries(player)
-                if (entries.isNullOrEmpty()) {
-                    player.sendMessage("${ChatColor.RED}Empty scoreboard!")
-                    return true
-                }
-                val list = entries.map(Entry::getName)
-                player.sendMessage("${ChatColor.DARK_BLUE}------------------------------------------------")
-                player.sendMessage(plugin.scoreboardManager.getTitle(player))
-                player.sendMessage("${ChatColor.DARK_GRAY}------------------------------------------------")
-                list.forEach(player::sendMessage)
-                player.sendMessage("${ChatColor.DARK_BLUE}------------------------------------------------")
-                return true
-            }
             "sound" -> {
                 if (!check(sender, command, label, args, 3, Permission.SETUP, true)) {
                     return true
@@ -152,68 +51,6 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 }
                 player.playSound(sound, pitch = pitch)
                 player.sendMessage("${ChatColor.GREEN}Played sound: ${sound.name} at pitch $pitch!")
-                return true
-            }
-            "debug" -> {
-                if (!check(sender, command, label, args, 1, Permission.SETUP, true)) {
-                    return true
-                }
-                val player = sender as Player
-                val game: BedwarsGame
-                if (args.size > 1) {
-                    val g = plugin.gameManager.getGame(args[1])
-                    if (g == null) {
-                        player.sendMessage(ErrorMessages.INVALID_GAME)
-                        return true
-                    }
-                    game = g
-                } else {
-                    val g = plugin.gameManager.getGame(player)
-                    if (g == null) {
-                        player.sendMessage(ErrorMessages.INVALID_GAME)
-                        return true
-                    }
-                    game = g
-                }
-                player.sendMessage("Test: ${plugin.gameManager.getGame(player) != null}")
-                player.sendMessage(
-                    "Is in lobby OR game: ${
-                        if (game.playersInLobby.plus(game.players.values.getCombinedValues())
-                                .contains(player.uniqueId)
-                        ) "Yes" else "No"
-                    }"
-                )
-                player.sendMessage("Game name: ${game.data.world.name}")
-                player.sendMessage("Players: ${game.getPlayersInGame().size}")
-                player.sendMessage("State: ${game.state.name}")
-                player.sendMessage(
-                    "Player list: ${
-                        game.getPlayersInGame().getPlayers().getUsernames().joinToString(", ")
-                    }"
-                )
-                player.sendMessage("Is in lobby: ${if (game.playersInLobby.contains(player.uniqueId)) "Yes" else "No"}")
-                player.sendMessage(
-                    "Is in game: ${
-                        if (game.players.values.getCombinedValues().contains(player.uniqueId)) "Yes" else "No"
-                    }"
-                )
-                player.sendMessage("Can start: ${game.canStart(false).name}, message: ${game.canStart(false).message}")
-                player.sendMessage("Is spawner runnable not-null: ${game.spawnerManager.runnable != null}")
-                return true
-            }
-            "help" -> {
-                if (!sender.hasPermission(Permission.HELP)) {
-                    sender.sendMessage(ErrorMessages.NO_PERMISSION)
-                    return true
-                }
-                if (args.size > 1) {
-                    sender.showHelpMsg(
-                        label,
-                        if (args[1].toIntOrNull() == null) 1 else args[1].toInt()
-                    )
-                    return true
-                }
-                sender.showHelpMsg(label)
                 return true
             }
             "list" -> {
@@ -374,9 +211,11 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                         game.forceStop {
                             sender.sendMessage("${ChatColor.GREEN}Successfully stopped game ${game.data.world.name} " +
                                     "(${count + 1}/$amount) (${System.currentTimeMillis() - time}ms)!")
+                            if ((count + 1) >= amount) {
+                                sender.sendMessage("${ChatColor.GREEN}Successfully stopped $amount games in ${System.currentTimeMillis() - start}ms!")
+                            }
                         }
                     }
-                    sender.sendMessage("${ChatColor.GREEN}Successfully stopped $amount games in ${System.currentTimeMillis() - start}ms!")
                     return true
                 }
                 val game = plugin.gameManager.getGame(args[1])

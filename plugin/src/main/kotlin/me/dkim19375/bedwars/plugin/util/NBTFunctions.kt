@@ -2,9 +2,9 @@
 
 package me.dkim19375.bedwars.plugin.util
 
-import de.tr7zw.nbtapi.NBTCompound
-import de.tr7zw.nbtapi.NBTEntity
-import de.tr7zw.nbtapi.NBTItem
+import de.tr7zw.changeme.nbtapi.NBTCompound
+import de.tr7zw.changeme.nbtapi.NBTEntity
+import de.tr7zw.changeme.nbtapi.NBTItem
 import de.tr7zw.nbtinjector.NBTInjector
 import org.bukkit.entity.Entity
 import org.bukkit.inventory.ItemStack

@@ -211,6 +211,9 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         if (playersInLobby.size >= data.maxPlayers) {
             return Result.TOO_MANY_PLAYERS
         }
+        if (!plugin.partiesListeners.onGameJoin(player)) {
+            return Result.TOO_MANY_PLAYERS
+        }
         playersInLobby.add(player.uniqueId)
         broadcast("${player.displayName}${ChatColor.GREEN} has joined the game! ${playersInLobby.size}/${data.maxPlayers}")
         val lobby = plugin.dataFileManager.getLobby()

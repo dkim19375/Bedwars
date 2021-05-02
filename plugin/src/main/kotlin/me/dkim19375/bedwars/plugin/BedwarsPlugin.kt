@@ -1,5 +1,7 @@
 package me.dkim19375.bedwars.plugin
 
+import com.alessiodp.parties.api.Parties
+import com.alessiodp.parties.api.interfaces.PartiesAPI
 import com.comphenix.protocol.ProtocolLibrary
 import de.tr7zw.nbtinjector.NBTInjector
 import me.dkim19375.bedwars.plugin.command.MainCommand
@@ -29,6 +31,8 @@ class BedwarsPlugin : CoreJavaPlugin() {
         private set
     lateinit var packetManager: PacketManager
         private set
+    val partiesListeners = PartiesListeners(this)
+    var partiesAPI: PartiesAPI? = null
 
     private val serializable = listOf(
         TeamData::class.java,
@@ -72,6 +76,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
     }
 
     private fun initVariables() {
+        server.pluginManager.getPlugin("Parties")?.isEnabled.let { partiesAPI = Parties.getApi() }
         dataFile = ConfigFile(this, "data.yml")
         registerConfig(dataFile)
         dataFileManager = DataFileManager(this)
@@ -92,7 +97,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
             PotionConsumeListener(this), InventoryClickListener(this), PlayerDropItemListener(this),
             PlayerItemDamageListener(this), CommandListeners(this),
             PlayerCoordsChangeListener(this), EntityDamageByEntityListener(this), CraftItemListener(this),
-            PlayerInteractListener(this), scoreboardManager
+            PlayerInteractListener(this), partiesListeners, scoreboardManager
         )
     }
 }
