@@ -2,6 +2,7 @@ package me.dkim19375.bedwars.plugin.enumclass
 
 import org.bukkit.Material
 
+@Suppress("unused")
 enum class ArmorType(val boots: Material, val leggings: Material) {
     LEATHER(Material.LEATHER_BOOTS, Material.LEATHER_LEGGINGS),
     CHAIN(Material.CHAINMAIL_BOOTS, Material.CHAINMAIL_LEGGINGS),

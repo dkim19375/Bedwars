@@ -25,7 +25,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     val players = mutableMapOf<Team, MutableSet<UUID>>()
     val playersInLobby = mutableSetOf<UUID>()
     var task: BukkitTask? = null
-    private val worldName: String = data.world.name!!
+    private val worldName: String = data.world.name
     val beds = mutableMapOf<Team, Boolean>()
     val npcManager = NPCManager(plugin, data)
     val upgradesManager = UpgradesManager(plugin, this)
@@ -219,7 +219,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         val lobby = plugin.dataFileManager.getLobby()
         beforeData[player.uniqueId] = PlayerData.getPlayerAndReset(
             player,
-            if (plugin.config.getBoolean("use-main-lobby") && lobby != null) lobby else data.lobby
+            data.lobby
         )
         plugin.scoreboardManager.getScoreboard(player, true) // activate
         if (playersInLobby.size >= data.minPlayers) {

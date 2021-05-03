@@ -49,7 +49,7 @@ data class GameData(
         @JvmStatic
         fun deserialize(map: Map<String, Any>): GameData {
             return GameData(
-                Bukkit.getWorld(map["world"] as String),
+                Bukkit.getWorld(map["world"] as String), // makes sure the world exists
                 map["min-players"] as Int,
                 map["max-players"] as Int,
                 (map["teams"] as List<TeamData>).toSet(),

@@ -235,13 +235,13 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
                 " "
             )
         )
-        if (amount >= item.costAmount) {
-            builder = ItemBuilder.from(itemstack)
+        builder = if (amount >= item.costAmount) {
+            ItemBuilder.from(itemstack)
                 .setName("${ChatColor.GREEN}${item.displayname}")
                 .addLore(*loreToAdd.toTypedArray())
                 .addLore("${ChatColor.YELLOW}Click to purchase!")
         } else {
-            builder = ItemBuilder.from(itemstack)
+            ItemBuilder.from(itemstack)
                 .setName("${ChatColor.RED}${item.displayname}")
                 .addLore(*loreToAdd.toTypedArray())
                 .addLore("${ChatColor.RED}You do not have enough ${item.costType.color}${item.costType.displayname}!")

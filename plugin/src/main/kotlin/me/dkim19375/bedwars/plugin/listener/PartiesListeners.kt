@@ -42,6 +42,7 @@ class PartiesListeners(private val plugin: BedwarsPlugin) : Listener {
         val command = message.replace("/", "").trim()
         val game = plugin.gameManager.getGame(player) ?: return
         if (game.state != GameState.LOBBY) {
+            isCancelled = true
             return
         }
         if (!command.equals("party teleport", ignoreCase = true)) {

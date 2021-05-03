@@ -2,7 +2,6 @@ package me.dkim19375.bedwars.plugin.listener
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.dkim19375core.data.LocationWrapper
-import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.TNTPrimed
 import org.bukkit.event.EventHandler

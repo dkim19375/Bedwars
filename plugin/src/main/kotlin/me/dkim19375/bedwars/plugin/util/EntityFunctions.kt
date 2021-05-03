@@ -49,15 +49,16 @@ val commands = listOf(
     HelpMessage("setup <name> spec", "Set the spectator spot", Permission.SETUP.permission),
     HelpMessage("setup <name> minplayers [min]", "Set the minimum players", Permission.SETUP.permission),
     HelpMessage("setup <name> maxplayers [max]", "Set the maximum players", Permission.SETUP.permission),
-    HelpMessage("setup <name> shop add", "Set the villager being looked at as a shop", Permission.SETUP.permission),
+    HelpMessage("setup <name> shop add [tp/teleport]", "Set the villager being looked at as a shop, " +
+            "if teleport/tp arg is set, then the villager will teleport to you", Permission.SETUP.permission),
     HelpMessage(
         "setup <name> shop remove",
         "Removes the villager being looked at as a shop",
         Permission.SETUP.permission
     ),
     HelpMessage(
-        "setup <name> upgrades add",
-        "Set the villager being looked at as an upgrade shop",
+        "setup <name> upgrades add [tp/teleport]",
+        "Set the villager being looked at as an upgrade shop, if teleport/tp arg is set, then the villager will teleport to you",
         Permission.SETUP.permission
     ),
     HelpMessage(

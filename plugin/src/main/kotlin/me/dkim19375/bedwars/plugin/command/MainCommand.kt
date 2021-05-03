@@ -33,6 +33,35 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
         }
         @Suppress("LiftReturnOrAssignment")
         when (args[0].toLowerCase()) {
+            "help" -> {
+                if (!sender.hasPermission(Permission.HELP)) {
+                    sender.sendMessage(ErrorMessages.NO_PERMISSION)
+                    return true
+                }
+                if (args.size > 1) {
+                    sender.showHelpMsg(
+                        label,
+                        if (args[1].toIntOrNull() == null) 1 else args[1].toInt()
+                    )
+                    return true
+                }
+                sender.showHelpMsg(label)
+                return true
+            }
+            "world" -> {
+                if (!check(sender, command, label, args, 1, Permission.SETUP, false)) {
+                    return true
+                }
+                val world = Bukkit.getWorld(args.getOrNull(1) ?: (sender as? Player)?.world?.name ?: "")
+                if (world == null) {
+                    sender.sendMessage("You must be a player or specify a valid world!")
+                    return true
+                }
+                sender.sendMessage("World name: ${world.name}")
+                sender.sendMessage("World uid: ${world.uid}")
+                sender.sendMessage("Is in world: ${(sender as? Player)?.world?.name == world.name ?: "false"}")
+                return true
+            }
             "sound" -> {
                 if (!check(sender, command, label, args, 3, Permission.SETUP, true)) {
                     return true
@@ -161,7 +190,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 return true
             }
             "create" -> {
-                if (!check(sender, command, label, args, 2, Permission.SETUP, true)) {
+                if (!check(sender, command, label, args, 1, Permission.SETUP, true)) {
                     return true
                 }
                 val player = sender as Player
@@ -570,8 +599,12 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 sender.sendMessage("${ChatColor.RED}That entity is already a shop/upgrades villager!")
                 return
             }
+            val teleport: Boolean = (args.getOrNull(4)?.equals("teleport", ignoreCase = true) ?: false ||
+                    args.getOrNull(4)?.equals("tp", ignoreCase = true) ?: false)
+            val loc = entity.location.clone()
+            loc.yaw = sender.location.getOppositeYaw().yaw
             villagers.add(entity.uniqueId)
-            entity.teleport(sender.location.getOppositeYaw())
+            entity.teleport(if (teleport) sender.location else loc)
             editor.save()
             for (villager in villagers) {
                 val e = villager.getEntity() ?: continue
