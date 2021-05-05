@@ -1,5 +1,6 @@
 package me.dkim19375.bedwars.plugin.data
 
+import me.dkim19375.bedwars.plugin.util.update
 import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.entity.Player
@@ -17,7 +18,7 @@ data class PlayerData(
         player.inventory.armorContents = armor
         player.inventory.contents = inventory
         player.enderChest.contents = enderChest
-        player.teleport(location)
+        player.teleport(location.update())
         player.activePotionEffects.forEach { e -> player.removePotionEffect(e.type) }
     }
 
@@ -57,22 +58,22 @@ data class PlayerData(
 
     companion object {
         @Suppress("MemberVisibilityCanBePrivate")
-        fun getPlayer(player: Player) =
+        fun getPlayer(player: Player, default: Location?) =
             PlayerData(
                 player.gameMode,
                 player.inventory.armorContents,
                 player.inventory.contents,
                 player.enderChest.contents,
-                player.location
+                default ?: player.location
             )
 
-        fun getPlayerAndReset(player: Player, location: Location?, gamemode: GameMode = GameMode.SURVIVAL): PlayerData {
-            val data = getPlayer(player)
+        fun getPlayerAndReset(player: Player, default: Location?, location: Location?, gamemode: GameMode = GameMode.SURVIVAL): PlayerData {
+            val data = getPlayer(player, default)
             player.gameMode = gamemode
             player.inventory.clear()
             player.enderChest.clear()
             if (location != null) {
-                player.teleport(location)
+                player.teleport(location.update())
             }
             return data
         }

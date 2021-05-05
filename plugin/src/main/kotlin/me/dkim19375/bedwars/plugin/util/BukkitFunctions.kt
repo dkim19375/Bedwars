@@ -186,3 +186,8 @@ fun Block.getBedFeet(): Location {
     val direction = data.facing
     return getRelative(direction.oppositeFace).location
 }
+
+fun Location.update(): Location {
+    world = Bukkit.getWorld(world?.name ?: return this)
+    return this
+}

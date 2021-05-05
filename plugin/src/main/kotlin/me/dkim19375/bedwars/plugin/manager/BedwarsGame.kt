@@ -219,6 +219,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         val lobby = plugin.dataFileManager.getLobby()
         beforeData[player.uniqueId] = PlayerData.getPlayerAndReset(
             player,
+            lobby,
             data.lobby
         )
         plugin.scoreboardManager.getScoreboard(player, true) // activate
@@ -254,7 +255,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         val teamData = data.teams.getTeam(team) ?: return
         player.inventory.clear()
         player.gameMode = GameMode.SPECTATOR
-        player.teleport(data.spec)
+        player.teleport(data.spec.update())
         object : BukkitRunnable() {
             var countDown = 5
             override fun run() {
