@@ -115,7 +115,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                     player.sendMessage(ErrorMessages.INVALID_GAME)
                     return true
                 }
-                when (game.addPlayer(player)) {
+                when (val result = game.addPlayer(player)) {
                     BedwarsGame.Result.SUCCESS -> {
                         player.sendMessage("${ChatColor.GREEN}Successfully joined the bedwars game!")
                         return true
@@ -129,7 +129,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                         return true
                     }
                     else -> {
-                        player.sendMessage("${ChatColor.RED}An error has occurred!")
+                        player.sendMessage("${ChatColor.RED}An error has occurred: ${result.message}")
                         return true
                     }
                 }
@@ -238,8 +238,10 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                         sender.sendMessage("${ChatColor.GREEN}Stopping the game..")
                         val time = System.currentTimeMillis()
                         game.forceStop {
-                            sender.sendMessage("${ChatColor.GREEN}Successfully stopped game ${game.data.world.name} " +
-                                    "(${count + 1}/$amount) (${System.currentTimeMillis() - time}ms)!")
+                            sender.sendMessage(
+                                "${ChatColor.GREEN}Successfully stopped game ${game.data.world.name} " +
+                                        "(${count + 1}/$amount) (${System.currentTimeMillis() - time}ms)!"
+                            )
                             if ((count + 1) >= amount) {
                                 sender.sendMessage("${ChatColor.GREEN}Successfully stopped $amount games in ${System.currentTimeMillis() - start}ms!")
                             }
@@ -298,6 +300,63 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                     return true
                 }
                 sender.teleport(game.data.lobby)
+                return true
+            }
+            "info" -> {
+                if (!check(sender, command, label, args, 2, Permission.INFO, false)) {
+                    return true
+                }
+                val world = Bukkit.getWorld(args[1])
+                if (world == null) {
+                    sender.sendMessage(ErrorMessages.INVALID_WORLD)
+                    return true
+                }
+                val editor = DataEditor.findFromWorld(world, plugin)
+                if (editor == null) {
+                    sender.sendMessage(ErrorMessages.INVALID_GAME)
+                    return true
+                }
+                val data = editor.data
+                sender.sendMessage("${ChatColor.DARK_BLUE}------------------------------------------------")
+                sender.sendMessage("${ChatColor.AQUA}World name: ${ChatColor.GOLD}${data.world.name}")
+                sender.sendMessage("${ChatColor.AQUA}Minimum players: ${ChatColor.GOLD}${data.minPlayers}")
+                sender.sendMessage("${ChatColor.AQUA}Maximum players: ${ChatColor.GOLD}${data.maxPlayers}")
+                sender.sendMessage("${ChatColor.AQUA}Lobby: ${ChatColor.GOLD}${data.lobby?.getWrapper()?.format() ?: "None"}")
+                sender.sendMessage("${ChatColor.AQUA}Spectator location: ${ChatColor.GOLD}${data.spec?.getWrapper()?.format() ?: "None"}")
+                sender.sendMessage(
+                    "${ChatColor.AQUA}Teams: ${ChatColor.GOLD}\n- ${
+                        if (data.teams.isEmpty()) "None" else {
+                            data.teams.joinToString("\n- ") { d
+                                ->
+                                "team: ${d.team.displayName}, spawn: ${d.spawn.getWrapper().format()}"
+                            }
+                        }
+                    }"
+                )
+                sender.sendMessage(
+                    "${ChatColor.AQUA}Beds: ${ChatColor.GOLD}\n- ${
+                        if (data.beds.isEmpty()) "None" else {
+                            data.beds.joinToString("\n- ") { d
+                                ->
+                                "team: ${d.team.displayName}, location: ${d.location.getWrapper().format()}"
+                            }
+                        }
+                    }"
+                )
+                sender.sendMessage(
+                    "${ChatColor.AQUA}Spawners: ${ChatColor.GOLD}\n- ${
+                        if (data.spawners.isEmpty()) "None" else {
+                            data.spawners.joinToString("\n- ") { d
+                                ->
+                                "type: ${d.type.material.name.capAndFormat()}, location: ${d.location.getWrapper().format()}"
+                            }
+                        }
+                    }"
+                )
+                sender.sendMessage("${ChatColor.AQUA}Shop villagers: ${ChatColor.GOLD}${data.shopVillagers.size}")
+                sender.sendMessage("${ChatColor.AQUA}Upgrade villagers: ${ChatColor.GOLD}${data.upgradeVillagers.size}")
+                sender.sendMessage("${ChatColor.AQUA}Can build: ${ChatColor.GOLD}${data.canBuild().isEmpty().getGreenOrRed()}")
+                sender.sendMessage("${ChatColor.DARK_BLUE}------------------------------------------------")
                 return true
             }
             "setup" -> {
@@ -637,7 +696,8 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
         args: Array<out String>,
         minArgs: Int,
         permission: Permission,
-        bePlayer: Boolean): Boolean {
+        bePlayer: Boolean
+    ): Boolean {
         if (!sender.hasPermission(permission)) {
             sender.showHelpMsg(label, ErrorMessages.NO_PERMISSION)
             return false

@@ -187,7 +187,6 @@ fun Block.getBedFeet(): Location {
     return getRelative(direction.oppositeFace).location
 }
 
-fun Location.update(): Location {
-    world = Bukkit.getWorld(world?.name ?: return this)
-    return this
-}
+fun Location.format(): String = "${if (world != null) "world: ${world.name}, " else ""}($x, $y, $z)"
+
+fun LocationWrapper.format(): String = "${"world: ${world.name}, "}($x, $y, $z)"

@@ -217,7 +217,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         playersInLobby.add(player.uniqueId)
         broadcast("${player.displayName}${ChatColor.GREEN} has joined the game! ${playersInLobby.size}/${data.maxPlayers}")
         val lobby = plugin.dataFileManager.getLobby()
-        beforeData[player.uniqueId] = PlayerData.getPlayerAndReset(
+        beforeData[player.uniqueId] = PlayerData.createDataAndReset(
             player,
             lobby,
             data.lobby
@@ -255,7 +255,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         val teamData = data.teams.getTeam(team) ?: return
         player.inventory.clear()
         player.gameMode = GameMode.SPECTATOR
-        player.teleport(data.spec.update())
+        player.teleport(data.spec)
         object : BukkitRunnable() {
             var countDown = 5
             override fun run() {

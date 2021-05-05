@@ -18,3 +18,44 @@ commands:
       - bw
     permission: bedwars.command
     usage: Use /bedwars help
+
+permissions:
+  bedwars.permpack.player:
+    description: Grant all permissions recommended for all players
+    children:
+      - bedwars.help
+      - bedwars.list
+      - bedwars.join
+      - bedwars.leave
+  bedwars.permpack.staff:
+    description: Grant all permissions recommended for staff
+    children:
+      - bedwars.permpack.player
+      - bedwars.start
+      - bedwars.stop
+  bedwars.permpack.admin:
+    description: Grant all permissions recommended for players who make the game
+    children:
+      - bedwars.permpack.staff
+      - bedwars.reload
+      - bedwars.setup
+      - bedwars.info
+
+  bedwars.start:
+    description: Start a bedwars game
+  bedwars.help:
+    description: See the help menu
+  bedwars.list:
+    description: See the list of bedwars games
+  bedwars.reload:
+    description: Reload the plugin's configuration files
+  bedwars.join:
+    description: Join a bedwars game
+  bedwars.leave:
+    description: Leave a bedwars game
+  bedwars.setup:
+    description: Setup a bedwars game
+  bedwars.stop:
+    description: Stop a bedwars game
+  bedwars.info:
+    description: See information about a bedwars game

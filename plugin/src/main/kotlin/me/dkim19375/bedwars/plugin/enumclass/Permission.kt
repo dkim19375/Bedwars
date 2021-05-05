@@ -8,5 +8,6 @@ enum class Permission(val permission: String) {
     JOIN("bedwars.join"),
     LEAVE("bedwars.leave"),
     SETUP("bedwars.setup"),
-    STOP("bedwars.stop")
+    STOP("bedwars.stop"),
+    INFO("bedwars.info")
 }
