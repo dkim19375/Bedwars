@@ -190,3 +190,20 @@ fun Block.getBedFeet(): Location {
 fun Location.format(): String = "${if (world != null) "world: ${world.name}, " else ""}($x, $y, $z)"
 
 fun LocationWrapper.format(): String = "${"world: ${world.name}, "}($x, $y, $z)"
+
+fun Player.giveItem(compareType: Boolean, vararg items: ItemStack?) {
+    for (item in items) {
+        item ?: continue
+        var newItem: ItemStack = item
+        var cloned = false
+        for (invItem in inventory.contents) {
+            invItem ?: continue
+            if (invItem.isSimilar(newItem) || (compareType && (invItem.type == newItem.type))) {
+                newItem = invItem.clone()
+                cloned = true
+            }
+        }
+        Bukkit.broadcastMessage("cloned: $cloned")
+        location.dropItem(newItem).pickupDelay = 0
+    }
+}

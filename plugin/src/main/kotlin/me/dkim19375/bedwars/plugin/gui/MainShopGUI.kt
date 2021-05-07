@@ -170,15 +170,8 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
         player.inventory.removeItem(ItemStack(item.costType.material, item.costAmount))
         val team = plugin.gameManager.getTeamOfPlayer(player)
         player.sendMessage("${ChatColor.GREEN}Successfully bought ${item.displayname}!")
-        if (team == null) {
-            removeSword(item.item.material)
-            player.inventory.addItem(item.item.toItemStack(team?.color))
-            player.playSound(Sound.NOTE_PLING, pitch = 7.0f)
-            game.upgradesManager.applyUpgrades(player)
-            return
-        }
         removeSword(item.item.material)
-        player.inventory.addItem(item.item.toItemStack(team.color))
+        player.giveItem(true, item.item.toItemStack(team?.color)) // TODO: might change
         player.playSound(Sound.NOTE_PLING, pitch = 7.0f)
         game.upgradesManager.applyUpgrades(player)
     }

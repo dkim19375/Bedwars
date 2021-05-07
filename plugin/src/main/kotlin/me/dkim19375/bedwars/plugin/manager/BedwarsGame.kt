@@ -280,7 +280,11 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     fun giveItems(player: Player, items: List<ItemStack?>?, team: Team) {
-        val newItems: List<ItemStack>? = items?.filterNonNull()
+        val newItems: List<ItemStack>? = items?.filterNonNull()?.filter { i ->
+            i.type.isArmor() || i.type.isTool() || i.type.isWeapon()
+        }?.filter { i ->
+            !i.type.name.contains("LEATHER")
+        }
         val armor: ArmorType =
             ArmorType.fromMaterial(newItems?.firstOrNull { i -> ArmorType.fromMaterial(i.type) != null }?.type)
                 ?: ArmorType.LEATHER
@@ -314,10 +318,10 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             if (item.item.material.isTool()) {
                 continue
             }
-            if (!item.defaultOnSpawn && !item.permanent) {
+            if (item.item.material.isWeapon()) {
                 continue
             }
-            if (item.type == MainShopGUI.ItemType.MELEE) {
+            if (!item.defaultOnSpawn && !item.permanent) {
                 continue
             }
             if (newItems != null && !item.defaultOnSpawn) {

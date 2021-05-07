@@ -1,7 +1,7 @@
 package me.dkim19375.bedwars.plugin.enumclass
 
-import me.dkim19375.bedwars.plugin.gui.MainShopGUI
 import me.dkim19375.bedwars.plugin.data.ItemWrapper
+import me.dkim19375.bedwars.plugin.gui.MainShopGUI
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.potion.PotionType
@@ -55,7 +55,6 @@ enum class MainShopItems(
         10,
         MainShopGUI.CostType.GOLD,
         "Stick (Knockback I)",
-        permanent = true,
         type = MainShopGUI.ItemType.MELEE
     ),
     LEATHER_ARMOR(

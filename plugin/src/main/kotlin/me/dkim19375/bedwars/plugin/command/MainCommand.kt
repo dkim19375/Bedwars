@@ -68,6 +68,24 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 player.sendMessage("is same: ${item == otherItem}")
                 return true
             }
+            "new" -> {
+                if (!check(sender, command, label, args, 1, Permission.SETUP, true)) {
+                    return true
+                }
+                val player = sender as Player
+                val game = plugin.gameManager.getGame(player)
+                val item = player.itemInHand ?: let {
+                    player.sendMessage("${ChatColor.RED}You must have an item in your main hand!")
+                    return true
+                }
+                val shopItem = MainShopItems.getByMaterial(item.type) ?: let {
+                    player.sendMessage("${ChatColor.RED}You must have a shop item in your main hand!")
+                    return true
+                }
+                player.inventory.addItem(shopItem.item.toItemStack(game?.getTeamOfPlayer(player)?.color))
+                player.sendMessage("Successfully gave a clone!")
+                return true
+            }
             "world" -> {
                 if (!check(sender, command, label, args, 1, Permission.SETUP, false)) {
                     return true
