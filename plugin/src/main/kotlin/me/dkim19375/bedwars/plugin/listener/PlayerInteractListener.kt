@@ -77,7 +77,7 @@ class PlayerInteractListener(private val plugin: BedwarsPlugin) : Listener {
         }
         val fireball = player.launchProjectile(Fireball::class.java)
         fireball.setIsIncendiary(true)
-        fireball.yield = 2.5f
+        fireball.yield = 2.3f
         plugin.gameManager.addExplosive(fireball.uniqueId, player.uniqueId)
     }
 }
