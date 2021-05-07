@@ -2,6 +2,7 @@ package me.dkim19375.bedwars.plugin.listener
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.enumclass.GameState
+import me.dkim19375.bedwars.plugin.manager.BedwarsGame
 import me.dkim19375.dkim19375core.function.filterNonNull
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -15,24 +16,26 @@ class PartiesListeners(private val plugin: BedwarsPlugin) : Listener {
     private val api = plugin.partiesAPI
     private val teleports = mutableSetOf<UUID>()
 
-    fun onGameJoin(player: Player): Boolean {
+    fun onGameJoin(player: Player, game: BedwarsGame): Boolean {
+        api ?: println("API IS NULL!")
         val api = api ?: return true
         if (!teleports.contains(player.uniqueId)) {
+            println("teleports: $teleports does not contain player: ${player.name}")
             return true
         }
+        api.getPartyPlayer(player.uniqueId) ?: println("Party player is null")
         val partyPlayer = api.getPartyPlayer(player.uniqueId) ?: return true
+        partyPlayer.partyId ?: println("party id is null")
+        api.getParty(partyPlayer.partyId ?: return true) ?: println("party is null")
         val party = api.getParty(partyPlayer.partyId ?: return true) ?: return true
-        val partyPlayers = party.onlineMembers.filter { p -> p.playerUUID != partyPlayer.playerUUID }
+        val partyPlayers = party.onlineMembers.filter { p -> !game.getPlayersInGame().contains(p.playerUUID) }
         val players = partyPlayers.map { p -> Bukkit.getPlayer(p.playerUUID ) }.filterNonNull()
-        val game = plugin.gameManager.getGame(player) ?: return true
-        if (game.state != GameState.LOBBY) {
-            return true
-        }
         if ((players.size + 1) > (game.data.maxPlayers - game.playersInLobby.size)) {
             player.sendMessage("The party is too large to join the game!")
             return false
         }
         players.forEach(game::addPlayer)
+        println("added players")
         return true
     }
 

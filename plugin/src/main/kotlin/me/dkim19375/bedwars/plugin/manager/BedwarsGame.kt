@@ -211,7 +211,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         if (playersInLobby.size >= data.maxPlayers) {
             return Result.TOO_MANY_PLAYERS
         }
-        if (!plugin.partiesListeners.onGameJoin(player)) {
+        if (!plugin.partiesListeners.onGameJoin(player, this)) {
             return Result.TOO_MANY_PLAYERS
         }
         playersInLobby.add(player.uniqueId)
@@ -446,7 +446,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         val folder = data.world.worldFolder
         val originalCreator = WorldCreator(data.world.name).copy(data.world)
         if (!Bukkit.unloadWorld(data.world, true)) {
-            throw RuntimeException("Could not unload world!")
+            throw IllegalStateException("Could not unload world!")
         }
         if (!plugin.isEnabled) {
             return

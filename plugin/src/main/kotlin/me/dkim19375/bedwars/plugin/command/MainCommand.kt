@@ -48,6 +48,26 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 sender.showHelpMsg(label)
                 return true
             }
+            "item" -> {
+                if (!check(sender, command, label, args, 1, Permission.SETUP, true)) {
+                    return true
+                }
+                val player = sender as Player
+                val game = plugin.gameManager.getGame(player)
+                if (game == null) {
+                    player.sendMessage(ErrorMessages.INVALID_GAME)
+                    return true
+                }
+                val item = player.itemInHand ?: let {
+                    player.sendMessage("${ChatColor.RED}You must have an item in your main hand!")
+                    return true
+                }
+                val otherItem = player.inventory.getItem(player.inventory.heldItemSlot + 1)
+                player.sendMessage("item: $item")
+                player.sendMessage("next item: $otherItem")
+                player.sendMessage("is same: ${item == otherItem}")
+                return true
+            }
             "world" -> {
                 if (!check(sender, command, label, args, 1, Permission.SETUP, false)) {
                     return true
@@ -144,7 +164,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                     if (game.state != GameState.LOBBY && game.state != GameState.STARTING) {
                         continue
                     }
-                    if (game.getPlayersInGame().size >= game.data.maxPlayers) {
+                    if ((game.getPlayersInGame().size + 1) >= game.data.maxPlayers) {
                         continue
                     }
                     if (maxGame == null) {
@@ -152,7 +172,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                         continue
                     }
                     val other = maxGame.second
-                    if (other > game.data.maxPlayers - game.getPlayersInGame().size) {
+                    if (other < game.data.maxPlayers - game.getPlayersInGame().size) {
                         maxGame = Pair(game, game.data.maxPlayers - game.getPlayersInGame().size)
                     }
                 }

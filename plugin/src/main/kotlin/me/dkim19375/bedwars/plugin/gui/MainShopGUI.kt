@@ -134,7 +134,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
                     return@asGuiItem
                 }
                 if (!event.isShiftClick) {
-                    givePlayerItem(item)
+                    onClick(item, event) {}
                     return@asGuiItem
                 }
                 plugin.dataFileManager.setQuickBuySlot(slot, player.uniqueId, null)

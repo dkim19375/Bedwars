@@ -31,7 +31,8 @@ class BedwarsPlugin : CoreJavaPlugin() {
         private set
     lateinit var packetManager: PacketManager
         private set
-    val partiesListeners = PartiesListeners(this)
+    lateinit var partiesListeners: PartiesListeners
+        private set
     var partiesAPI: PartiesAPI? = null
 
     private val serializable = listOf(
@@ -76,13 +77,20 @@ class BedwarsPlugin : CoreJavaPlugin() {
     }
 
     private fun initVariables() {
-        server.pluginManager.getPlugin("Parties")?.isEnabled.let { partiesAPI = Parties.getApi() }
+        server.pluginManager.getPlugin("Parties")?.isEnabled?.let {
+            if (it) {
+                partiesAPI = Parties.getApi()
+                logger.info("Hooked onto Parties!")
+            }
+        }
+        partiesAPI ?: logger.info("Could not hook into Parties!")
         dataFile = ConfigFile(this, "data.yml")
         registerConfig(dataFile)
         dataFileManager = DataFileManager(this)
         gameManager = GameManager(this)
         scoreboardManager = ScoreboardManager(this)
         packetManager = PacketManager(this)
+        partiesListeners = PartiesListeners(this)
     }
 
     private fun registerCommands() {
