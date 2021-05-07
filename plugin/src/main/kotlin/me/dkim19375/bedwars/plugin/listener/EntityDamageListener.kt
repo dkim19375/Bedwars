@@ -9,7 +9,6 @@ import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
 
 class EntityDamageListener(private val plugin: BedwarsPlugin) : Listener {
-
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private fun EntityDamageEvent.onDamage() {
         if (plugin.gameManager.getVillagersUUID().contains(entity.uniqueId)) {
@@ -21,13 +20,22 @@ class EntityDamageListener(private val plugin: BedwarsPlugin) : Listener {
     private fun EntityDamageEvent.playerAutoRespawn() {
         val player = entity as? Player ?: return
         val game = plugin.gameManager.getGame(player) ?: return
+        if (player.location.y > 0.0) {
+            return
+        }
         if (game.state == GameState.STARTED) {
             player.health = 0.0
             return
         }
-        if (game.state == GameState.LOBBY || game.state == GameState.STARTING) {
-            isCancelled = true
+    }
+
+    private fun EntityDamageEvent.lobbyDamage() {
+        val player = entity as? Player ?: return
+        val game = plugin.gameManager.getGame(player) ?: return
+        if (game.state != GameState.LOBBY && game.state != GameState.STARTING) {
             return
         }
+        isCancelled = true
+        return
     }
 }

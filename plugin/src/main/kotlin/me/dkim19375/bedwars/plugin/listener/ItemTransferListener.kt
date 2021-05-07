@@ -14,26 +14,21 @@ import org.bukkit.inventory.ItemStack
 class ItemTransferListener(private val plugin: BedwarsPlugin) : Listener {
     @EventHandler(ignoreCancelled = true)
     private fun InventoryItemTransferEvent.onTransfer() {
+        if (type != TransferType.PUT_SELF) {
+            return
+        }
         plugin.gameManager.getGame(player)?: return
-        checkArmor()
         checkSpecialItems()
     }
 
-    private fun InventoryItemTransferEvent.checkArmor() {
-        if (items.map(ItemStack::getType).none(Material::isArmor)) {
-            return
-        }
-        isCancelled = true
-    }
-
     private fun InventoryItemTransferEvent.checkSpecialItems() {
-        if (!(type == TransferType.PUT_SELF || !type.isPut)) {
-            return
-        }
         if (items.map(ItemStack::getType).any(Material::isTool)) {
             isCancelled = true
         }
         if (items.map(ItemStack::getType).any(Material::isWeapon)) {
+            isCancelled = true
+        }
+        if (items.map(ItemStack::getType).any(Material::isArmor)) {
             isCancelled = true
         }
     }

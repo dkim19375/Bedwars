@@ -44,10 +44,6 @@ class PartiesListeners(private val plugin: BedwarsPlugin) : Listener {
         val api = api ?: return
         val command = message.replace("/", "").trim()
         val game = plugin.gameManager.getGame(player) ?: return
-        if (game.state != GameState.LOBBY) {
-            isCancelled = true
-            return
-        }
         if (!command.equals("party teleport", ignoreCase = true)) {
             return
         }
@@ -60,6 +56,11 @@ class PartiesListeners(private val plugin: BedwarsPlugin) : Listener {
         }
         val partyId = partyPlayer.partyId ?: return
         val party = api.getParty(partyId) ?: return
+        if (game.state != GameState.LOBBY && game.state != GameState.STARTING) {
+            player.sendMessage("You must be in the lobby!")
+            isCancelled = true
+            return
+        }
         if ((party.onlineMembers.size - 1) > (game.data.maxPlayers - game.playersInLobby.size)) {
             isCancelled = true
             player.sendMessage("The party is too large to join the game!")

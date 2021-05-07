@@ -32,7 +32,7 @@ class BlockPlaceListener(private val plugin: BedwarsPlugin) : Listener {
             newLoc.z += Random.nextDouble(-OFFSET, OFFSET)
             tnt.teleport(loc)
         }
-        tnt.fuseTicks = 60
+        tnt.fuseTicks = 50
         plugin.gameManager.addExplosive(tnt.uniqueId, player)
     }
 }

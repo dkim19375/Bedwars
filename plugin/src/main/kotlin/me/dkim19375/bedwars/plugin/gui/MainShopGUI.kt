@@ -270,7 +270,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
     private fun showShopScreen(col: Int, name: String, type: ItemType) {
         reset()
         setTopRow()
-        putGreenGlass(col)
+        putGreenGlass(col + 1)
         for (item in MainShopItems.values()) {
             if (item.defaultOnSpawn) {
                 continue
