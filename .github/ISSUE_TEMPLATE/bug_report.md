@@ -20,6 +20,9 @@ Directory: \logs\latest.log
 ## How to reproduce
 Add your steps to reproduce the issue/bug experienced here.
 
+## What is expected
+Add what is supposed to happen instead.
+
 ## Final checklist
 - [ ] I am using the latest version of Bedwars
 - [ ] I have included logs, exceptions and / or steps to reproduce the issue.
