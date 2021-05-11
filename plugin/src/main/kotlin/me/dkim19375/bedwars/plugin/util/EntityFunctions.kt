@@ -47,6 +47,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
 import org.bukkit.permissions.Permissible
 import org.bukkit.plugin.java.JavaPlugin
+import org.bukkit.potion.Potion
 import java.util.*
 import kotlin.math.ceil
 
@@ -226,10 +227,19 @@ private fun <T : Entity> T.getTarget(
 fun Player.giveItem(compareType: Boolean, vararg items: ItemStack?) {
     for (item in items) {
         item ?: continue
+        val potion = Potion.fromItemStack(item)
         var newItem: ItemStack = item
         inventory.contents.forEach { invItem ->
             invItem ?: return@forEach
-            if (invItem.isSimilar(newItem) || (compareType && (invItem.type == newItem.type))) {
+            val invPot = Potion.fromItemStack(invItem)
+            if (invItem.isSimilar(newItem)
+                || ((compareType && (invItem.type == newItem.type))
+                        && (if (potion == null || invPot == null) {
+                    true
+                } else {
+                    potion.type == invPot.type
+                }))
+            ) {
                 newItem = invItem.clone()
             }
         }
