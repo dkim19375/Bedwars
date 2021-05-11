@@ -1,13 +1,35 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2021 dkim19375
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package me.dkim19375.bedwars.plugin.manager
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.GameData
 import me.dkim19375.bedwars.plugin.data.PlayerData
 import me.dkim19375.bedwars.plugin.enumclass.*
-import me.dkim19375.bedwars.plugin.gui.MainShopGUI
 import me.dkim19375.bedwars.plugin.util.*
 import me.dkim19375.dkim19375core.data.LocationWrapper
-import me.dkim19375.dkim19375core.function.filterNonNull
 import org.apache.commons.io.FileUtils
 import org.bukkit.*
 import org.bukkit.entity.Player
@@ -142,13 +164,8 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         }
     }
 
-    private fun revertBack() {
-        for (uuid in getPlayersInGame().toSet()) {
-            val player = Bukkit.getPlayer(uuid) ?: continue
-            revertPlayer(player)
-        }
-    }
-
+    private fun revertBack() = getPlayersInGame().toSet().forEach { Bukkit.getPlayer(it)?.let(::revertPlayer) }
+    
     fun isEditing() = plugin.dataFileManager.isEditing(data)
 
     fun canStart(force: Boolean): Result {
@@ -253,7 +270,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             return
         }
         val teamData = data.teams.getTeam(team) ?: return
-        player.inventory.clear()
+        player.inventory.clearAll()
         player.gameMode = GameMode.SPECTATOR
         player.teleport(data.spec)
         object : BukkitRunnable() {
@@ -280,60 +297,35 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     fun giveItems(player: Player, items: List<ItemStack?>?, team: Team) {
-        val newItems: List<ItemStack>? = items?.filterNonNull()?.filter { i ->
-            i.type.isArmor() || i.type.isTool() || i.type.isWeapon()
-        }?.filter { i ->
-            !i.type.name.contains("LEATHER")
-        }
-        val armor: ArmorType =
-            ArmorType.fromMaterial(newItems?.firstOrNull { i -> ArmorType.fromMaterial(i.type) != null }?.type)
-                ?: ArmorType.LEATHER
-        player.inventory.addItem(MainShopItems.WOOD_SWORD.item.toItemStack(team.color))
-        player.inventory.helmet = team.getColored(ItemStack(Material.LEATHER_HELMET))
-        player.inventory.chestplate = team.getColored(ItemStack(Material.LEATHER_CHESTPLATE))
-        player.inventory.leggings = team.getColored(ItemStack(armor.leggings))
-        player.inventory.boots = team.getColored(ItemStack(armor.boots))
+        var armorType: ArmorType = ArmorType.LEATHER
         var addPick = false
         var addAxe = false
         var addShears = false
-
-        for (item in newItems.default(listOf())) {
-            if (item.type.isTool()) {
-                if (item.type.name.endsWith("PICKAXE")) {
-                    addPick = true
-                    continue
-                }
-                if (item.type.name.endsWith("AXE")) {
-                    addAxe = true
-                    continue
-                }
-                if (item.type == Material.SHEARS) {
-                    addShears = true
-                    continue
-                }
-                continue
+        player.inventory.clearAll()
+        items?.forEach { item ->
+            item ?: return@forEach
+            if (item.type.name.endsWith("PICKAXE")) {
+                addPick = true
+                return@forEach
+            }
+            if (item.type.name.endsWith("AXE")) {
+                addAxe = true
+                return@forEach
+            }
+            if (item.type == Material.SHEARS) {
+                addShears = true
+                return@forEach
+            }
+            val armor = ArmorType.fromMaterial(item.type) ?: return@forEach
+            if (armor != ArmorType.LEATHER) {
+                armorType = armor
             }
         }
-        for (item in MainShopItems.values()) {
-            if (item.item.material.isTool()) {
-                continue
-            }
-            if (item.item.material.isWeapon()) {
-                continue
-            }
-            if (!item.defaultOnSpawn && !item.permanent) {
-                continue
-            }
-            if (newItems != null && !item.defaultOnSpawn) {
-                if (!newItems.map(ItemStack::getType).contains(item.item.material)) {
-                    continue
-                }
-            }
-            if (item.type == MainShopGUI.ItemType.ARMOR) {
-                continue
-            }
-            player.inventory.addItem(item.item.toItemStack(team.color))
-        }
+        player.inventory.addItem(MainShopItems.WOOD_SWORD.item.toItemStack(team.color))
+        player.inventory.helmet = team.getColored(ItemStack(Material.LEATHER_HELMET))
+        player.inventory.chestplate = team.getColored(ItemStack(Material.LEATHER_CHESTPLATE))
+        player.inventory.leggings = team.getColored(ItemStack(armorType.leggings))
+        player.inventory.boots = team.getColored(ItemStack(armorType.boots))
         if (addPick) {
             player.inventory.addItem(MainShopItems.WOOD_PICK.item.toItemStack(team.color))
         }

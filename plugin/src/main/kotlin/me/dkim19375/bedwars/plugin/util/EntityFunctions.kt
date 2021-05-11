@@ -1,3 +1,27 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2021 dkim19375
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package me.dkim19375.bedwars.plugin.util
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
@@ -54,8 +78,10 @@ val commands = listOf(
     HelpMessage("setup <name> spec", "Set the spectator spot", Permission.SETUP.permission),
     HelpMessage("setup <name> minplayers [min]", "Set the minimum players", Permission.SETUP.permission),
     HelpMessage("setup <name> maxplayers [max]", "Set the maximum players", Permission.SETUP.permission),
-    HelpMessage("setup <name> shop add [tp/teleport]", "Set the villager being looked at as a shop, " +
-            "if teleport/tp arg is set, then the villager will teleport to you", Permission.SETUP.permission),
+    HelpMessage(
+        "setup <name> shop add [tp/teleport]", "Set the villager being looked at as a shop, " +
+                "if teleport/tp arg is set, then the villager will teleport to you", Permission.SETUP.permission
+    ),
     HelpMessage(
         "setup <name> shop remove",
         "Removes the villager being looked at as a shop",
@@ -94,45 +120,33 @@ fun CommandSender.showHelpMsg(label: String, page: Int = 1) = showHelpMsg(label,
 
 fun CommandSender.showHelpMsg(label: String, error: ErrorMessages) = showHelpMsg(label, error.message)
 
-fun CommandSender.showHelpMsg(label: String, error: String?, page: Int = 1) {
-    showHelpMessage(
-        label, error, page, commands,
-        JavaPlugin.getProvidingPlugin(BedwarsPlugin::class.java) as CoreJavaPlugin
-    )
-}
+fun CommandSender.showHelpMsg(label: String, error: String?, page: Int = 1) = showHelpMessage(
+    label, error, page, commands,
+    JavaPlugin.getProvidingPlugin(BedwarsPlugin::class.java) as CoreJavaPlugin
+)
 
-fun Permissible.getMaxHelpPages(): Int {
-    val newCommands = commands.filter { msg -> hasPermission(msg.permission) }
-    return ceil(newCommands.size.toDouble() / 7.0).toInt()
-}
+fun Permissible.getMaxHelpPages(): Int =
+    ceil(commands.filter { msg -> hasPermission(msg.permission) }.size.toDouble() / 7.0).toInt()
 
-fun PlayerInventory.containsArmor(): ArmorType? {
-    for (item in contents) {
-        val type = ArmorType.fromMaterial(item.type)
-        if (type != null) {
-            return type
-        }
-    }
-    return null
-}
+fun PlayerInventory.containsArmor(): ArmorType? = getAllContents()
+    .toList()
+    .filterNonNull()
+    .map(ItemStack::getType)
+    .map(ArmorType::fromMaterial)
+    .filterNonNull()
+    .firstOrNull()
 
-fun PlayerInventory.containsTool(): Boolean {
-    for (item in contents) {
-        if (item.type.isTool()) {
-            return true
-        }
-    }
-    return false
-}
+fun PlayerInventory.containsTool(): Boolean = getAllContents()
+    .toList()
+    .filterNonNull()
+    .map(ItemStack::getType)
+    .any(Material::isTool)
 
-fun PlayerInventory.containsWeapon(): Boolean {
-    for (item in contents) {
-        if (item.type.isWeapon()) {
-            return true
-        }
-    }
-    return false
-}
+fun PlayerInventory.containsWeapon(): Boolean = getAllContents()
+    .toList()
+    .filterNonNull()
+    .map(ItemStack::getType)
+    .any(Material::isWeapon)
 
 fun Set<UUID>.getPlayers(): Set<Player> = map(Bukkit::getPlayer).filterNonNull().toSet()
 
@@ -154,17 +168,13 @@ fun Player.getItemAmount(type: Material): Int {
 
 fun Permissible.hasPermission(permission: Permission) = hasPermission(permission.permission)
 
-fun Player.playSound(sound: Sound, volume: Float = 0.85f, pitch: Float = 1.0f) {
+fun Player.playSound(sound: Sound, volume: Float = 0.85f, pitch: Float = 1.0f) =
     playSound(location, sound, volume, pitch)
-}
 
-fun PlayerInventory.getAllContents(): Array<ItemStack?> {
-    return contents.plus(armorContents)
-}
+fun PlayerInventory.getAllContents(): Array<ItemStack?> = contents.plus(armorContents)
 
-fun LivingEntity.getLookingAt(distance: Double = 4.0): LivingEntity? {
-    return getTarget(getNearbyEntities(distance, distance, distance)) as? LivingEntity
-}
+fun LivingEntity.getLookingAt(distance: Double = 4.0): LivingEntity? =
+    getTarget(getNearbyEntities(distance, distance, distance)) as? LivingEntity
 
 fun Player.sendOtherTitle(
     title: String? = null,
@@ -180,15 +190,13 @@ fun Player.sendTitle(
     fadeIn: Int = 10,
     stay: Int = 50,
     fadeOut: Int = 10
-) {
-    val newTitle = LegacyComponentSerializer.legacySection().deserialize(title ?: "")
-    val newSubTitle = LegacyComponentSerializer.legacySection().deserialize(subtitle ?: "")
-    val times =
+) = BukkitAudiences.create(JavaPlugin.getPlugin(BedwarsPlugin::class.java)).player(this).showTitle(
+    Title.title(
+        LegacyComponentSerializer.legacySection().deserialize(title ?: ""),
+        LegacyComponentSerializer.legacySection().deserialize(subtitle ?: ""),
         Title.Times.of(Ticks.duration(fadeIn.toLong()), Ticks.duration(stay.toLong()), Ticks.duration(fadeOut.toLong()))
-    val cTitle = Title.title(newTitle, newSubTitle, times)
-    val audience = BukkitAudiences.create(JavaPlugin.getPlugin(BedwarsPlugin::class.java)).player(this)
-    audience.showTitle(cTitle)
-}
+    )
+)
 
 private fun <T : Entity> T.getTarget(
     entities: Iterable<T>
@@ -213,4 +221,24 @@ private fun <T : Entity> T.getTarget(
         }
     }
     return target
+}
+
+fun Player.giveItem(compareType: Boolean, vararg items: ItemStack?) {
+    for (item in items) {
+        item ?: continue
+        var newItem: ItemStack = item
+        inventory.contents.forEach { invItem ->
+            invItem ?: return@forEach
+            if (invItem.isSimilar(newItem) || (compareType && (invItem.type == newItem.type))) {
+                newItem = invItem.clone()
+            }
+        }
+        newItem.amount = item.amount
+        location.dropItem(newItem).pickupDelay = 0
+    }
+}
+
+fun PlayerInventory.clearAll() {
+    clear()
+    armorContents = arrayOfNulls(armorContents.size)
 }
