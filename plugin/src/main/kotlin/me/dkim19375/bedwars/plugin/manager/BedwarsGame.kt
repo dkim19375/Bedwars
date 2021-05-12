@@ -152,7 +152,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         task = null
         beds.clear()
         time = 0
-        state = GameState.STOPPED
+        state = GameState.REGENERATING_WORLD
         spawnerManager.reset()
         upgradesManager.stop()
         placedBlocks.clear()

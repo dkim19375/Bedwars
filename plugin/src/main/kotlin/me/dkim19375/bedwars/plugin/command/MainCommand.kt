@@ -72,58 +72,6 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 sender.showHelpMsg(label)
                 return true
             }
-            "item" -> {
-                if (!check(sender, command, label, args, 1, Permission.SETUP, true)) {
-                    return true
-                }
-                val player = sender as Player
-                val game = plugin.gameManager.getGame(player)
-                if (game == null) {
-                    player.sendMessage(ErrorMessages.INVALID_GAME)
-                    return true
-                }
-                val item = player.itemInHand ?: let {
-                    player.sendMessage("${ChatColor.RED}You must have an item in your main hand!")
-                    return true
-                }
-                val otherItem = player.inventory.getItem(player.inventory.heldItemSlot + 1)
-                player.sendMessage("item: $item")
-                player.sendMessage("next item: $otherItem")
-                player.sendMessage("is same: ${item == otherItem}")
-                return true
-            }
-            "new" -> {
-                if (!check(sender, command, label, args, 1, Permission.SETUP, true)) {
-                    return true
-                }
-                val player = sender as Player
-                val game = plugin.gameManager.getGame(player)
-                val item = player.itemInHand ?: let {
-                    player.sendMessage("${ChatColor.RED}You must have an item in your main hand!")
-                    return true
-                }
-                val shopItem = MainShopItems.getByMaterial(item.type) ?: let {
-                    player.sendMessage("${ChatColor.RED}You must have a shop item in your main hand!")
-                    return true
-                }
-                player.inventory.addItem(shopItem.item.toItemStack(game?.getTeamOfPlayer(player)?.color))
-                player.sendMessage("Successfully gave a clone!")
-                return true
-            }
-            "world" -> {
-                if (!check(sender, command, label, args, 1, Permission.SETUP, false)) {
-                    return true
-                }
-                val world = Bukkit.getWorld(args.getOrNull(1) ?: (sender as? Player)?.world?.name ?: "")
-                if (world == null) {
-                    sender.sendMessage("You must be a player or specify a valid world!")
-                    return true
-                }
-                sender.sendMessage("World name: ${world.name}")
-                sender.sendMessage("World uid: ${world.uid}")
-                sender.sendMessage("Is in world: ${(sender as? Player)?.world?.name == world.name ?: "false"}")
-                return true
-            }
             "sound" -> {
                 if (!check(sender, command, label, args, 3, Permission.SETUP, true)) {
                     return true
@@ -353,6 +301,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                     return true
                 }
                 plugin.dataFileManager.setEditing(game.data, true)
+                game.state = GameState.STOPPED
                 sender.sendMessage(
                     "${ChatColor.GREEN}Successfully set the game mode to edit! " +
                             "Do ${ChatColor.GOLD}/$label save ${game.data.world.name} ${ChatColor.GREEN}to save it, " +
@@ -457,6 +406,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                         gameData.save(plugin)
                         val game = BedwarsGame(plugin, gameData)
                         game.saveMap()
+                        game.state = GameState.LOBBY
                         plugin.dataFileManager.setEditing(gameData, false)
                         plugin.gameManager.builders.remove(gameData.world.name)
                         plugin.gameManager.addGame(game)
