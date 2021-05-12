@@ -25,6 +25,7 @@
 package me.dkim19375.bedwars.plugin.listener
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
+import me.dkim19375.bedwars.plugin.util.toPotion
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
@@ -41,7 +42,7 @@ class PotionConsumeListener(private val plugin: BedwarsPlugin) : Listener {
         if (item.type != Material.POTION) {
             return
         }
-        val potion = Potion.fromItemStack(item) ?: return
+        val potion = item.toPotion() ?: return
         val potionType = potion.type ?: return
         val type = potionType.effectType
         plugin.gameManager.getGame(player) ?: return

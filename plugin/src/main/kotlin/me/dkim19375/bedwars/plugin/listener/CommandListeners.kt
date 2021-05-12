@@ -26,6 +26,7 @@ package me.dkim19375.bedwars.plugin.listener
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.enumclass.GameState
+import me.dkim19375.bedwars.plugin.manager.BedwarsGame
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.bukkit.event.Cancellable
@@ -60,7 +61,9 @@ class CommandListeners(private val plugin: BedwarsPlugin) : Listener {
         if (!args[0].equals("stop", ignoreCase = true)) {
             return
         }
-        if (plugin.gameManager.getGames().values.none { g -> g.state != GameState.LOBBY }) {
+        if (plugin.gameManager.getGames().values.filter { !it.isEditing() }.none { game ->
+                game.state != GameState.LOBBY
+            }) {
             return
         }
         if (args.size < 2) {

@@ -134,6 +134,10 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                         player.sendMessage("${ChatColor.RED}The game is already running!")
                         return true
                     }
+                    BedwarsGame.Result.GAME_STOPPED -> {
+                        player.sendMessage("${ChatColor.RED}The game is not running!")
+                        return true
+                    }
                     BedwarsGame.Result.TOO_MANY_PLAYERS -> {
                         player.sendMessage("${ChatColor.RED}The game is full!")
                         return true
@@ -242,6 +246,10 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 if (args[1].equals("all", ignoreCase = true)) {
                     val games = plugin.gameManager.getRunningGames().values
                     val amount = games.size
+                    if (amount <= 0) {
+                        sender.sendMessage("${ChatColor.GREEN}Successfully stopped $amount games in 0 s!")
+                        return true
+                    }
                     val start = System.currentTimeMillis()
                     for ((count, game) in games.toList().withIndex()) {
                         game.broadcast("${ChatColor.RED}An admin has force stopped the game!")

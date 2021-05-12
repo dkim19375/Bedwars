@@ -227,11 +227,11 @@ private fun <T : Entity> T.getTarget(
 fun Player.giveItem(compareType: Boolean, vararg items: ItemStack?) {
     for (item in items) {
         item ?: continue
-        val potion = Potion.fromItemStack(item)
+        val potion = item.toPotion()
         var newItem: ItemStack = item
         inventory.contents.forEach { invItem ->
             invItem ?: return@forEach
-            val invPot = Potion.fromItemStack(invItem)
+            val invPot = invItem.toPotion()
             if (invItem.isSimilar(newItem)
                 || ((compareType && (invItem.type == newItem.type))
                         && (if (potion == null || invPot == null) {
@@ -243,8 +243,7 @@ fun Player.giveItem(compareType: Boolean, vararg items: ItemStack?) {
                 newItem = invItem.clone()
             }
         }
-        newItem.amount = item.amount
-        location.dropItem(newItem).pickupDelay = 0
+        inventory.addItem(newItem)
     }
 }
 

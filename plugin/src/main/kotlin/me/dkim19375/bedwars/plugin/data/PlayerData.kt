@@ -102,6 +102,9 @@ data class PlayerData(
             player.gameMode = gamemode
             player.inventory.clearAll()
             player.enderChest.clear()
+            for (effect in player.activePotionEffects) {
+                player.removePotionEffect(effect.type)
+            }
             player.health = 20.0
             if (location != null) {
                 player.teleport(location)

@@ -224,6 +224,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             if (isRunning()) {
                 return Result.GAME_RUNNING
             }
+            return Result.GAME_STOPPED
         }
         if (playersInLobby.size >= data.maxPlayers) {
             return Result.TOO_MANY_PLAYERS
@@ -355,6 +356,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             broadcast("${player.displayName}${ChatColor.RED} has left the game! ${playersInLobby.size}/${data.maxPlayers}")
             if (playersInLobby.size < data.minPlayers) {
                 task?.cancel()
+                state = GameState.LOBBY
                 broadcast("${ChatColor.RED}Cancelled - Not enough players to start!")
             }
             return
@@ -423,9 +425,6 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     fun regenerateMap(whenDone: Runnable? = null) {
-        if (state != GameState.STOPPED) {
-            return
-        }
         val dir = Paths.get(plugin.dataFolder.absolutePath, "worlds", data.world.name).toFile()
         if (!dir.exists()) {
             // Something went wrong here
@@ -487,6 +486,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     enum class Result(val message: String) {
         SUCCESS("Successful!"),
         GAME_RUNNING("The game is currently running!"),
+        GAME_STOPPED("The game is not running!"),
         GAME_IN_WORLD("The game is in the same world!"),
         NOT_ENOUGH_PLAYERS("Not enough players!"),
         REGENERATING_WORLD("The game world is regenerating!"),
