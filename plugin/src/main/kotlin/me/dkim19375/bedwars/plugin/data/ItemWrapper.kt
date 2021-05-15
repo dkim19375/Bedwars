@@ -31,6 +31,7 @@ import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.LeatherArmorMeta
 import org.bukkit.material.Colorable
 import org.bukkit.potion.Potion
 import org.bukkit.potion.PotionType
@@ -55,18 +56,20 @@ data class ItemWrapper (
             return item
         }
         val item: ItemStack
-        if (ItemStack(material, amount).itemMeta is Colorable) {
-            item = ItemStack(material, amount)
-        } else {
-            @Suppress("DEPRECATION", "LiftReturnOrAssignment") // fix warning = error?!
-            if (color == null) {
-                item = ItemStack(material, amount)
-            } else {
-                val type = MainShopItems.getByMaterial(material)
-                if (type != null && type.type == MainShopGUI.ItemType.BLOCKS) {
-                    item = ItemStack(material, amount, color.data.toShort())
-                } else {
+        when (ItemStack(material, amount).itemMeta) {
+            is LeatherArmorMeta -> item = ItemStack(material, amount)
+            is Colorable -> item = ItemStack(material, amount)
+            else -> {
+                @Suppress("DEPRECATION", "LiftReturnOrAssignment") // fix warning = error?!
+                if (color == null) {
                     item = ItemStack(material, amount)
+                } else {
+                    val type = MainShopItems.getByMaterial(material)
+                    if (type != null && type.type == MainShopGUI.ItemType.BLOCKS) {
+                        item = ItemStack(material, amount, color.data.toShort())
+                    } else {
+                        item = ItemStack(material, amount)
+                    }
                 }
             }
         }
@@ -76,6 +79,9 @@ data class ItemWrapper (
         item.itemMeta?.let {
             if (it is Colorable) {
                 it.color = color
+            }
+            if (it is LeatherArmorMeta && color != null) {
+                it.color = color.color
             }
             it.addItemFlags(*ItemFlag.values())
             item.itemMeta = it

@@ -112,12 +112,16 @@ fun Material.isArmor() = when (this) {
     else -> false
 }
 
-fun ItemStack.getWrapper(): ItemWrapper {
-    val potion = try {
+fun ItemStack.toPotion(): Potion? {
+    return try {
         Potion.fromItemStack(this)
     } catch (_: IllegalArgumentException) {
         null
     }
+}
+
+fun ItemStack.getWrapper(): ItemWrapper {
+    val potion = toPotion()
     if (potion != null) {
         return ItemWrapper(type, amount, potion.type, potion.level + 1, enchantments.keys.toList())
     }
