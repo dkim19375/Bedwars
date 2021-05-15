@@ -107,6 +107,7 @@ class DataFileManager(private val plugin: BedwarsPlugin) {
             return
         }
         plugin.dataFile.config.set("editing.${data.world.name}", editing)
+        save = true
         return
     }
 }

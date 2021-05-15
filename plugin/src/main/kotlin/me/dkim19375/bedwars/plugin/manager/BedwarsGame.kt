@@ -234,10 +234,12 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         playersInLobby.add(player.uniqueId)
         broadcast("${player.displayName}${ChatColor.GREEN} has joined the game! ${playersInLobby.size}/${data.maxPlayers}")
         val lobby = plugin.dataFileManager.getLobby()
+        val gameLobby = data.lobby.clone()
+        println("game lobby location: ${gameLobby.format()}")
         beforeData[player.uniqueId] = PlayerData.createDataAndReset(
             player,
             lobby,
-            data.lobby
+            gameLobby
         )
         plugin.scoreboardManager.getScoreboard(player, true) // activate
         if (playersInLobby.size >= data.minPlayers) {
