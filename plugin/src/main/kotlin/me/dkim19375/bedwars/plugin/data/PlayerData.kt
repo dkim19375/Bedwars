@@ -106,9 +106,7 @@ data class PlayerData(
                 player.removePotionEffect(effect.type)
             }
             player.health = 20.0
-            if (location != null) {
-                player.teleport(location)
-            }
+            location?.let { player.teleport(it) }
             return data
         }
     }

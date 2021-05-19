@@ -102,7 +102,7 @@ subprojects {
         implementation('net.kyori:adventure-text-serializer-legacy:4.7.0')
         implementation('net.kyori:adventure-platform-bukkit:4.0.0-SNAPSHOT')
         // implementation('de.tr7zw:item-nbt-api:2.7.1')
-        compileOnly('commons-io:commons-io:2.8.0')
+        implementation('commons-io:commons-io:2.8.0')
         compileOnly('org.jetbrains:annotations:20.1.0')
         compileOnly('com.comphenix.protocol:ProtocolLib:4.6.0')
         compileOnly('com.alessiodp.parties:parties-api:3.0.4') {

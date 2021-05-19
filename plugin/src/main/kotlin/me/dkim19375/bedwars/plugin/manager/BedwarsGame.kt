@@ -165,7 +165,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     private fun revertBack() = getPlayersInGame().toSet().forEach { Bukkit.getPlayer(it)?.let(::revertPlayer) }
-    
+
     fun isEditing() = plugin.dataFileManager.isEditing(data)
 
     fun canStart(force: Boolean): Result {
@@ -441,21 +441,24 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         }
         state = GameState.REGENERATING_WORLD
         val folder = data.world.worldFolder
-        val originalCreator = WorldCreator(data.world.name).copy(data.world)
-        if (!Bukkit.unloadWorld(data.world, true)) {
-            throw IllegalStateException("Could not unload world!")
-        }
-        if (!plugin.isEnabled) {
-            return
-        }
-        Bukkit.getScheduler().runTaskAsynchronously(plugin) {
-            FileUtils.forceDelete(folder)
-            FileUtils.copyDirectory(dir, folder)
-            Bukkit.getScheduler().runTask(plugin) {
-                data.copy(world = originalCreator.createWorld()).save(plugin)
-                whenDone?.run()
+        // added delay to give bukkit time to remove all players from the world
+        // fix by SecretX :)
+        Bukkit.getScheduler().runTaskLater(plugin, {
+            val originalCreator = WorldCreator(data.world.name).copy(data.world)
+            if (!Bukkit.unloadWorld(data.world, true)) {
+                throw IllegalStateException("Could not unload world!")
             }
-        }
+            if (!plugin.isEnabled) return@runTaskLater
+
+            Bukkit.getScheduler().runTaskAsynchronously(plugin) {
+                FileUtils.forceDelete(folder)
+                FileUtils.copyDirectory(dir, folder)
+                Bukkit.getScheduler().runTask(plugin) {
+                    data.copy(world = originalCreator.createWorld()).save(plugin)
+                    whenDone?.run()
+                }
+            }
+        }, 20L)
     }
 
     // DURING GAME EVENTS
