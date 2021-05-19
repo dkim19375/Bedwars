@@ -8,6 +8,7 @@ plugins {
 final String basePackage = 'me.dkim19375.bedwars.libs'
 
 compileKotlin {
+    //noinspection GrUnresolvedAccess
     kotlinOptions.jvmTarget = '1.8'
 }
 
@@ -16,9 +17,9 @@ shadowJar {
     relocate("me.mattstudios.mfgui", "${basePackage}.mfgui")
     relocate("de.tr7zw.changeme.nbtapi", "${basePackage}.nbtapi")
     relocate("de.tr7zw.nbtinjector", "${basePackage}.nbtinjector")
-    relocate("net.kyori.adventure", "${basePackage}.kyori.adventure")
+    relocate("net.kyori", "${basePackage}.kyori")
+    relocate("org.apache", "${basePackage}.apache")
     relocate("me.tigerhix.lib.scoreboard", "${basePackage}.scoreboard")
-    relocate("net.kyori.examination", "${basePackage}.kyori.examination")
     relocate("me.dkim19375.dkim19375core", "${basePackage}.dkim19375core")
     relocate("me.katsumag.itemactionslib", "${basePackage}.itemactionslib")
     relocate("me.dkim19375.itemmovedetectionlib", "${basePackage}.itemmovedetectionlib")
@@ -101,8 +102,8 @@ subprojects {
         implementation('com.github.dkim19375:ItemMoveDetectionLib:1.0.1')
         implementation('net.kyori:adventure-text-serializer-legacy:4.7.0')
         implementation('net.kyori:adventure-platform-bukkit:4.0.0-SNAPSHOT')
+        implementation('commons-io:commons-io:2.8.0')
         // implementation('de.tr7zw:item-nbt-api:2.7.1')
-        compileOnly('commons-io:commons-io:2.8.0')
         compileOnly('org.jetbrains:annotations:20.1.0')
         compileOnly('com.comphenix.protocol:ProtocolLib:4.6.0')
         compileOnly('com.alessiodp.parties:parties-api:3.0.4') {

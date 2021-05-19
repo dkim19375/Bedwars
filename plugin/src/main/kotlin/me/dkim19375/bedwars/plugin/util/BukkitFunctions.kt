@@ -47,9 +47,6 @@ private val entities = mutableMapOf<UUID, Entity>()
 
 fun UUID.getEntity(): Entity? {
     val entityInList = entities[this] ?: return getEntityFromLoop(this)
-    if (!entities.containsKey(this)) {
-        return getEntityFromLoop(this)
-    }
     if (entityInList.isValid) {
         return entityInList
     }

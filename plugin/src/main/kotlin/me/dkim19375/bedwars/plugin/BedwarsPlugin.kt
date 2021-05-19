@@ -36,12 +36,19 @@ import me.dkim19375.bedwars.plugin.data.SpawnerData
 import me.dkim19375.bedwars.plugin.data.TeamData
 import me.dkim19375.bedwars.plugin.listener.*
 import me.dkim19375.bedwars.plugin.manager.*
+import me.dkim19375.bedwars.plugin.util.logMsg
 import me.dkim19375.dkim19375core.config.ConfigFile
 import me.dkim19375.dkim19375core.javaplugin.CoreJavaPlugin
 import me.dkim19375.itemmovedetectionlib.ItemMoveDetectionLib
 import me.tigerhix.lib.scoreboard.ScoreboardLib
 import org.bukkit.configuration.serialization.ConfigurationSerialization
+import java.util.logging.Logger
+import kotlin.system.measureTimeMillis
 
+var SERVER_ONLINE = true
+    private set
+lateinit var LOGGER: Logger
+    private set
 
 @Suppress("MemberVisibilityCanBePrivate")
 class BedwarsPlugin : CoreJavaPlugin() {
@@ -66,27 +73,30 @@ class BedwarsPlugin : CoreJavaPlugin() {
         GameData::class.java
     )
 
-
     override fun onLoad() {
-        val before = System.currentTimeMillis()
-        serializable.forEach(ConfigurationSerialization::registerClass)
-        NBTInjector.inject()
-        ScoreboardLib.setPluginInstance(this)
-        logger.info("Successfully loaded (not enabled) ${description.name} v${description.version} in ${System.currentTimeMillis() - before}ms!")
+        LOGGER = logger
+        val time = measureTimeMillis {
+            serializable.forEach(ConfigurationSerialization::registerClass)
+            NBTInjector.inject()
+            ScoreboardLib.setPluginInstance(this)
+        }
+        logMsg("Successfully loaded (not enabled) ${description.name} v${description.version} in ${time}ms!")
     }
 
     override fun onEnable() {
-        val before = System.currentTimeMillis()
-        ItemMoveDetectionLib.register()
-        initVariables()
-        registerCommands()
-        registerListeners()
-        reloadConfig()
-        packetManager.addListeners()
-        logger.info("Successfully enabled ${description.name} v${description.version} in ${System.currentTimeMillis() - before}ms!")
+        val time = measureTimeMillis {
+            ItemMoveDetectionLib.register()
+            initVariables()
+            registerCommands()
+            registerListeners()
+            reloadConfig()
+            packetManager.addListeners()
+        }
+        logMsg("Successfully enabled ${description.name} v${description.version} in ${time}ms!")
     }
 
     override fun onDisable() {
+        SERVER_ONLINE = false
         gameManager.getGames().values.forEach(BedwarsGame::forceStop)
         gameManager.save()
         ProtocolLibrary.getProtocolManager().removePacketListeners(this)
@@ -104,10 +114,10 @@ class BedwarsPlugin : CoreJavaPlugin() {
         server.pluginManager.getPlugin("Parties")?.isEnabled?.let {
             if (it) {
                 partiesAPI = Parties.getApi()
-                logger.info("Hooked onto Parties!")
+                logMsg("Hooked onto Parties!")
             }
         }
-        partiesAPI ?: logger.info("Could not hook into Parties!")
+        partiesAPI ?: logMsg("Could not hook into Parties!")
         dataFile = ConfigFile(this, "data.yml")
         registerConfig(dataFile)
         dataFileManager = DataFileManager(this)

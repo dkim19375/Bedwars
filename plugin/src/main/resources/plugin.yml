@@ -2,7 +2,6 @@ main: me.dkim19375.bedwars.plugin.BedwarsPlugin
 name: Bedwars
 version: ${pluginVersion}
 author: dkim19375
-api-version: 1.8
 description: A Bedwars Plugin!
 depend:
   - ProtocolLib

@@ -24,11 +24,17 @@
 
 package me.dkim19375.bedwars.plugin.util
 
+import me.dkim19375.bedwars.plugin.LOGGER
 import org.apache.commons.lang.StringUtils
 import org.bukkit.ChatColor
+import java.util.logging.Level
 
 fun String.setGray(): String {
     return "${ChatColor.GRAY}$this"
 }
+
+fun String.log(level: Level = Level.INFO) = LOGGER.log(level, this)
+
+fun logMsg(msg: String, level: Level = Level.INFO) = msg.log(level)
 
 fun String.capAndFormat(): String = StringUtils.capitalize(this.toLowerCase().replace("_", " "))

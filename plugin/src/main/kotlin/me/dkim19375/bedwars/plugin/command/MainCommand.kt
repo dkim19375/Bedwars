@@ -42,6 +42,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import java.util.*
+import kotlin.system.measureTimeMillis
 
 
 class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
@@ -197,10 +198,9 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                     sender.sendMessage(ErrorMessages.NO_PERMISSION)
                     return true
                 }
-                val before = System.currentTimeMillis()
                 sender.sendMessage("${ChatColor.YELLOW}Reloading...")
-                plugin.reloadConfig()
-                sender.sendMessage("${ChatColor.GREEN}Successfully reloaded in ${System.currentTimeMillis() - before}ms!")
+                val time = measureTimeMillis(plugin::reloadConfig)
+                sender.sendMessage("${ChatColor.GREEN}Successfully reloaded in ${time}ms!")
                 return true
             }
             "create" -> {

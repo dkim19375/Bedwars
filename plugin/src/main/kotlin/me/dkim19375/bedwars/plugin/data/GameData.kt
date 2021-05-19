@@ -25,6 +25,7 @@
 package me.dkim19375.bedwars.plugin.data
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
+import me.dkim19375.bedwars.plugin.SERVER_ONLINE
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
 import me.dkim19375.dkim19375core.function.filterNonNull
 import me.dkim19375.dkim19375core.function.toUUID
@@ -35,7 +36,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable
 import java.util.*
 
 data class GameData(
-    val world: World,
+    private val gameWorld: World,
     val minPlayers: Int = 2,
     val maxPlayers: Int = 8,
     private val gameTeams: Set<TeamData>,
@@ -46,6 +47,8 @@ data class GameData(
     private val gameSpec: Location,
     private val gameLobby: Location
 ) : ConfigurationSerializable {
+    val world: World
+        get() = if (!SERVER_ONLINE) gameWorld else Bukkit.getWorld(gameWorld.name)
     val spec: Location
         get() {
             if (gameSpec.world.name == world.name) {
@@ -115,7 +118,7 @@ data class GameData(
 
     fun save(plugin: BedwarsPlugin) {
         val copy = copy(
-            world = world,
+            gameWorld = world,
             minPlayers = minPlayers,
             maxPlayers = maxPlayers,
             gameTeams = teams,
