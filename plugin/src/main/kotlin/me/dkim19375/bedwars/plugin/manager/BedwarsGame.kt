@@ -460,6 +460,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
                 FileUtils.copyDirectory(dir, folder)
                 Bukkit.getScheduler().runTask(plugin) {
                     data.copy(gameWorld = originalCreator.createWorld()).save(plugin)
+                    println("${data.world.name} has finished regenerating!")
                     whenDone?.run()
                 }
             }

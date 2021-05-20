@@ -1,3 +1,5 @@
+import org.gradle.groovy.scripts.internal.BuildScriptData
+
 //file:noinspection SpellCheckingInspection
 plugins {
     id 'com.github.johnrengelman.shadow' version '6.1.0'
@@ -5,24 +7,22 @@ plugins {
     id 'net.minecrell.licenser' version '0.4.1'
 }
 
+final boolean DEBUG = true
 final String basePackage = 'me.dkim19375.bedwars.libs'
 
-compileKotlin {
-    //noinspection GrUnresolvedAccess
-    kotlinOptions.jvmTarget = '1.8'
-}
-
 shadowJar {
-    relocate("kotlin", "${basePackage}.kotlin")
-    relocate("me.mattstudios.mfgui", "${basePackage}.mfgui")
-    relocate("de.tr7zw.changeme.nbtapi", "${basePackage}.nbtapi")
-    relocate("de.tr7zw.nbtinjector", "${basePackage}.nbtinjector")
-    relocate("net.kyori", "${basePackage}.kyori")
-    relocate("org.apache", "${basePackage}.apache")
-    relocate("me.tigerhix.lib.scoreboard", "${basePackage}.scoreboard")
-    relocate("me.dkim19375.dkim19375core", "${basePackage}.dkim19375core")
-    relocate("me.katsumag.itemactionslib", "${basePackage}.itemactionslib")
-    relocate("me.dkim19375.itemmovedetectionlib", "${basePackage}.itemmovedetectionlib")
+    if (!DEBUG) {
+        relocate("kotlin", "${basePackage}.kotlin")
+        relocate("me.mattstudios.mfgui", "${basePackage}.mfgui")
+        relocate("de.tr7zw.changeme.nbtapi", "${basePackage}.nbtapi")
+        relocate("de.tr7zw.nbtinjector", "${basePackage}.nbtinjector")
+        relocate("net.kyori", "${basePackage}.kyori")
+        relocate("org.apache", "${basePackage}.apache")
+        relocate("me.tigerhix.lib.scoreboard", "${basePackage}.scoreboard")
+        relocate("me.dkim19375.dkim19375core", "${basePackage}.dkim19375core")
+        relocate("me.katsumag.itemactionslib", "${basePackage}.itemactionslib")
+        relocate("me.dkim19375.itemmovedetectionlib", "${basePackage}.itemmovedetectionlib")
+    }
 }
 
 repositories {
@@ -58,7 +58,7 @@ subprojects {
     apply plugin: 'com.github.johnrengelman.shadow'
     apply plugin: 'net.minecrell.licenser'
 
-    group = 'me.dkim19375'
+    group = parent.group
     version = parent.version
 
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
@@ -69,6 +69,7 @@ subprojects {
     }
 
     compileKotlin {
+        //noinspection GrUnresolvedAccess
         kotlinOptions.jvmTarget = '1.8'
     }
 
