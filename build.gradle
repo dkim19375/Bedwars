@@ -1,5 +1,3 @@
-import org.gradle.groovy.scripts.internal.BuildScriptData
-
 //file:noinspection SpellCheckingInspection
 plugins {
     id 'com.github.johnrengelman.shadow' version '6.1.0'
