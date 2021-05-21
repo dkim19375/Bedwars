@@ -1,5 +1,3 @@
-import org.gradle.groovy.scripts.internal.BuildScriptData
-
 //file:noinspection SpellCheckingInspection
 plugins {
     id 'com.github.johnrengelman.shadow' version '6.1.0'
@@ -7,8 +5,8 @@ plugins {
     id 'net.minecrell.licenser' version '0.4.1'
 }
 
-final boolean DEBUG = true
-final String basePackage = 'me.dkim19375.bedwars.libs'
+final def DEBUG = true
+final def basePackage = 'me.dkim19375.bedwars.libs'
 
 shadowJar {
     if (!DEBUG) {
@@ -118,12 +116,41 @@ subprojects {
     }
 }
 
+task removeBuildJars() {
+    new File('build/libs').deleteDir()
+}
+
 task copyFile(type: Copy) {
+    if (!new File('../.TestServers/1.8/plugins/').exists()) {
+        return
+    }
     new File('../.TestServers/1.8/plugins/' + project.name + '-' + project.version + '-all.jar').delete()
     from('build/libs/' + project.name + '-' + project.version + '-all.jar')
     into('../.TestServers/1.8/plugins')
     include('*.jar')
 }
 
+task copyFile_16(type: Copy) {
+    if (!new File('../.TestServers/1.16/plugins/').exists()) {
+        return
+    }
+    new File('../.TestServers/1.16/plugins/' + project.name + '-' + project.version + '-all.jar').delete()
+    from('build/libs/' + project.name + '-' + project.version + '-all.jar')
+    into('../.TestServers/1.16/plugins')
+    include('*.jar')
+}
+
+task deleteAll() {
+    for (File file : new File('../.TestServers/1.16/plugins').listFiles()) {
+        if (file.name.startsWith(project.name)) {
+            file.delete()
+        }
+    }
+    for (File file : new File('../.TestServers/1.8/plugins').listFiles()) {
+        if (file.name.startsWith(project.name)) {
+            file.delete()
+        }
+    }
+}
+
 shadowJar.dependsOn licenseFormat
-shadowJar.finalizedBy copyFile

@@ -25,10 +25,12 @@
 package me.dkim19375.bedwars.plugin.data
 
 import me.dkim19375.bedwars.plugin.util.clearAll
+import me.dkim19375.bedwars.plugin.util.logMsg
 import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import java.util.logging.Level
 
 data class PlayerData(
     val gamemode: GameMode,
@@ -107,7 +109,9 @@ data class PlayerData(
             }
             player.health = 20.0
             if (location != null) {
-                player.teleport(location)
+                if (!player.teleport(location)) {
+                    logMsg("Could not teleport player ${player.name} successfully!", Level.SEVERE)
+                }
             }
             return data
         }

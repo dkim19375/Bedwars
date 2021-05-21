@@ -24,16 +24,17 @@
 
 package me.dkim19375.bedwars.plugin.util
 
-import me.dkim19375.bedwars.plugin.LOGGER
+import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import org.apache.commons.lang.StringUtils
 import org.bukkit.ChatColor
+import org.bukkit.plugin.java.JavaPlugin
 import java.util.logging.Level
 
 fun String.setGray(): String {
     return "${ChatColor.GRAY}$this"
 }
 
-fun String.log(level: Level = Level.INFO) = LOGGER.log(level, this)
+fun String.log(level: Level = Level.INFO) = JavaPlugin.getPlugin(BedwarsPlugin::class.java).logger.log(level, this)
 
 fun logMsg(msg: String, level: Level = Level.INFO) = msg.log(level)
 

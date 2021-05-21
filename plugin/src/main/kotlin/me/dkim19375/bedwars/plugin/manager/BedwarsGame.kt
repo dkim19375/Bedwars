@@ -25,7 +25,6 @@
 package me.dkim19375.bedwars.plugin.manager
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
-import me.dkim19375.bedwars.plugin.SERVER_ONLINE
 import me.dkim19375.bedwars.plugin.data.GameData
 import me.dkim19375.bedwars.plugin.data.PlayerData
 import me.dkim19375.bedwars.plugin.enumclass.*
@@ -146,6 +145,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     fun forceStop(whenDone: Runnable? = null) {
+        state = GameState.REGENERATING_WORLD
         getPlayersInGame().getPlayers().forEach { p -> leavePlayer(p, false) }
         players.clear()
         playersInLobby.clear()
@@ -153,7 +153,6 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         task = null
         beds.clear()
         time = 0
-        state = GameState.REGENERATING_WORLD
         spawnerManager.reset()
         upgradesManager.stop()
         placedBlocks.clear()
@@ -237,10 +236,6 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         broadcast("${player.displayName}${ChatColor.GREEN} has joined the game! ${playersInLobby.size}/${data.maxPlayers}")
         val lobby = plugin.dataFileManager.getLobby()
         val gameLobby = data.lobby.clone()
-        logMsg("game lobby location: ${gameLobby.format()}")
-        if (!gameLobby.chunk.load()) {
-            return Result.REGENERATING_WORLD
-        }
         beforeData[player.uniqueId] = PlayerData.createDataAndReset(
             player,
             lobby,
@@ -447,7 +442,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         }
         state = GameState.REGENERATING_WORLD
         val folder = data.world.worldFolder
-        if (!SERVER_ONLINE) {
+        if (!plugin.isEnabled) {
             return
         }
         Bukkit.getScheduler().runTaskLater(plugin, {

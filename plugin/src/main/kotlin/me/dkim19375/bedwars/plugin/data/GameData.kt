@@ -25,7 +25,6 @@
 package me.dkim19375.bedwars.plugin.data
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
-import me.dkim19375.bedwars.plugin.SERVER_ONLINE
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
 import me.dkim19375.dkim19375core.function.filterNonNull
 import me.dkim19375.dkim19375core.function.toUUID
@@ -48,7 +47,7 @@ data class GameData(
     private val gameLobby: Location
 ) : ConfigurationSerializable {
     val world: World
-        get() = if (!SERVER_ONLINE) gameWorld else Bukkit.getWorld(gameWorld.name)
+        get() =  Bukkit.getWorld(gameWorld.name) ?: gameWorld
     val spec: Location
         get() {
             if (gameSpec.world.name == world.name) {

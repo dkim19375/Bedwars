@@ -42,13 +42,7 @@ import me.dkim19375.dkim19375core.javaplugin.CoreJavaPlugin
 import me.dkim19375.itemmovedetectionlib.ItemMoveDetectionLib
 import me.tigerhix.lib.scoreboard.ScoreboardLib
 import org.bukkit.configuration.serialization.ConfigurationSerialization
-import java.util.logging.Logger
 import kotlin.system.measureTimeMillis
-
-var SERVER_ONLINE = true
-    private set
-lateinit var LOGGER: Logger
-    private set
 
 @Suppress("MemberVisibilityCanBePrivate")
 class BedwarsPlugin : CoreJavaPlugin() {
@@ -74,7 +68,6 @@ class BedwarsPlugin : CoreJavaPlugin() {
     )
 
     override fun onLoad() {
-        LOGGER = logger
         val time = measureTimeMillis {
             serializable.forEach(ConfigurationSerialization::registerClass)
             NBTInjector.inject()
@@ -96,7 +89,6 @@ class BedwarsPlugin : CoreJavaPlugin() {
     }
 
     override fun onDisable() {
-        SERVER_ONLINE = false
         gameManager.getGames().values.forEach(BedwarsGame::forceStop)
         gameManager.save()
         ProtocolLibrary.getProtocolManager().removePacketListeners(this)
