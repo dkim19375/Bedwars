@@ -59,6 +59,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
     lateinit var partiesListeners: PartiesListeners
         private set
     var partiesAPI: PartiesAPI? = null
+    var protocolLibSupport = false
 
     private val serializable = listOf(
         TeamData::class.java,
@@ -78,6 +79,14 @@ class BedwarsPlugin : CoreJavaPlugin() {
 
     override fun onEnable() {
         val time = measureTimeMillis {
+            protocolLibSupport = try {
+                Class.forName("com.comphenix.protocol.ProtocolLibrary")
+                logMsg("Hooked onto ProtocolLib")
+                true
+            } catch (e: ClassNotFoundException) {
+                logMsg("Could not hook onto ProtocolLib!")
+                false
+            }
             ItemMoveDetectionLib.register()
             initVariables()
             registerCommands()
@@ -91,7 +100,9 @@ class BedwarsPlugin : CoreJavaPlugin() {
     override fun onDisable() {
         gameManager.getGames().values.forEach(BedwarsGame::forceStop)
         gameManager.save()
-        ProtocolLibrary.getProtocolManager().removePacketListeners(this)
+        if (protocolLibSupport) {
+            ProtocolLibrary.getProtocolManager().removePacketListeners(this)
+        }
         dataFile.save()
         serializable.reversed().forEach(ConfigurationSerialization::unregisterClass)
         unregisterConfig(dataFile)
@@ -109,7 +120,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
                 logMsg("Hooked onto Parties!")
             }
         }
-        partiesAPI ?: logMsg("Could not hook into Parties!")
+        partiesAPI ?: logMsg("Could not hook onto Parties!")
         dataFile = ConfigFile(this, "data.yml")
         registerConfig(dataFile)
         dataFileManager = DataFileManager(this)
