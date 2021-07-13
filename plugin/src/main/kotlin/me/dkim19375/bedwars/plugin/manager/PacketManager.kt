@@ -39,6 +39,9 @@ import java.lang.reflect.InvocationTargetException
 class PacketManager(private val plugin: BedwarsPlugin) {
     fun addListeners() {
         val plugin = plugin
+        if (!plugin.protocolLibSupport) {
+            return
+        }
         ProtocolLibrary.getProtocolManager().addPacketListener(object :
             PacketAdapter(plugin, PacketType.Play.Server.REMOVE_ENTITY_EFFECT) {
             override fun onPacketSending(event: PacketEvent) {
@@ -63,6 +66,9 @@ class PacketManager(private val plugin: BedwarsPlugin) {
     }
 
     fun hideArmor(player: Player) {
+        if (!plugin.protocolLibSupport) {
+            return
+        }
         broadcastNearby(player, setAir(player, 1))
         broadcastNearby(player, setAir(player, 2))
         broadcastNearby(player, setAir(player, 3))
@@ -71,6 +77,9 @@ class PacketManager(private val plugin: BedwarsPlugin) {
     }
 
     fun restoreArmor(player: Player) {
+        if (!plugin.protocolLibSupport) {
+            return
+        }
         plugin.gameManager.invisPlayers.remove(player.uniqueId)
         broadcastNearby(player, setItem(player, player.inventory.boots, 1))
         broadcastNearby(player, setItem(player, player.inventory.leggings, 2))
@@ -79,6 +88,9 @@ class PacketManager(private val plugin: BedwarsPlugin) {
     }
 
     private fun broadcastNearby(player: Player, packet: PacketContainer) {
+        if (!plugin.protocolLibSupport) {
+            return
+        }
         val manager = ProtocolLibrary.getProtocolManager()
         for (observer in manager.getEntityTrackers(player)) {
             val gameName = plugin.gameManager.getPlayerInGame(observer)?: continue

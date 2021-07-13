@@ -4,10 +4,10 @@ version: ${pluginVersion}
 author: dkim19375
 description: A Bedwars Plugin!
 depend:
-  - ProtocolLib
   - PlaceholderAPI
 
 softdepend:
+  - ProtocolLib
   - Parties
   - Multiverse-Core
 

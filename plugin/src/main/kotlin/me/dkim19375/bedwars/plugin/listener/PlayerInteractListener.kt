@@ -51,6 +51,7 @@ class PlayerInteractListener(private val plugin: BedwarsPlugin) : Listener {
     }
 
     private fun PlayerInteractEvent.makeItemUnbreakable() {
+        plugin.gameManager.getGame(player) ?: return
         item ?: return
         if (item.type.isTool() || item.type.isArmor() || item.type.isWeapon()) {
             item.durability = 0
