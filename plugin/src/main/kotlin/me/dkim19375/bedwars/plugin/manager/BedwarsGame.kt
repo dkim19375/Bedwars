@@ -144,7 +144,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         forceStop()
     }
 
-    fun forceStop(whenDone: Runnable? = null) {
+    fun forceStop(whenDone: () -> Unit = {}) {
         state = GameState.REGENERATING_WORLD
         getPlayersInGame().getPlayers().forEach { p -> leavePlayer(p, false) }
         players.clear()
@@ -160,7 +160,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         beforeData.clear()
         regenerateMap {
             state = GameState.LOBBY
-            whenDone?.run()
+            whenDone()
         }
     }
 
@@ -427,7 +427,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         return players.getOrDefault(team, setOf())
     }
 
-    fun regenerateMap(whenDone: Runnable? = null) {
+    fun regenerateMap(whenDone: () -> Unit = {}) {
         val dir = Paths.get(plugin.dataFolder.absolutePath, "worlds", data.world.name).toFile()
         if (!dir.exists()) {
             // Something went wrong here
@@ -447,16 +447,21 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         }
         Bukkit.getScheduler().runTaskLater(plugin, {
             val originalCreator = WorldCreator(data.world.name).copy(data.world)
-            if (!Bukkit.unloadWorld(data.world, true)) {
-                throw IllegalStateException("Could not unload world!")
+            if (!data.world.name.unloadWorld()) {
+                throw IllegalStateException("Could not unload world ${data.world.name}!")
             }
             Bukkit.getScheduler().runTaskAsynchronously(plugin) {
                 FileUtils.forceDelete(folder)
                 FileUtils.copyDirectory(dir, folder)
                 Bukkit.getScheduler().runTask(plugin) {
-                    data.copy(gameWorld = originalCreator.createWorld()).save(plugin)
-                    println("${data.world.name} has finished regenerating!")
-                    whenDone?.run()
+                    val result = originalCreator.loadWorld()
+                    if (!result.first) {
+                        throw IllegalStateException("Could not load world ${data.world.name}!")
+                    }
+                    val world = result.second ?: throw IllegalStateException("Could not load world ${data.world.name}!")
+                    data.copy(gameWorld = world).save(plugin)
+                    println("${world.name} has finished regenerating!")
+                    whenDone()
                 }
             }
         }, 2L)

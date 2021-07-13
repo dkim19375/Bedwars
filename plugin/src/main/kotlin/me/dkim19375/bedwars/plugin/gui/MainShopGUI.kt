@@ -35,7 +35,6 @@ import me.mattstudios.mfgui.gui.guis.GuiItem
 import org.bukkit.ChatColor
 import org.bukkit.DyeColor
 import org.bukkit.Material
-import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
@@ -174,7 +173,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
         if (item.type == ItemType.ARMOR) {
             if (player.inventory.hasArmor(ArmorType.fromMaterial(item.item.material))) {
                 player.sendMessage("${ChatColor.RED}You already have this!")
-                player.playSound(Sound.ANVIL_LAND, pitch = 0.8f)
+                player.playErrorSound()
                 return
             }
             player.inventory.removeItem(ItemStack(item.costType.material, item.costAmount))
@@ -183,12 +182,12 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
             player.inventory.boots = ItemStack(armorType.boots)
             player.inventory.leggings = ItemStack(armorType.leggings)
             game.upgradesManager.applyUpgrades(player)
-            player.playSound(Sound.NOTE_PLING, pitch = 7.0f)
+            player.playErrorSound()
             return
         }
         if (player.inventory.hasItem(item.item.material) && (item.permanent || item.defaultOnSpawn)) {
             player.sendMessage("${ChatColor.RED}You already have this!")
-            player.playSound(Sound.ANVIL_LAND, pitch = 0.8f)
+            player.playErrorSound()
             return
         }
         player.inventory.removeItem(ItemStack(item.costType.material, item.costAmount))
@@ -196,7 +195,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
         player.sendMessage("${ChatColor.GREEN}Successfully bought ${item.displayname}!")
         removeSword(item.item.material)
         player.giveItem(true, item.item.toItemStack(team?.color))
-        player.playSound(Sound.NOTE_PLING, pitch = 7.0f)
+        player.playBoughtSound()
         game.upgradesManager.applyUpgrades(player)
     }
 
@@ -278,7 +277,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
         val playerCostAmount = player.getItemAmount(item.costType.material)
         if (playerCostAmount < item.costAmount) {
             player.sendMessage("${ChatColor.RED}You need ${item.costAmount - playerCostAmount} more ${item.costType.displayname}!")
-            player.playSound(Sound.ANVIL_LAND, pitch = 0.8f)
+            player.playErrorSound()
             return
         }
         givePlayerItem(item)

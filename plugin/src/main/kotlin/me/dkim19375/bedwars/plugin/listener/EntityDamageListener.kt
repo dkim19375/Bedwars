@@ -45,11 +45,11 @@ class EntityDamageListener(private val plugin: BedwarsPlugin) : Listener {
     private fun EntityDamageEvent.playerAutoRespawn() {
         val player = entity as? Player ?: return
         val game = plugin.gameManager.getGame(player) ?: return
-        if (player.location.y > 0.0) {
+        if (player.location.y > 1.0) {
             return
         }
         if (game.state == GameState.STARTED) {
-            player.health = 0.0
+            player.health = 0.01
             return
         }
     }

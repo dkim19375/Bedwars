@@ -33,7 +33,10 @@ import me.dkim19375.bedwars.plugin.util.*
 import me.mattstudios.mfgui.gui.components.util.ItemBuilder
 import me.mattstudios.mfgui.gui.guis.Gui
 import me.mattstudios.mfgui.gui.guis.GuiItem
-import org.bukkit.*
+import org.bukkit.Bukkit
+import org.bukkit.ChatColor
+import org.bukkit.DyeColor
+import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
@@ -321,7 +324,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
         val cost = level + 1
         if (diamonds < cost) {
             player.sendMessage("${ChatColor.RED}You need ${cost - diamonds} more Diamond!")
-            player.playSound(Sound.ANVIL_LAND, pitch = 0.8f)
+            player.playErrorSound()
             return
         }
         player.inventory.removeItem(ItemStack(Material.DIAMOND, cost))
@@ -419,7 +422,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
         val playerItems = player.getItemAmount(Material.DIAMOND)
         if (playerItems < cost) {
             player.sendMessage("${ChatColor.RED}You need ${cost - playerItems} more Diamond!")
-            player.playSound(Sound.ANVIL_LAND, pitch = 0.8f)
+            player.playErrorSound()
             return
         }
         map[team] = level + 1
@@ -442,14 +445,14 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
         val playerItems = player.getItemAmount(Material.DIAMOND)
         if (playerItems < cost) {
             player.sendMessage("${ChatColor.RED}You need ${cost - playerItems} more Diamond!")
-            player.playSound(Sound.ANVIL_LAND, pitch = 0.8f)
+            player.playErrorSound()
             return false
         }
         return true
     }
 
     private fun sendUpgradeMessage(upgrade: String, game: BedwarsGame) {
-        player.playSound(Sound.NOTE_PLING, pitch = 7.0f)
+        player.playBoughtSound()
         for (uuid in game.getPlayersInTeam(team)) {
             val p = Bukkit.getPlayer(uuid) ?: continue
             p.sendMessage("${player.displayName} ${ChatColor.GREEN}has purchased $upgrade!")

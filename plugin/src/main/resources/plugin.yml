@@ -9,6 +9,7 @@ depend:
 
 softdepend:
   - Parties
+  - Multiverse-Core
 
 commands:
   bedwars:

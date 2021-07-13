@@ -27,6 +27,8 @@ package me.dkim19375.bedwars.plugin
 import com.alessiodp.parties.api.Parties
 import com.alessiodp.parties.api.interfaces.PartiesAPI
 import com.comphenix.protocol.ProtocolLibrary
+import com.onarandombox.MultiverseCore.MultiverseCore
+import com.onarandombox.MultiverseCore.api.MVWorldManager
 import de.tr7zw.nbtinjector.NBTInjector
 import me.dkim19375.bedwars.plugin.command.MainCommand
 import me.dkim19375.bedwars.plugin.command.TabCompletionHandler
@@ -42,6 +44,7 @@ import me.dkim19375.dkim19375core.javaplugin.CoreJavaPlugin
 import me.dkim19375.itemmovedetectionlib.ItemMoveDetectionLib
 import me.tigerhix.lib.scoreboard.ScoreboardLib
 import org.bukkit.configuration.serialization.ConfigurationSerialization
+import org.bukkit.plugin.Plugin
 import kotlin.system.measureTimeMillis
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -58,6 +61,9 @@ class BedwarsPlugin : CoreJavaPlugin() {
         private set
     lateinit var partiesListeners: PartiesListeners
         private set
+    var worldManager: MVWorldManager? = null
+        private set
+
     var partiesAPI: PartiesAPI? = null
 
     private val serializable = listOf(
@@ -102,14 +108,29 @@ class BedwarsPlugin : CoreJavaPlugin() {
         gameManager.reloadData()
     }
 
-    private fun initVariables() {
-        server.pluginManager.getPlugin("Parties")?.isEnabled?.let {
-            if (it) {
-                partiesAPI = Parties.getApi()
-                logMsg("Hooked onto Parties!")
+    @Suppress("UNCHECKED_CAST")
+    private fun <T : Plugin> hookOntoLib(name: String, getPlugin: Boolean = true, api: (T) -> Unit) {
+        server.pluginManager.getPlugin(name)?.let {
+            if (!getPlugin) {
+                api(this as T)
+                return
             }
-        }
-        partiesAPI ?: logMsg("Could not hook into Parties!")
+            val plugin = (it as? T) ?: let {
+                logMsg("Could not hook into $name!")
+                return
+            }
+            if (plugin.isEnabled) {
+                api(plugin)
+                logMsg("Hooked onto $name!")
+            } else {
+                logMsg("Could not hook into $name!")
+            }
+        } ?: logMsg("Could not hook into $name!")
+    }
+
+    private fun initVariables() {
+        hookOntoLib("Parties", false) { _: BedwarsPlugin -> partiesAPI = Parties.getApi() }
+        hookOntoLib("Multiverse-Core") { pl: MultiverseCore -> worldManager = pl.mvWorldManager }
         dataFile = ConfigFile(this, "data.yml")
         registerConfig(dataFile)
         dataFileManager = DataFileManager(this)

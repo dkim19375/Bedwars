@@ -24,12 +24,17 @@
 
 package me.dkim19375.bedwars.plugin.data
 
+import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.util.clearAll
+import me.dkim19375.bedwars.plugin.util.format
+import me.dkim19375.bedwars.plugin.util.getWrapper
 import me.dkim19375.bedwars.plugin.util.logMsg
+import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.bukkit.plugin.java.JavaPlugin
 import java.util.logging.Level
 
 data class PlayerData(
@@ -108,8 +113,16 @@ data class PlayerData(
                 player.removePotionEffect(effect.type)
             }
             player.health = 20.0
-            if (location != null) {
-                if (!player.teleport(location)) {
+            val newLoc = location?.let { loc ->
+                Location(Bukkit.getWorld(loc.world.name), loc.x, loc.y, loc.z, loc.yaw, loc.pitch)
+            }
+            if (newLoc != null) {
+                val plugin = JavaPlugin.getPlugin(BedwarsPlugin::class.java)
+                plugin.worldManager?.getMVWorld(newLoc.world)?.setKeepSpawnInMemory(true)
+                if (!newLoc.chunk.load(true)) {
+                    logMsg("Could not load chunk: ${newLoc.getWrapper().format()}!", Level.SEVERE)
+                }
+                if (!player.teleport(newLoc)) {
                     logMsg("Could not teleport player ${player.name} successfully!", Level.SEVERE)
                 }
             }

@@ -24,13 +24,11 @@
 
 package me.dkim19375.bedwars.plugin.util
 
+import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.ItemWrapper
 import me.dkim19375.bedwars.plugin.enumclass.ArmorType
 import me.dkim19375.dkim19375core.data.LocationWrapper
-import org.bukkit.Bukkit
-import org.bukkit.Location
-import org.bukkit.Material
-import org.bukkit.World
+import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Item
@@ -39,11 +37,13 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
 import org.bukkit.material.Bed
+import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.potion.Potion
 import java.util.*
 import kotlin.math.abs
 
 private val entities = mutableMapOf<UUID, Entity>()
+private val plugin: BedwarsPlugin by lazy { JavaPlugin.getPlugin(BedwarsPlugin::class.java) }
 
 fun UUID.getEntity(): Entity? {
     val entityInList = entities[this] ?: return getEntityFromLoop(this)
@@ -87,6 +87,21 @@ private fun getEntityFromLoop(uuid: UUID): Entity? {
         }
     }
     return null
+}
+
+fun String.loadWorld(worldCreator: WorldCreator? = null): Pair<Boolean, World?> {
+    plugin.worldManager?.let {
+        return Pair(it.loadWorld(this), Bukkit.getWorld(this))
+    }
+    worldCreator?.environment(World.Environment.NORMAL)
+    val world = worldCreator?.createWorld()
+    return Pair(world != null, world)
+}
+
+fun WorldCreator.loadWorld(): Pair<Boolean, World?> = name().loadWorld(this)
+
+fun String.unloadWorld(): Boolean {
+    return plugin.worldManager?.unloadWorld(this, true) ?: Bukkit.unloadWorld(this, true)
 }
 
 fun Material.isArmor() = when (this) {
