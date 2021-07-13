@@ -45,13 +45,13 @@ import org.bukkit.inventory.ItemStack
 class PlayerInteractListener(private val plugin: BedwarsPlugin) : Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     private fun PlayerInteractEvent.onInteract() {
+        plugin.gameManager.getGame(player) ?: return
         makeItemUnbreakable()
         bedPrevention()
         setupFireballs()
     }
 
     private fun PlayerInteractEvent.makeItemUnbreakable() {
-        plugin.gameManager.getGame(player) ?: return
         item ?: return
         if (item.type.isTool() || item.type.isArmor() || item.type.isWeapon()) {
             item.durability = 0

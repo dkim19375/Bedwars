@@ -65,6 +65,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
         private set
 
     var partiesAPI: PartiesAPI? = null
+    var protocolLibSupport = false
 
     private val serializable = listOf(
         TeamData::class.java,
@@ -97,7 +98,9 @@ class BedwarsPlugin : CoreJavaPlugin() {
     override fun onDisable() {
         gameManager.getGames().values.forEach(BedwarsGame::forceStop)
         gameManager.save()
-        ProtocolLibrary.getProtocolManager().removePacketListeners(this)
+        if (protocolLibSupport) {
+            ProtocolLibrary.getProtocolManager().removePacketListeners(this)
+        }
         dataFile.save()
         serializable.reversed().forEach(ConfigurationSerialization::unregisterClass)
         unregisterConfig(dataFile)
@@ -129,6 +132,14 @@ class BedwarsPlugin : CoreJavaPlugin() {
     }
 
     private fun initVariables() {
+        protocolLibSupport = try {
+            Class.forName("com.comphenix.protocol.ProtocolLibrary")
+            logMsg("Hooked onto ProtocolLib")
+            true
+        } catch (e: ClassNotFoundException) {
+            logMsg("Could not hook onto ProtocolLib!")
+            false
+        }
         hookOntoLib("Parties", false) { _: BedwarsPlugin -> partiesAPI = Parties.getApi() }
         hookOntoLib("Multiverse-Core") { pl: MultiverseCore -> worldManager = pl.mvWorldManager }
         dataFile = ConfigFile(this, "data.yml")
