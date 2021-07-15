@@ -25,7 +25,8 @@
 package me.dkim19375.bedwars.plugin.listener
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
-import me.dkim19375.dkim19375core.data.LocationWrapper
+import me.dkim19375.bedwars.plugin.util.teleportUpdated
+import me.dkim19375.dkimbukkitcore.data.LocationWrapper
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.TNTPrimed
@@ -36,6 +37,7 @@ import org.bukkit.event.block.BlockPlaceEvent
 import kotlin.random.Random
 
 private const val OFFSET = 0.01
+
 class BlockPlaceListener(private val plugin: BedwarsPlugin) : Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private fun BlockPlaceEvent.onPlace() {
@@ -49,12 +51,12 @@ class BlockPlaceListener(private val plugin: BedwarsPlugin) : Listener {
         val loc = block.location.clone()
         loc.x += Random.nextDouble(-OFFSET, OFFSET)
         loc.z += Random.nextDouble(-OFFSET, OFFSET)
-        tnt.teleport(loc)
+        tnt.teleportUpdated(loc)
         Bukkit.getScheduler().runTask(plugin) {
             val newLoc = block.location.clone()
             newLoc.x += Random.nextDouble(-OFFSET, OFFSET)
             newLoc.z += Random.nextDouble(-OFFSET, OFFSET)
-            tnt.teleport(loc)
+            tnt.teleportUpdated(loc)
         }
         tnt.fuseTicks = 50
         plugin.gameManager.addExplosive(tnt.uniqueId, player)

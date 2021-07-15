@@ -30,6 +30,11 @@ import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.potion.PotionType
 
+private const val WOODEN_TOOL_PRICE = 8
+private const val STONE_TOOL_PRICE = 15
+private const val IRON_TOOL_PRICE = 4
+private const val DIAMOND_TOOL_PRICE = 8
+
 @Suppress("unused")
 enum class MainShopItems(
     val slot: Int, val item: ItemWrapper, val costAmount: Int, val costType: MainShopGUI.CostType,
@@ -113,7 +118,7 @@ enum class MainShopItems(
     SHEARS(
         19,
         ItemWrapper(Material.SHEARS, 1),
-        30,
+        20,
         MainShopGUI.CostType.IRON,
         "Shears",
         permanent = true,
@@ -122,23 +127,23 @@ enum class MainShopItems(
     WOOD_PICK(
         20,
         ItemWrapper(Material.WOOD_PICKAXE, 1),
-        10,
+        WOODEN_TOOL_PRICE,
         MainShopGUI.CostType.IRON, "Wooden Pickaxe",
         permanent = true,
         type = MainShopGUI.ItemType.TOOLS
     ),
     STONE_PICK(
-        21, ItemWrapper(Material.STONE_PICKAXE, 1), 10, MainShopGUI.CostType.IRON,
+        21, ItemWrapper(Material.STONE_PICKAXE, 1), STONE_TOOL_PRICE, MainShopGUI.CostType.IRON,
         "Stone Pickaxe", type = MainShopGUI.ItemType.TOOLS
     ),
     IRON_PICKAXE(
-        22, ItemWrapper(Material.IRON_PICKAXE, 1), 3, MainShopGUI.CostType.GOLD,
+        22, ItemWrapper(Material.IRON_PICKAXE, 1), IRON_TOOL_PRICE, MainShopGUI.CostType.GOLD,
         "Iron Pickaxe", type = MainShopGUI.ItemType.TOOLS
     ),
     DIAMOND_PICKAXE(
         23,
         ItemWrapper(Material.DIAMOND_PICKAXE, 1),
-        6,
+        DIAMOND_TOOL_PRICE,
         MainShopGUI.CostType.GOLD,
         "Diamond Pickaxe",
         type = MainShopGUI.ItemType.TOOLS
@@ -146,22 +151,22 @@ enum class MainShopItems(
     WOOD_AXE(
         24,
         ItemWrapper(Material.WOOD_AXE, 1),
-        10,
+        WOODEN_TOOL_PRICE,
         MainShopGUI.CostType.IRON,
         "Wooden Axe",
         permanent = true,
         type = MainShopGUI.ItemType.TOOLS
     ),
     STONE_AXE(
-        25, ItemWrapper(Material.STONE_AXE, 1), 10, MainShopGUI.CostType.IRON,
+        25, ItemWrapper(Material.STONE_AXE, 1), STONE_TOOL_PRICE, MainShopGUI.CostType.IRON,
         "Stone Axe", type = MainShopGUI.ItemType.TOOLS
     ),
     IRON_AXE(
-        28, ItemWrapper(Material.IRON_AXE, 1), 3, MainShopGUI.CostType.GOLD,
+        28, ItemWrapper(Material.IRON_AXE, 1), IRON_TOOL_PRICE, MainShopGUI.CostType.GOLD,
         "Iron Axe", type = MainShopGUI.ItemType.TOOLS
     ),
     DIAMOND_AXE(
-        29, ItemWrapper(Material.DIAMOND_AXE, 1), 6, MainShopGUI.CostType.GOLD,
+        29, ItemWrapper(Material.DIAMOND_AXE, 1), DIAMOND_TOOL_PRICE, MainShopGUI.CostType.GOLD,
         "Diamond Axe", type = MainShopGUI.ItemType.TOOLS
     ),
     ARROW(

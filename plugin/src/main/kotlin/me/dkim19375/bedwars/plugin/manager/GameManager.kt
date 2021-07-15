@@ -127,6 +127,7 @@ class GameManager(private val plugin: BedwarsPlugin) {
         plugin.dataFileManager.removeGameData(game)
     }
 
+    @Suppress("unused")
     fun getVillagers() = getShopVillagers().toMutableSet().plus(getUpgradeVillagers()).toSet()
 
     fun getUpgradeVillagers(): Set<Villager> {
@@ -155,6 +156,7 @@ class GameManager(private val plugin: BedwarsPlugin) {
         return set.toSet()
     }
 
+    @Suppress("unused")
     fun removeVillager(villager: UUID) {
         for (game in games.values) {
             game.npcManager.removeVillager(villager)

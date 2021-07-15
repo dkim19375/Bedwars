@@ -48,6 +48,7 @@ enum class Team(val color: DyeColor, val chatColor: ChatColor, val displayName: 
     }
 }
 
+@Suppress("unused")
 fun Team.getColored(material: Material): ItemStack = getColored(ItemStack(material))
 
 fun Team.getColored(item: ItemStack): ItemStack {

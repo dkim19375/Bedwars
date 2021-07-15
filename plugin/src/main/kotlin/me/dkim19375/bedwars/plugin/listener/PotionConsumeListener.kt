@@ -32,7 +32,6 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerItemConsumeEvent
-import org.bukkit.potion.Potion
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 
@@ -49,18 +48,23 @@ class PotionConsumeListener(private val plugin: BedwarsPlugin) : Listener {
         Bukkit.getScheduler().runTask(plugin) {
             player.inventory.remove(Material.GLASS_BOTTLE)
         }
-        if (type == PotionEffectType.INVISIBILITY) {
-            player.addPotionEffect(PotionEffect(type, 600, 0), true)
-            plugin.packetManager.hideArmor(player)
-            return
-        }
-        if (type == PotionEffectType.SPEED) {
-            player.addPotionEffect(PotionEffect(type, 900, 1), true)
-            return
-        }
-        if (type == PotionEffectType.JUMP) {
-            player.addPotionEffect(PotionEffect(type, 900, 4), true)
-            return
+        when (type) {
+            PotionEffectType.INVISIBILITY -> {
+                player.addPotionEffect(PotionEffect(type, 2, 1), true)
+                Bukkit.getScheduler().runTask(plugin) {
+                    player.addPotionEffect(PotionEffect(type, 599, 0), true)
+                }
+                plugin.packetManager.hideArmor(player)
+                return
+            }
+            PotionEffectType.SPEED -> {
+                player.addPotionEffect(PotionEffect(type, 900, 1), true)
+                return
+            }
+            PotionEffectType.JUMP -> {
+                player.addPotionEffect(PotionEffect(type, 900, 4), true)
+                return
+            }
         }
     }
 }

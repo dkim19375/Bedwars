@@ -28,8 +28,7 @@ import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.util.getBedHead
 import me.dkim19375.bedwars.plugin.util.getWrapper
-import me.dkim19375.dkim19375core.data.LocationWrapper
-import me.dkim19375.dkim19375core.function.filterNonNull
+import me.dkim19375.dkimbukkitcore.data.LocationWrapper
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -66,8 +65,7 @@ class BlockBreakListener(private val plugin: BedwarsPlugin) : Listener {
         isCancelled = true
         Bukkit.getScheduler().runTask(plugin) {
             player.getNearbyEntities(6.0, 6.0, 6.0)
-                .map { i -> i as? Item }
-                .filterNonNull()
+                .mapNotNull { i -> i as? Item }
                 .filter { i -> i.itemStack.type == Material.BED }
                 .forEach(Item::remove)
         }

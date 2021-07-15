@@ -29,7 +29,7 @@ import me.dkim19375.bedwars.plugin.data.GameData
 import me.dkim19375.bedwars.plugin.data.PlayerData
 import me.dkim19375.bedwars.plugin.enumclass.*
 import me.dkim19375.bedwars.plugin.util.*
-import me.dkim19375.dkim19375core.data.LocationWrapper
+import me.dkim19375.dkimbukkitcore.data.LocationWrapper
 import org.apache.commons.io.FileUtils
 import org.bukkit.*
 import org.bukkit.entity.Player
@@ -123,7 +123,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             val players = entry.value.getPlayers()
             val spawn = (data.teams.getTeam(team) ?: continue).spawn
             for (player in players) {
-                player.teleport(spawn)
+                player.teleportUpdated(spawn)
             }
         }
         state = GameState.STARTED
@@ -145,8 +145,8 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     fun forceStop(whenDone: () -> Unit = {}) {
-        state = GameState.REGENERATING_WORLD
         getPlayersInGame().getPlayers().forEach { p -> leavePlayer(p, false) }
+        state = GameState.REGENERATING_WORLD
         players.clear()
         playersInLobby.clear()
         task?.cancel()
@@ -274,12 +274,12 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         val teamData = data.teams.getTeam(team) ?: return
         player.inventory.clearAll()
         player.gameMode = GameMode.SPECTATOR
-        player.teleport(data.spec)
+        player.teleportUpdated(data.spec)
         object : BukkitRunnable() {
             var countDown = 5
             override fun run() {
                 if (countDown <= 0) {
-                    player.teleport(teamData.spawn)
+                    player.teleportUpdated(teamData.spawn)
                     player.gameMode = GameMode.SURVIVAL
                     player.sendOtherTitle("${ChatColor.GREEN}Respawned!")
                     giveItems(player, inventory, team)
@@ -401,7 +401,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             leavePlayer(player)
         }
         for (player in data.world.players) {
-            player.teleport(Bukkit.getWorld("world").spawnLocation)
+            player.teleportUpdated(Bukkit.getWorld("world").spawnLocation)
         }
         val folder = data.world.worldFolder
         val originalCreator = WorldCreator(data.world.name).copy(data.world)
@@ -438,7 +438,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             leavePlayer(player)
         }
         for (player in data.world.players) {
-            player.teleport(Bukkit.getWorld("world").spawnLocation)
+            player.teleportUpdated(Bukkit.getWorld("world").spawnLocation)
         }
         state = GameState.REGENERATING_WORLD
         val folder = data.world.worldFolder

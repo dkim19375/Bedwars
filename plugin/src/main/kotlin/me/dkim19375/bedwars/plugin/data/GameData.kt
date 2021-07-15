@@ -26,8 +26,8 @@ package me.dkim19375.bedwars.plugin.data
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
-import me.dkim19375.dkim19375core.function.filterNonNull
-import me.dkim19375.dkim19375core.function.toUUID
+import me.dkim19375.bedwars.plugin.util.update
+import me.dkim19375.dkimbukkitcore.function.toUUID
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.World
@@ -51,14 +51,14 @@ data class GameData(
     val spec: Location
         get() {
             if (gameSpec.world.name == world.name) {
-                return gameSpec
+                return gameSpec.update()
             }
             return gameSpec.setWorld(world.name, false)
         }
     val lobby: Location
         get() {
             if (gameLobby.world.name == world.name) {
-                return gameLobby
+                return gameLobby.update()
             }
             return gameLobby.setWorld(world.name, false)
         }
@@ -164,8 +164,8 @@ data class GameData(
                         spawn = data.spawn.setWorld(worldName)
                     )
                 }.toSet(),
-                (map["shop-villagers"] as List<String>).map(String::toUUID).filterNonNull().toSet(),
-                (map["upgrade-villagers"] as List<String>).map(String::toUUID).filterNonNull().toSet(),
+                (map["shop-villagers"] as List<String>).mapNotNull(String::toUUID).toSet(),
+                (map["upgrade-villagers"] as List<String>).mapNotNull(String::toUUID).toSet(),
                 (map["spawners"] as List<SpawnerData>).map { data ->
                     data.copy(
                         type = data.type,

@@ -22,12 +22,14 @@
  * SOFTWARE.
  */
 
+@file:Suppress("unused")
+
 package me.dkim19375.bedwars.plugin.util
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.ItemWrapper
 import me.dkim19375.bedwars.plugin.enumclass.ArmorType
-import me.dkim19375.dkim19375core.data.LocationWrapper
+import me.dkim19375.dkimbukkitcore.data.LocationWrapper
 import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.entity.Entity
@@ -164,6 +166,7 @@ fun Material.isWeapon() = when (this) {
     else -> false
 }
 
+@Suppress("unused")
 fun Location.getWrapper() = LocationWrapper(this)
 
 fun Location.getOppositeYaw(): Location {
@@ -174,6 +177,8 @@ fun Location.getOppositeYaw(): Location {
     }
     return clone
 }
+
+fun Location.update(): Location = Location(Bukkit.getWorld(world?.name), x, y, z, yaw, pitch)
 
 fun Block.getBedHead(): Location {
     val data = state.data

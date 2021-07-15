@@ -22,21 +22,23 @@
  * SOFTWARE.
  */
 
+@file:Suppress("unused")
+
 package me.dkim19375.bedwars.plugin.util
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.enumclass.ArmorType
 import me.dkim19375.bedwars.plugin.enumclass.ErrorMessages
 import me.dkim19375.bedwars.plugin.enumclass.Permission
-import me.dkim19375.dkim19375core.data.HelpMessage
-import me.dkim19375.dkim19375core.function.filterNonNull
-import me.dkim19375.dkim19375core.function.showHelpMessage
-import me.dkim19375.dkim19375core.javaplugin.CoreJavaPlugin
+import me.dkim19375.dkimbukkitcore.data.HelpMessage
+import me.dkim19375.dkimbukkitcore.function.showHelpMessage
+import me.dkim19375.dkimbukkitcore.javaplugin.CoreJavaPlugin
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.kyori.adventure.title.Title
 import net.kyori.adventure.util.Ticks
 import org.bukkit.Bukkit
+import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.command.CommandSender
@@ -47,7 +49,6 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
 import org.bukkit.permissions.Permissible
 import org.bukkit.plugin.java.JavaPlugin
-import org.bukkit.potion.Potion
 import java.util.*
 import kotlin.math.ceil
 
@@ -131,25 +132,24 @@ fun Permissible.getMaxHelpPages(): Int =
 
 fun PlayerInventory.containsArmor(): ArmorType? = getAllContents()
     .toList()
-    .filterNonNull()
+    .filterNotNull()
     .map(ItemStack::getType)
-    .map(ArmorType::fromMaterial)
-    .filterNonNull()
+    .mapNotNull(ArmorType::fromMaterial)
     .firstOrNull()
 
 fun PlayerInventory.containsTool(): Boolean = getAllContents()
     .toList()
-    .filterNonNull()
+    .filterNotNull()
     .map(ItemStack::getType)
     .any(Material::isTool)
 
 fun PlayerInventory.containsWeapon(): Boolean = getAllContents()
     .toList()
-    .filterNonNull()
+    .filterNotNull()
     .map(ItemStack::getType)
     .any(Material::isWeapon)
 
-fun Set<UUID>.getPlayers(): Set<Player> = map(Bukkit::getPlayer).filterNonNull().toSet()
+fun Set<UUID>.getPlayers(): Set<Player> = mapNotNull(Bukkit::getPlayer).toSet()
 
 fun Set<Player>.getUsernames() = map(Player::getName).toSet()
 
@@ -157,7 +157,7 @@ fun CommandSender.sendMessage(message: ErrorMessages) = sendMessage(message.mess
 
 fun Player.getItemAmount(type: Material): Int {
     var amount = 0
-    val inv = inventory.contents.toList()
+    val inv = inventory.getAllContents().toList()
     for (item in inv) {
         item ?: continue
         if (item.type == type) {
@@ -172,7 +172,13 @@ fun Permissible.hasPermission(permission: Permission) = hasPermission(permission
 fun Player.playSound(sound: Sound, volume: Float = 0.85f, pitch: Float = 1.0f) =
     playSound(location, sound, volume, pitch)
 
-fun PlayerInventory.getAllContents(): Array<ItemStack?> = contents.plus(armorContents)
+fun PlayerInventory.getAllContents(): List<ItemStack?> = (0..39).map(this::getItem)
+
+fun PlayerInventory.setAllContents(items: List<ItemStack?>) {
+    items.forEachIndexed { index, itemStack ->
+        setItem(index, itemStack)
+    }
+}
 
 fun LivingEntity.getLookingAt(distance: Double = 4.0): LivingEntity? =
     getTarget(getNearbyEntities(distance, distance, distance)) as? LivingEntity
@@ -243,11 +249,15 @@ fun Player.giveItem(compareType: Boolean, vararg items: ItemStack?) {
                 newItem = invItem.clone()
             }
         }
+        newItem.amount = item.amount
         inventory.addItem(newItem)
     }
 }
 
+fun Entity.teleportUpdated(location: Location): Boolean = teleport(location.update())
+
 fun PlayerInventory.clearAll() {
-    clear()
-    armorContents = arrayOfNulls(armorContents.size)
+    for (i in 0..39) {
+        setItem(i, ItemStack(Material.AIR))
+    }
 }

@@ -27,7 +27,6 @@ package me.dkim19375.bedwars.plugin.listener
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
-import me.dkim19375.dkim19375core.function.filterNonNull
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -48,7 +47,7 @@ class PartiesListeners(private val plugin: BedwarsPlugin) : Listener {
         val partyPlayer = api.getPartyPlayer(player.uniqueId) ?: return true
         val party = api.getParty(partyPlayer.partyId ?: return true) ?: return true
         val partyPlayers = party.onlineMembers.filter { p -> !game.getPlayersInGame().contains(p.playerUUID) }
-        val players = partyPlayers.map { p -> Bukkit.getPlayer(p.playerUUID ) }.filterNonNull()
+        val players = partyPlayers.mapNotNull { p -> Bukkit.getPlayer(p.playerUUID) }
         if ((players.size + 1) > (game.data.maxPlayers - game.playersInLobby.size)) {
             player.sendMessage("The party is too large to join the game!")
             return false

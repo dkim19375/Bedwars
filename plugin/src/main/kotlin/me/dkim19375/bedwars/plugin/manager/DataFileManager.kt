@@ -89,6 +89,7 @@ class DataFileManager(private val plugin: BedwarsPlugin) {
         return dataSet.toSet()
     }
 
+    @Suppress("unused")
     fun setLobby(location: Location) {
         plugin.dataFile.config.set("lobby", location)
         save = true

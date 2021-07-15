@@ -29,7 +29,6 @@ import me.dkim19375.bedwars.plugin.util.isArmor
 import me.dkim19375.bedwars.plugin.util.isTool
 import me.dkim19375.bedwars.plugin.util.isWeapon
 import me.dkim19375.itemmovedetectionlib.event.InventoryItemTransferEvent
-import me.dkim19375.itemmovedetectionlib.util.TransferType
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -38,10 +37,10 @@ import org.bukkit.inventory.ItemStack
 class ItemTransferListener(private val plugin: BedwarsPlugin) : Listener {
     @EventHandler(ignoreCancelled = true)
     private fun InventoryItemTransferEvent.onTransfer() {
-        if (type != TransferType.PUT_SELF) {
+        if (!type.isFromSelf) {
             return
         }
-        plugin.gameManager.getGame(player)?: return
+        plugin.gameManager.getGame(player) ?: return
         checkSpecialItems()
     }
 

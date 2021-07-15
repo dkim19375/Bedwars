@@ -39,8 +39,8 @@ import me.dkim19375.bedwars.plugin.data.TeamData
 import me.dkim19375.bedwars.plugin.listener.*
 import me.dkim19375.bedwars.plugin.manager.*
 import me.dkim19375.bedwars.plugin.util.logMsg
-import me.dkim19375.dkim19375core.config.ConfigFile
-import me.dkim19375.dkim19375core.javaplugin.CoreJavaPlugin
+import me.dkim19375.dkimbukkitcore.config.ConfigFile
+import me.dkim19375.dkimbukkitcore.javaplugin.CoreJavaPlugin
 import me.dkim19375.itemmovedetectionlib.ItemMoveDetectionLib
 import me.tigerhix.lib.scoreboard.ScoreboardLib
 import org.bukkit.configuration.serialization.ConfigurationSerialization
@@ -49,6 +49,7 @@ import kotlin.system.measureTimeMillis
 
 @Suppress("MemberVisibilityCanBePrivate")
 class BedwarsPlugin : CoreJavaPlugin() {
+    override val defaultConfig: Boolean = false
     lateinit var gameManager: GameManager
         private set
     lateinit var dataFile: ConfigFile
@@ -85,7 +86,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
 
     override fun onEnable() {
         val time = measureTimeMillis {
-            ItemMoveDetectionLib.register()
+            ItemMoveDetectionLib.register(this)
             initVariables()
             registerCommands()
             registerListeners()

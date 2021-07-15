@@ -28,7 +28,6 @@ import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.enumclass.ArmorType
 import me.dkim19375.bedwars.plugin.enumclass.MainShopItems
 import me.dkim19375.bedwars.plugin.util.*
-import me.dkim19375.dkim19375core.function.filterNonNull
 import me.mattstudios.mfgui.gui.components.util.ItemBuilder
 import me.mattstudios.mfgui.gui.guis.Gui
 import me.mattstudios.mfgui.gui.guis.GuiItem
@@ -317,7 +316,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
                     return@asGuiItem
                 }
                 if (item.permanent) {
-                    if (player.inventory.getAllContents().toList().filterNonNull().any { i ->
+                    if (player.inventory.getAllContents().toList().filterNotNull().any { i ->
                             i.type == item.item.material
                         }) {
                         player.sendMessage("${ChatColor.RED}You already have that item!")

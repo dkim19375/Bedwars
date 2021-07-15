@@ -58,6 +58,14 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
         }
         @Suppress("LiftReturnOrAssignment")
         when (args[0].toLowerCase()) {
+            "test" -> {
+                if (sender !is Player) {
+                    sender.sendMessage(ErrorMessages.MUST_BE_PLAYER)
+                    return true
+                }
+                sender.sendMessage("Contents: ${sender.inventory.getAllContents()}")
+                return true
+            }
             "help" -> {
                 if (!sender.hasPermission(Permission.HELP)) {
                     sender.sendMessage(ErrorMessages.NO_PERMISSION)
@@ -236,6 +244,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 game.saveMap()
                 plugin.dataFileManager.setEditing(game.data, false)
                 game.state = GameState.LOBBY
+                (sender as? Player)?.teleport((Bukkit.getWorld("world") ?: Bukkit.getWorlds().first()).spawnLocation)
                 sender.sendMessage("${ChatColor.GREEN}Successfully saved!")
                 return true
             }
@@ -318,7 +327,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 if (sender !is Player) {
                     return true
                 }
-                sender.teleport(game.data.lobby)
+                sender.teleportUpdated(game.data.lobby)
                 return true
             }
             "info" -> {
@@ -683,7 +692,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
             val loc = entity.location.clone()
             loc.yaw = sender.location.getOppositeYaw().yaw
             villagers.add(entity.uniqueId)
-            entity.teleport(if (teleport) sender.location else loc)
+            entity.teleportUpdated(if (teleport) sender.location else loc)
             editor.save()
             for (villager in villagers) {
                 val e = villager.getEntity() ?: continue

@@ -24,6 +24,7 @@
 
 package me.dkim19375.bedwars.plugin.event
 
+import me.dkim19375.dkimcore.annotation.API
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
@@ -33,6 +34,7 @@ import org.bukkit.event.player.PlayerEvent
 class PlayerCoordsChangeEvent(player: Player, val from: Location, val to: Location, private var cancelState: Boolean) : PlayerEvent(player), Cancellable {
     companion object {
         private val HANDLERS = HandlerList()
+        @API
         @JvmStatic
         fun getHandlerList() = HANDLERS
     }

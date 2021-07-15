@@ -29,7 +29,6 @@ import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.enumclass.Team
 import me.dkim19375.bedwars.plugin.enumclass.TrapType
 import me.dkim19375.bedwars.plugin.util.*
-import me.dkim19375.dkim19375core.function.filterNonNull
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.enchantments.Enchantment
@@ -106,7 +105,7 @@ class UpgradesManager(plugin: BedwarsPlugin, val game: BedwarsGame) {
         val team = game.getTeamOfPlayer(player) ?: return
         val sharpness = sharpness.contains(team)
         val protection = protection[team]
-        for (item in player.inventory.getAllContents().toList().filterNonNull()) {
+        for (item in player.inventory.getAllContents().toList().filterNotNull()) {
             item.itemMeta?.let {
                 it.removeItemFlags(*ItemFlag.values())
                 item.itemMeta = it
