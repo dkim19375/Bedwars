@@ -33,7 +33,7 @@ class PlayerQuitListener(private val plugin: BedwarsPlugin) : Listener {
     @EventHandler
     private fun PlayerQuitEvent.onQuit() {
         plugin.gameManager.invisPlayers.remove(player.uniqueId)
-        plugin.gameManager.getGame(player)?: return
-        player.damage(player.maxHealth * 2)
+        val game = plugin.gameManager.getGame(player) ?: return
+        game.leavePlayer(player)
     }
 }
