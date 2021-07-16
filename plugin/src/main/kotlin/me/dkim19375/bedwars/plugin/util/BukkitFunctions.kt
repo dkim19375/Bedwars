@@ -32,6 +32,7 @@ import me.dkim19375.bedwars.plugin.enumclass.ArmorType
 import me.dkim19375.dkimbukkitcore.data.LocationWrapper
 import org.bukkit.*
 import org.bukkit.block.Block
+import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Item
 import org.bukkit.entity.Player
@@ -235,3 +236,5 @@ fun Block.getBedFeet(): Location {
 fun Location.format(): String = "${if (world != null) "world: ${world.name}, " else ""}($x, $y, $z)"
 
 fun LocationWrapper.format(): String = "${"world: ${world.name}, "}($x, $y, $z)"
+
+fun ConfigurationSection.getIntOrNull(path: String): Int? = if (isSet(path) && isInt(path)) getInt(path) else null

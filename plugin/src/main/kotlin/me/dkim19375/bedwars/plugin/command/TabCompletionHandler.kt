@@ -82,7 +82,7 @@ class TabCompletionHandler(private val plugin: BedwarsPlugin) : TabCompleter {
             0 -> return Lists.newArrayList(completesListMap["core"])
             1 -> return getPartial(args[0], completesListMap["core"])
             2 -> {
-                return when (args[0].toLowerCase()) {
+                return when (args[0].lowercase()) {
                     "help" -> getPartial(args[1], getHelpTab(sender))
                     "join" -> getPartial(args[1], getBedwarsGames())
                     "delete" -> getPartial(args[1], getBedwarsGames())
@@ -102,7 +102,7 @@ class TabCompletionHandler(private val plugin: BedwarsPlugin) : TabCompleter {
                 if (!args[0].equals("setup", ignoreCase = true)) {
                     return emptyList()
                 }
-                return when (args[2].toLowerCase()) {
+                return when (args[2].lowercase()) {
                     "shop" -> getPartial(args[3], completesListMap["addRemove"])
                     "upgrades" -> getPartial(args[3], completesListMap["addRemove"])
                     "spawner" -> getPartial(args[3], completesListMap["addRemove"])
@@ -115,23 +115,23 @@ class TabCompletionHandler(private val plugin: BedwarsPlugin) : TabCompleter {
                 if (!args[0].equals("setup", ignoreCase = true)) {
                     return emptyList()
                 }
-                return when (args[2].toLowerCase()) {
+                return when (args[2].lowercase()) {
                     "spawner" -> {
-                        return when (args[3].toLowerCase()) {
+                        return when (args[3].lowercase()) {
                             "remove" -> emptyList()
                             "add" -> getPartial(args[4], completesListMap["spawners"])
                             else -> emptyList()
                         }
                     }
                     "team" -> {
-                        return when (args[3].toLowerCase()) {
+                        return when (args[3].lowercase()) {
                             "add" -> getMissingTeams(sender, args[1])
                             "remove" -> getPartial(args[4], getTeams(sender, args[1]))
                             else -> emptyList()
                         }
                     }
                     "bed" -> {
-                        return when (args[3].toLowerCase()) {
+                        return when (args[3].lowercase()) {
                             "add" -> getMissingTeams(sender, args[1])
                             "remove" -> getPartial(args[4], getTeams(sender, args[1]))
                             else -> emptyList()

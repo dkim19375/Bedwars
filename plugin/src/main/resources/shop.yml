@@ -1,0 +1,360 @@
+# EXAMPLE ITEM
+#
+# example-item:
+#
+#   row: 1
+#   column: 2
+#     OR
+#   slot: 1 (starts at 0)
+#
+#   material: 'POTION'
+#   amount: 2
+#   potion-type: 'STRENGTH' (Only needed if "material" is POTION)
+#   potion-amplifier: 2 (Only needed if "material" is POTION)
+#   enchants: (Optional)
+#     - 'DAMAGE_ALL'
+#   cost: 10
+#   cost-item: 'IRON' (Item category: IRON, GOLD, EMERALD)
+#   display-name: 'Damage Potion' (Optional)
+#   permanent: false (Optional, if true, then you will keep it when you die)
+#   default-on-spawn: false (Optional, if true, then you will get it when you spawn)
+#   item-category: 'POTIONS' (Shop category: BLOCKS, MELEE, ARMOR, TOOLS, RANGED, POTIONS, UTILITY)
+
+wool:
+  slot: 19
+  material: 'WOOL'
+  amount: 16
+  cost: 4
+  cost-item: 'IRON'
+  display-name: 'Wool'
+  item-category: 'BLOCKS'
+
+hardened-clay:
+  slot: 20
+  material: 'HARD_CLAY'
+  amount: 16
+  cost: 12
+  cost-item: 'IRON'
+  display-name: 'Clay'
+  item-category: 'BLOCKS'
+
+blast-proof-glass:
+  slot: 21
+  material: 'GLASS'
+  amount: 4
+  cost: 12
+  cost-item: 'IRON'
+  display-name: 'Blast Proof Glass'
+  item-category: 'BLOCKS'
+
+end-stone:
+  slot: 22
+  material: 'ENDER_STONE'
+  amount: 12
+  cost: 24
+  cost-item: 'IRON'
+  display-name: 'Endstone'
+  item-category: 'BLOCKS'
+
+wood:
+  slot: 23
+  material: 'WOOD'
+  amount: 16
+  cost: 4
+  cost-item: 'GOLD'
+  display-name: 'Wood'
+  item-category: 'BLOCKS'
+
+obsidian:
+  slot: 24
+  material: 'OBSIDIAN'
+  amount: 4
+  cost: 4
+  cost-item: 'EMERALD'
+  display-name: 'Obsidian'
+  item-category: 'BLOCKS'
+
+wood-sword:
+  slot: -1
+  material: 'WOOD_SWORD'
+  amount: 1
+  cost: 0
+  cost-item: 'IRON'
+  display-name: 'Wooden Sword'
+  permanent: true
+  default-on-spawn: true
+  item-category: 'MELEE'
+
+stone-sword:
+  slot: 19
+  material: 'STONE_SWORD'
+  amount: 10
+  cost: 10
+  cost-item: 'IRON'
+  display-name: 'Stone Sword'
+  item-category: 'MELEE'
+
+iron-sword:
+  slot: 20
+  material: 'IRON_SWORD'
+  amount: 1
+  cost: 7
+  cost-item: 'GOLD'
+  display-name: 'Iron Sword'
+  item-category: 'MELEE'
+
+knockback-stick:
+  slot: 21
+  material: 'STICK'
+  amount: 1
+  enchants:
+    - 'KNOCKBACK'
+  cost: 10
+  cost-item: 'GOLD'
+  display-name: 'Stick (Knockback I)'
+  item-category: 'MELEE'
+
+leather-armor:
+  slot: -1
+  material: 'LEATHER_BOOTS'
+  amount: 1
+  cost: 0
+  cost-item: 'IRON'
+  display-name: 'Leather Armor'
+  permanent: true
+  default-on-spawn: true
+  item-category: 'ARMOR'
+
+chain-armor:
+  slot: 19
+  material: 'CHAINMAIL_BOOTS'
+  amount: 1
+  cost: 40
+  cost-item: 'IRON'
+  display-name: 'Chainmail Armor'
+  permanent: true
+  item-category: 'ARMOR'
+
+iron-armor:
+  slot: 20
+  material: 'IRON_BOOTS'
+  amount: 1
+  cost: 12
+  cost-item: 'GOLD'
+  display-name: 'Iron Armor'
+  permanent: true
+  item-category: 'ARMOR'
+
+diamond-armor:
+  slot: 21
+  material: 'DIAMOND_BOOTS'
+  amount: 1
+  cost: 6
+  cost-item: 'EMERALD'
+  display-name: 'Diamond Armor'
+  permanent: true
+  item-category: 'ARMOR'
+
+SHEARS:
+  slot: 19
+  material: 'SHEARS'
+  amount: 1
+  cost: 20
+  cost-item: 'IRON'
+  display-name: 'Shears'
+  permanent: true
+  item-category: 'TOOLS'
+
+wooden-pickaxe:
+  slot: 20
+  material: 'WOOD_PICKAXE'
+  amount: 1
+  cost: 8
+  cost-item: 'IRON'
+  display-name: 'Wooden Pickaxe'
+  permanent: true
+  item-category: 'TOOLS'
+
+stone-pickaxe:
+  slot: 21
+  material: 'STONE_PICKAXE'
+  amount: 1
+  cost: 15
+  cost-item: 'IRON'
+  display-name: 'Stone Pickaxe'
+  item-category: 'TOOLS'
+
+iron-pickaxe:
+  slot: 22
+  material: 'IRON_PICKAXE'
+  amount: 1
+  cost: 4
+  cost-item: 'GOLD'
+  display-name: 'Iron Pickaxe'
+  item-category: 'TOOLS'
+
+diamond-pickaxe:
+  slot: 23
+  material: 'DIAMOND_PICKAXE'
+  amount: 1
+  cost: 8
+  cost-item: 'GOLD'
+  display-name: 'Diamond Pickaxe'
+  item-category: 'TOOLS'
+
+wood-axe:
+  slot: 24
+  material: 'WOOD_AXE'
+  amount: 1
+  cost: 8
+  cost-item: 'IRON'
+  display-name: 'Wooden Axe'
+  permanent: true
+  item-category: 'TOOLS'
+
+stone-axe:
+  slot: 25
+  material: 'STONE_AXE'
+  amount: 1
+  cost: 15
+  cost-item: 'IRON'
+  display-name: 'Stone Axe'
+  item-category: 'TOOLS'
+
+iron-axe:
+  slot: 28
+  material: 'IRON_AXE'
+  amount: 1
+  cost: 4
+  cost-item: 'GOLD'
+  display-name: 'Iron Axe'
+  item-category: 'TOOLS'
+
+
+diamond-axe:
+  slot: 29
+  material: 'DIAMOND_AXE'
+  amount: 1
+  cost: 8
+  cost-item: 'GOLD'
+  display-name: 'Diamond Axe'
+  item-category: 'TOOLS'
+
+arrow:
+  slot: 19
+  material: 'ARROW'
+  amount: 8
+  cost: 2
+  cost-item: 'GOLD'
+  display-name: 'Arrow'
+  item-category: 'RANGED'
+
+bow:
+  slot: 20
+  material: 'BOW'
+  amount: 1
+  cost: 12
+  cost-item: 'GOLD'
+  display-name: 'Bow'
+  item-category: 'RANGED'
+
+power-bow:
+  slot: 21
+  material: 'BOW'
+  amount: 1
+  enchants:
+    - 'ARROW_DAMAGE'
+  cost: 24
+  cost-item: 'GOLD'
+  display-name: 'Bow (Power I)'
+  item-category: 'RANGED'
+
+punch-bow:
+  slot: 22
+  material: 'BOW'
+  amount: 1
+  enchants:
+    - 'ARROW_DAMAGE'
+    - 'ARROW_KNOCKBACK'
+  cost: 6
+  cost-item: 'EMERALD'
+  display-name: 'Bow (Power I, Punch I)'
+  item-category: 'RANGED'
+
+speed:
+  slot: 19
+  material: 'POTION'
+  amount: 1
+  potion-type: 'SPEED'
+  potion-amplifier: 2
+  cost: 1
+  cost-item: 'EMERALD'
+  display-name: 'Speed II Potion'
+  item-category: 'POTIONS'
+
+jump:
+  slot: 20
+  material: 'POTION'
+  amount: 1
+  potion-type: 'JUMP'
+  potion-amplifier: 5
+  cost: 1
+  cost-item: 'EMERALD'
+  display-name: 'Jump V Potion'
+  item-category: 'POTIONS'
+
+invisibility:
+    slot: 21
+    material: 'POTION'
+    amount: 1
+    potion-type: 'INVISIBILITY'
+    potion-amplifier: 1
+    cost: 2
+    cost-item: 'EMERALD'
+    display-name: 'Invisibility Potion'
+    item-category: 'POTIONS'
+
+pearl:
+  slot: 19
+  material: 'ENDER_PEARL'
+  amount: 1
+  cost: 4
+  cost-item: 'EMERALD'
+  display-name: 'Ender Pearl'
+  item-category: 'UTILITY'
+
+golden-apple:
+  slot: 20
+  material: 'GOLDEN_APPLE'
+  amount: 1
+  cost: 3
+  cost-item: 'GOLD'
+  display-name: 'GOLDEN_APPLE'
+  type: 'UTILITY'
+
+fireball:
+  slot: 21
+  material: 'FIREBALL'
+  amount: 1
+  cost: 40
+  cost-item: 'IRON'
+  display-name: 'FIREBALL'
+  item-category: 'UTILITY'
+
+TNT:
+  slot: 22
+  material: 'TNT'
+  amount: 1
+  cost: 4
+  cost-item: 'GOLD'
+  display-name: 'TNT'
+  item-category: 'UTILITY'
+
+water-bucket:
+  slot: 23
+  material: 'WATER_BUCKET'
+  amount: 1
+  cost: 1
+  cost-item: 'EMERALD'
+  display-name: 'Water Bucket'
+  item-category: 'UTILITY'

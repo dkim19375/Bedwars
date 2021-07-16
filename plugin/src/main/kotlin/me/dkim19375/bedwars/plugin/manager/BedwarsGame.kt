@@ -27,9 +27,13 @@ package me.dkim19375.bedwars.plugin.manager
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.GameData
 import me.dkim19375.bedwars.plugin.data.PlayerData
-import me.dkim19375.bedwars.plugin.enumclass.*
+import me.dkim19375.bedwars.plugin.enumclass.ArmorType
+import me.dkim19375.bedwars.plugin.enumclass.GameState
+import me.dkim19375.bedwars.plugin.enumclass.Team
+import me.dkim19375.bedwars.plugin.enumclass.getColored
 import me.dkim19375.bedwars.plugin.util.*
 import me.dkim19375.dkimbukkitcore.data.LocationWrapper
+import me.dkim19375.dkimbukkitcore.function.logInfo
 import org.apache.commons.io.FileUtils
 import org.bukkit.*
 import org.bukkit.entity.Player
@@ -77,7 +81,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         }
         state = GameState.STARTING
         countdown = 10
-        logMsg("Game ${data.world.name} is starting!")
+        logInfo("Game ${data.world.name} is starting!")
         task?.cancel()
         plugin.scoreboardManager.update(this)
         val game = this
@@ -229,9 +233,6 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         if (playersInLobby.size >= data.maxPlayers) {
             return Result.TOO_MANY_PLAYERS
         }
-        if (!plugin.partiesListeners.onGameJoin(player, this)) {
-            return Result.TOO_MANY_PLAYERS
-        }
         playersInLobby.add(player.uniqueId)
         broadcast("${player.displayName}${ChatColor.GREEN} has joined the game! ${playersInLobby.size}/${data.maxPlayers}")
         val lobby = plugin.dataFileManager.getLobby()
@@ -299,6 +300,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     fun giveItems(player: Player, items: List<ItemStack?>?, team: Team) {
+        val configManager = plugin.configManager
         var armorType: ArmorType = ArmorType.LEATHER
         var addPick = false
         var addAxe = false
@@ -323,19 +325,27 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
                 armorType = armor
             }
         }
-        player.inventory.addItem(MainShopItems.WOOD_SWORD.item.toItemStack(team.color))
+        configManager.getItemFromMaterial(Material.WOOD_SWORD)?.item?.toItemStack(team.color)?.let {
+            player.inventory.addItem(it)
+        }
         player.inventory.helmet = team.getColored(ItemStack(Material.LEATHER_HELMET))
         player.inventory.chestplate = team.getColored(ItemStack(Material.LEATHER_CHESTPLATE))
         player.inventory.leggings = team.getColored(ItemStack(armorType.leggings))
         player.inventory.boots = team.getColored(ItemStack(armorType.boots))
         if (addPick) {
-            player.inventory.addItem(MainShopItems.WOOD_PICK.item.toItemStack(team.color))
+            configManager.getItemFromMaterial(Material.WOOD_PICKAXE)?.item?.toItemStack(team.color)?.let {
+                player.inventory.addItem(it)
+            }
         }
         if (addAxe) {
-            player.inventory.addItem(MainShopItems.WOOD_AXE.item.toItemStack(team.color))
+            configManager.getItemFromMaterial(Material.WOOD_AXE)?.item?.toItemStack(team.color)?.let {
+                player.inventory.addItem(it)
+            }
         }
         if (addShears) {
-            player.inventory.addItem(MainShopItems.SHEARS.item.toItemStack(team.color))
+            configManager.getItemFromMaterial(Material.SHEARS)?.item?.toItemStack(team.color)?.let {
+                player.inventory.addItem(it)
+            }
         }
         upgradesManager.applyUpgrades(player)
     }

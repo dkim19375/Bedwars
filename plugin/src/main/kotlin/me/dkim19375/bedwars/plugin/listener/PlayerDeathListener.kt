@@ -28,7 +28,7 @@ import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.util.dropItem
 import me.dkim19375.bedwars.plugin.util.isWeapon
-import me.dkim19375.bedwars.plugin.util.logMsg
+import me.dkim19375.dkimbukkitcore.function.logInfo
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -53,13 +53,13 @@ class PlayerDeathListener(private val plugin: BedwarsPlugin) : Listener {
         newDrops.removeIf { item ->
             item.type.isWeapon()
         }
-        logMsg("drops: $newDrops")
+        logInfo("drops: $newDrops")
         val killer = entity.killer
         killer?.inventory?.let {
             it.addItem(*newDrops.toTypedArray())
-            logMsg("added $newDrops to player inventory!")
+            logInfo("added $newDrops to player inventory!")
         }
-        killer ?: logMsg("killer is null!")
+        killer ?: logInfo("killer is null!")
         killer ?: newDrops.forEach { drop -> location.dropItem(drop) }
         game.playerKilled(entity, originalDrops)
     }

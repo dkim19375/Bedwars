@@ -26,9 +26,10 @@ package me.dkim19375.bedwars.plugin.manager
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.GameData
-import me.dkim19375.bedwars.plugin.enumclass.MainShopItems
+import me.dkim19375.bedwars.plugin.data.MainShopConfigItem
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.plugin.java.JavaPlugin
 import java.util.*
 
 class DataFileManager(private val plugin: BedwarsPlugin) {
@@ -45,11 +46,15 @@ class DataFileManager(private val plugin: BedwarsPlugin) {
         }
     }
 
-    fun getQuickBuySlot(slot: Int, player: UUID): MainShopItems? {
-        return MainShopItems.fromString(plugin.dataFile.config.getString("$player.shop.quick-buy.$slot"))
+    fun getQuickBuySlot(slot: Int, player: UUID): MainShopConfigItem? {
+        return JavaPlugin.getPlugin(BedwarsPlugin::class.java).configManager.getItemFromName(
+            plugin.dataFile.config.getString(
+                "$player.shop.quick-buy.$slot"
+            )
+        )
     }
 
-    fun setQuickBuySlot(slot: Int, player: UUID, item: MainShopItems?) {
+    fun setQuickBuySlot(slot: Int, player: UUID, item: MainShopConfigItem?) {
         if (item == null) {
             plugin.dataFile.config.set("$player.shop.quick-buy.$slot", null)
             save = true

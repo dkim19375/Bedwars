@@ -57,7 +57,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
             return true
         }
         @Suppress("LiftReturnOrAssignment")
-        when (args[0].toLowerCase()) {
+        when (args[0].lowercase()) {
             "test" -> {
                 if (sender !is Player) {
                     sender.sendMessage(ErrorMessages.MUST_BE_PLAYER)
@@ -87,7 +87,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 }
                 val player = sender as Player
                 val sound: Sound = try {
-                    Sound.valueOf(args[1].toUpperCase())
+                    Sound.valueOf(args[1].lowercase())
                 } catch (_: IllegalArgumentException) {
                     player.sendMessage(ErrorMessages.INVALID_ARG)
                     return true
@@ -397,7 +397,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                     player.sendMessage("${ChatColor.RED}You must be in the same world as the arena!")
                     return true
                 }
-                when (args[2].toLowerCase()) {
+                when (args[2].lowercase()) {
                     "ready" -> {
                         val buildStatus = editor.data.canBuild()
                         if (buildStatus.isEmpty()) {

@@ -32,14 +32,15 @@ import com.onarandombox.MultiverseCore.api.MVWorldManager
 import de.tr7zw.nbtinjector.NBTInjector
 import me.dkim19375.bedwars.plugin.command.MainCommand
 import me.dkim19375.bedwars.plugin.command.TabCompletionHandler
+import me.dkim19375.bedwars.plugin.config.ConfigManager
 import me.dkim19375.bedwars.plugin.data.BedData
 import me.dkim19375.bedwars.plugin.data.GameData
 import me.dkim19375.bedwars.plugin.data.SpawnerData
 import me.dkim19375.bedwars.plugin.data.TeamData
 import me.dkim19375.bedwars.plugin.listener.*
 import me.dkim19375.bedwars.plugin.manager.*
-import me.dkim19375.bedwars.plugin.util.logMsg
 import me.dkim19375.dkimbukkitcore.config.ConfigFile
+import me.dkim19375.dkimbukkitcore.function.logInfo
 import me.dkim19375.dkimbukkitcore.javaplugin.CoreJavaPlugin
 import me.dkim19375.itemmovedetectionlib.ItemMoveDetectionLib
 import me.tigerhix.lib.scoreboard.ScoreboardLib
@@ -49,7 +50,8 @@ import kotlin.system.measureTimeMillis
 
 @Suppress("MemberVisibilityCanBePrivate")
 class BedwarsPlugin : CoreJavaPlugin() {
-    override val defaultConfig: Boolean = false
+    val configManager = ConfigManager(this)
+    val shopFile = ConfigFile(this, "shop.yml")
     lateinit var gameManager: GameManager
         private set
     lateinit var dataFile: ConfigFile
@@ -81,7 +83,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
             NBTInjector.inject()
             ScoreboardLib.setPluginInstance(this)
         }
-        logMsg("Successfully loaded (not enabled) ${description.name} v${description.version} in ${time}ms!")
+        logInfo("Successfully loaded (not enabled) ${description.name} v${description.version} in ${time}ms!")
     }
 
     override fun onEnable() {
@@ -92,8 +94,9 @@ class BedwarsPlugin : CoreJavaPlugin() {
             registerListeners()
             reloadConfig()
             packetManager.addListeners()
+            configManager.update()
         }
-        logMsg("Successfully enabled ${description.name} v${description.version} in ${time}ms!")
+        logInfo("Successfully enabled ${description.name} v${description.version} in ${time}ms!")
     }
 
     override fun onDisable() {
@@ -105,11 +108,13 @@ class BedwarsPlugin : CoreJavaPlugin() {
         dataFile.save()
         serializable.reversed().forEach(ConfigurationSerialization::unregisterClass)
         unregisterConfig(dataFile)
+        unregisterConfig(shopFile)
     }
 
     override fun reloadConfig() {
         super.reloadConfig()
         gameManager.reloadData()
+        configManager.update()
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -120,31 +125,32 @@ class BedwarsPlugin : CoreJavaPlugin() {
                 return
             }
             val plugin = (it as? T) ?: let {
-                logMsg("Could not hook into $name!")
+                logInfo("Could not hook into $name!")
                 return
             }
             if (plugin.isEnabled) {
                 api(plugin)
-                logMsg("Hooked onto $name!")
+                logInfo("Hooked onto $name!")
             } else {
-                logMsg("Could not hook into $name!")
+                logInfo("Could not hook into $name!")
             }
-        } ?: logMsg("Could not hook into $name!")
+        } ?: logInfo("Could not hook into $name!")
     }
 
     private fun initVariables() {
         protocolLibSupport = try {
             Class.forName("com.comphenix.protocol.ProtocolLibrary")
-            logMsg("Hooked onto ProtocolLib")
+            logInfo("Hooked onto ProtocolLib")
             true
         } catch (e: ClassNotFoundException) {
-            logMsg("Could not hook onto ProtocolLib!")
+            logInfo("Could not hook onto ProtocolLib!")
             false
         }
         hookOntoLib("Parties", false) { _: BedwarsPlugin -> partiesAPI = Parties.getApi() }
         hookOntoLib("Multiverse-Core") { pl: MultiverseCore -> worldManager = pl.mvWorldManager }
         dataFile = ConfigFile(this, "data.yml")
         registerConfig(dataFile)
+        registerConfig(shopFile)
         dataFileManager = DataFileManager(this)
         gameManager = GameManager(this)
         scoreboardManager = ScoreboardManager(this)

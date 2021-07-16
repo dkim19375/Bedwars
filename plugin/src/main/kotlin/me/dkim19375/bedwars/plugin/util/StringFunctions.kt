@@ -24,20 +24,11 @@
 
 package me.dkim19375.bedwars.plugin.util
 
-import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import org.apache.commons.lang.StringUtils
 import org.bukkit.ChatColor
-import org.bukkit.plugin.java.JavaPlugin
-import java.util.logging.Level
-
-private val plugin: BedwarsPlugin by lazy { JavaPlugin.getPlugin(BedwarsPlugin::class.java) }
 
 fun String.setGray(): String {
     return "${ChatColor.GRAY}$this"
 }
 
-fun String.log(level: Level = Level.INFO) = plugin.logger.log(level, this)
-
-fun logMsg(msg: String, level: Level = Level.INFO) = msg.log(level)
-
-fun String.capAndFormat(): String = StringUtils.capitalize(this.toLowerCase().replace("_", " "))
+fun String.capAndFormat(): String = StringUtils.capitalize(this.lowercase().replace("_", " "))

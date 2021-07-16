@@ -25,8 +25,8 @@
 package me.dkim19375.bedwars.plugin.gui
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
+import me.dkim19375.bedwars.plugin.data.MainShopConfigItem
 import me.dkim19375.bedwars.plugin.enumclass.ArmorType
-import me.dkim19375.bedwars.plugin.enumclass.MainShopItems
 import me.dkim19375.bedwars.plugin.util.*
 import me.mattstudios.mfgui.gui.components.util.ItemBuilder
 import me.mattstudios.mfgui.gui.guis.Gui
@@ -40,9 +40,10 @@ import org.bukkit.inventory.ItemStack
 
 @Suppress("MemberVisibilityCanBePrivate")
 class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin) {
+    private val configManager = plugin.configManager
     val menu = Gui(6, "Quick Buy")
     var isSettingQuickBuy = false
-    lateinit var quickBuyItem: MainShopItems
+    lateinit var quickBuyItem: MainShopConfigItem
 
     private fun reset() {
         for (i in 0..53) {
@@ -145,11 +146,11 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
                 }
                 it.isCancelled = true
             }
-        return formatItem(item)
+        return formatItem(item, true)
             .addLore("${ChatColor.AQUA}Sneak Click to remove from Quick Buy!")
             .asGuiItem { event ->
                 event.isCancelled = true
-                item.type.getShowMethod()
+                item.itemCategory.getShowMethod()
                 val player = event.view.player as? Player ?: return@asGuiItem
                 if (isSettingQuickBuy) {
                     quickBuyAction(player)
@@ -167,15 +168,15 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
             }
     }
 
-    private fun givePlayerItem(item: MainShopItems) {
+    private fun givePlayerItem(item: MainShopConfigItem) {
         val game = plugin.gameManager.getGame(player) ?: return
-        if (item.type == ItemType.ARMOR) {
+        if (item.itemCategory == ItemType.ARMOR) {
             if (player.inventory.hasArmor(ArmorType.fromMaterial(item.item.material))) {
                 player.sendMessage("${ChatColor.RED}You already have this!")
                 player.playErrorSound()
                 return
             }
-            player.inventory.removeItem(ItemStack(item.costType.material, item.costAmount))
+            player.inventory.removeItem(ItemStack(item.costItem.material, item.cost))
             player.sendMessage("${ChatColor.GREEN}Successfully bought ${item.displayname}!")
             val armorType = ArmorType.fromMaterial(item.item.material) ?: return
             player.inventory.boots = ItemStack(armorType.boots)
@@ -189,7 +190,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
             player.playErrorSound()
             return
         }
-        player.inventory.removeItem(ItemStack(item.costType.material, item.costAmount))
+        player.inventory.removeItem(ItemStack(item.costItem.material, item.cost))
         val team = plugin.gameManager.getTeamOfPlayer(player)
         player.sendMessage("${ChatColor.GREEN}Successfully bought ${item.displayname}!")
         removeSword(item.item.material)
@@ -216,14 +217,14 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
         return amount
     }
 
-    private fun formatItem(item: MainShopItems): ItemBuilder {
+    private fun formatItem(item: MainShopConfigItem, quickBuy: Boolean = false): ItemBuilder {
         val team = plugin.gameManager.getTeamOfPlayer(player)
         val itemstack = item.item.toItemStack(team?.color)
-        val amount = player.getItemAmount(item.costType.material)
+        val amount = player.getItemAmount(item.costItem.material)
         val builder: ItemBuilder
         val loreToAdd = mutableListOf(
             "${ChatColor.GRAY}Cost: " +
-                    "${item.costType.color}${item.costAmount} ${item.costType.displayname}",
+                    "${item.costItem.color}${item.cost} ${item.costItem.displayname}",
             " "
         )
         if (item.permanent) {
@@ -244,13 +245,15 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
                 )
             )
         }
-        loreToAdd.addAll(
-            listOf(
-                "${ChatColor.AQUA}Sneak Click to add to Quick Buy",
-                " "
+        if (!quickBuy) {
+            loreToAdd.addAll(
+                listOf(
+                    "${ChatColor.AQUA}Sneak Click to add to Quick Buy",
+                    " "
+                )
             )
-        )
-        builder = if (amount >= item.costAmount) {
+        }
+        builder = if (amount >= item.cost) {
             ItemBuilder.from(itemstack)
                 .setName("${ChatColor.GREEN}${item.displayname}")
                 .addLore(*loreToAdd.toTypedArray())
@@ -259,7 +262,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
             ItemBuilder.from(itemstack)
                 .setName("${ChatColor.RED}${item.displayname}")
                 .addLore(*loreToAdd.toTypedArray())
-                .addLore("${ChatColor.RED}You do not have enough ${item.costType.color}${item.costType.displayname}!")
+                .addLore("${ChatColor.RED}You do not have enough ${item.costItem.color}${item.costItem.displayname}!")
         }
         if (getRemainingQuickSlots() < 1) {
             return builder
@@ -267,15 +270,15 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
         return builder.addLore("")
     }
 
-    private fun onClick(item: MainShopItems, event: InventoryClickEvent, menuAction: (MainShopGUI) -> Unit) {
+    private fun onClick(item: MainShopConfigItem, event: InventoryClickEvent, menuAction: (MainShopGUI) -> Unit) {
         event.isCancelled = true
         if (isSettingQuickBuy) {
             return
         }
         menuAction(this)
-        val playerCostAmount = player.getItemAmount(item.costType.material)
-        if (playerCostAmount < item.costAmount) {
-            player.sendMessage("${ChatColor.RED}You need ${item.costAmount - playerCostAmount} more ${item.costType.displayname}!")
+        val playerCostAmount = player.getItemAmount(item.costItem.material)
+        if (playerCostAmount < item.cost) {
+            player.sendMessage("${ChatColor.RED}You need ${item.cost - playerCostAmount} more ${item.costItem.displayname}!")
             player.playErrorSound()
             return
         }
@@ -286,21 +289,15 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
         reset()
         setTopRow()
         putGreenGlass(col + 1)
-        for (item in MainShopItems.values()) {
+        for (item in configManager.getByType(type)) {
             if (item.defaultOnSpawn) {
-                continue
-            }
-            if (item.type != type) {
                 continue
             }
             menu.setItem(item.slot, formatItem(item).asGuiItem {
                 it.isCancelled = true
                 if (it.isShiftClick) {
                     if (getBuySlots().none { i ->
-                            plugin.dataFileManager.getQuickBuySlot(
-                                i,
-                                player.uniqueId
-                            ) == null
+                            plugin.dataFileManager.getQuickBuySlot(i, player.uniqueId) == null
                         }) {
                         player.sendMessage("${ChatColor.RED}You have no available Quick Buy slots!")
                         return@asGuiItem
@@ -323,7 +320,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
                         return@asGuiItem
                     }
                 }
-                onClick(item, it, item.type.getShowMethod())
+                onClick(item, it, item.itemCategory.getShowMethod())
             })
         }
         menu.updateTitle(name)
@@ -396,6 +393,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
         }
     }
 
+    @Suppress("unused") // the enum values are still being used, but not the value names ("IRON", "GOLD", etc)
     enum class CostType(val material: Material, val color: ChatColor, val displayname: String) {
         IRON(Material.IRON_INGOT, ChatColor.WHITE, "Iron"),
         GOLD(Material.GOLD_INGOT, ChatColor.GOLD, "Gold"),
