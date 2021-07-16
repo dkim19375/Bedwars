@@ -87,6 +87,12 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         val game = this
         task = object : BukkitRunnable() {
             override fun run() {
+                if (!force && playersInLobby.size < data.minPlayers) {
+                    broadcast("${ChatColor.RED}Start cancelled - not enough players!")
+                    state = GameState.LOBBY
+                    cancel()
+                    return
+                }
                 if (countdown < 1) {
                     broadcast("${ChatColor.AQUA}The game started!")
                     cancel()
@@ -172,7 +178,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
 
     fun isEditing() = plugin.dataFileManager.isEditing(data)
 
-    fun canStart(force: Boolean): Result {
+    fun canStart(force: Boolean = false): Result {
         update()
         if (isRunning()) {
             return Result.GAME_RUNNING
