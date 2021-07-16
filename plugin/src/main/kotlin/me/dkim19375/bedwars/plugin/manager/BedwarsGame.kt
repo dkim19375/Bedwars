@@ -279,6 +279,9 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         object : BukkitRunnable() {
             var countDown = 5
             override fun run() {
+                if (!getPlayersInGame().contains(player.uniqueId)) {
+                    return
+                }
                 if (countDown <= 0) {
                     player.teleportUpdated(teamData.spawn)
                     player.gameMode = GameMode.SURVIVAL
