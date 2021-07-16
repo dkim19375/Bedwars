@@ -94,7 +94,6 @@ class BedwarsPlugin : CoreJavaPlugin() {
             registerListeners()
             reloadConfig()
             packetManager.addListeners()
-            configManager.update()
         }
         logInfo("Successfully enabled ${description.name} v${description.version} in ${time}ms!")
     }
@@ -118,7 +117,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun <T : Plugin> hookOntoLib(name: String, getPlugin: Boolean = true, api: (T) -> Unit) {
+    private fun <T : Plugin> hookOntoLib(name: String, getPlugin: Boolean = true, api: (T) -> Unit) =
         server.pluginManager.getPlugin(name)?.let {
             if (!getPlugin) {
                 api(this as T)
@@ -131,21 +130,13 @@ class BedwarsPlugin : CoreJavaPlugin() {
             if (plugin.isEnabled) {
                 api(plugin)
                 logInfo("Hooked onto $name!")
-            } else {
-                logInfo("Could not hook into $name!")
+                return@let
             }
+            logInfo("Could not hook into $name!")
         } ?: logInfo("Could not hook into $name!")
-    }
 
     private fun initVariables() {
-        protocolLibSupport = try {
-            Class.forName("com.comphenix.protocol.ProtocolLibrary")
-            logInfo("Hooked onto ProtocolLib")
-            true
-        } catch (e: ClassNotFoundException) {
-            logInfo("Could not hook onto ProtocolLib!")
-            false
-        }
+        hookOntoLib("ProtocolLib", false) { _: BedwarsPlugin -> protocolLibSupport = true }
         hookOntoLib("Parties", false) { _: BedwarsPlugin -> partiesAPI = Parties.getApi() }
         hookOntoLib("Multiverse-Core") { pl: MultiverseCore -> worldManager = pl.mvWorldManager }
         dataFile = ConfigFile(this, "data.yml")

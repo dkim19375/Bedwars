@@ -5,20 +5,21 @@ plugins {
     id 'net.minecrell.licenser' version '0.4.1'
 }
 
-final def DEBUG = true
+final def DEBUG = false
 final def basePackage = 'me.dkim19375.bedwars.libs'
 
 shadowJar {
     if (!DEBUG) {
         relocate("kotlin", "${basePackage}.kotlin")
+        relocate("net.kyori", "${basePackage}.kyori")
         relocate("me.mattstudios.mfgui", "${basePackage}.mfgui")
+        relocate("me.dkim19375.dkimcore", "${basePackage}.dkimcore")
         relocate("de.tr7zw.changeme.nbtapi", "${basePackage}.nbtapi")
         relocate("de.tr7zw.nbtinjector", "${basePackage}.nbtinjector")
-        relocate("net.kyori", "${basePackage}.kyori")
-        relocate("org.apache", "${basePackage}.apache")
+        relocate("org.apache.commons.io", "${basePackage}.commons.io")
         relocate("me.tigerhix.lib.scoreboard", "${basePackage}.scoreboard")
-        relocate("me.dkim19375.dkim19375core", "${basePackage}.dkim19375core")
         relocate("me.katsumag.itemactionslib", "${basePackage}.itemactionslib")
+        relocate("me.dkim19375.dkimbukkitcore", "${basePackage}.dkimbukkitcore")
         relocate("me.dkim19375.itemmovedetectionlib", "${basePackage}.itemmovedetectionlib")
     }
 }
@@ -28,6 +29,8 @@ static def addRepositories(Project project) {
         mavenCentral()
         maven { url = 'https://jitpack.io' }
         maven { url = 'https://repo.alessiodp.com/releases/' }
+        maven { url = 'https://repo.essentialsx.net/releases/' }
+        maven { url = 'https://repo.essentialsx.net/snapshots/' }
         maven { url = 'https://repo.mattstudios.me/artifactory/public' }
         maven { url = 'https://repo.codemc.org/repository/maven-public/' }
         maven { url = 'https://repo.dmulloy2.net/nexus/repository/public/' }

@@ -39,9 +39,6 @@ class ConfigManager(private val plugin: BedwarsPlugin) {
                 set.add(i)
             }
         }
-        println("all items: ${mainItems.map(MainShopConfigItem::name).joinToString(", ")}")
-        println("-----------------------------------------------------------")
-        println("type of ${type.name}: ${set.map(MainShopConfigItem::name).joinToString(", ")}")
         return set.toSet()
     }
 }

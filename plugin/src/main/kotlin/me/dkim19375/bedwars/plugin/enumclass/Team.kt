@@ -40,7 +40,7 @@ enum class Team(val color: DyeColor, val chatColor: ChatColor, val displayName: 
         fun fromString(str: String?): Team? {
             str ?: return null
             return try {
-                valueOf(str.toUpperCase())
+                valueOf(str.uppercase())
             } catch (_: IllegalArgumentException) {
                 return null
             }

@@ -95,7 +95,7 @@ class ScoreboardManager(private val plugin: BedwarsPlugin) : ScoreboardHandler, 
         for (data in game.data.teams) {
             val team = data.team
             val stringBuilder = StringBuilder(team.chatColor.toString())
-            stringBuilder.append(team.name[0].toString().toUpperCase())
+            stringBuilder.append(team.name[0].toString().uppercase())
                 .append(" ${ChatColor.WHITE}${team.displayName}: ")
             if (game.getPlayersInTeam(team).isEmpty()) {
                 stringBuilder.append("${ChatColor.RED}${ChatColor.BOLD}\u3024")

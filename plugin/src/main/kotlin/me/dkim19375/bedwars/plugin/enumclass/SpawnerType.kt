@@ -44,7 +44,7 @@ enum class SpawnerType(val material: Material, val maxAmount: Int, val delayFirs
         fun fromString(str: String?): SpawnerType? {
             str ?: return null
             return try {
-                valueOf(str.toUpperCase())
+                valueOf(str.uppercase())
             } catch (_: IllegalArgumentException) {
                 return null
             }
