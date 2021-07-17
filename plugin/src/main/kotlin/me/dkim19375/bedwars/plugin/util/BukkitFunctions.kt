@@ -238,3 +238,8 @@ fun Location.format(): String = "${if (world != null) "world: ${world.name}, " e
 fun LocationWrapper.format(): String = "${"world: ${world.name}, "}($x, $y, $z)"
 
 fun ConfigurationSection.getIntOrNull(path: String): Int? = if (isSet(path) && isInt(path)) getInt(path) else null
+
+@Suppress("UNUSED_PARAMETER") // temp
+fun World.kickPlayer(player: Player, useLobby: Boolean = false) {
+
+}

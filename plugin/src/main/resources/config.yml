@@ -1,1 +1,2 @@
 use-main-lobby: true
+kick-world: 'world' # Used when kicking players out of the world if use-main-lobby is false or there is no lobby set

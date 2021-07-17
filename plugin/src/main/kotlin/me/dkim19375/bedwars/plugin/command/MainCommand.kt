@@ -241,10 +241,22 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
             }
             "save" -> {
                 val game = hasPermissionAndValidGame(sender, command, label, args) ?: return true
+                (sender as? Player)?.let {
+                    val loc = plugin.gameManager.builderLocations[sender.uniqueId]
+                    if (loc != null) {
+                        sender.teleport(loc)
+                        return@let
+                    }
+                    val worldManager = plugin.worldManager
+                    if (worldManager != null) {
+                        worldManager.removePlayersFromWorld(game.data.world.name)
+                        return@let
+                    }
+
+                }
                 game.saveMap()
                 plugin.dataFileManager.setEditing(game.data, false)
                 game.state = GameState.LOBBY
-                (sender as? Player)?.teleport((Bukkit.getWorld("world") ?: Bukkit.getWorlds().first()).spawnLocation)
                 sender.sendMessage("${ChatColor.GREEN}Successfully saved!")
                 return true
             }
@@ -327,6 +339,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 if (sender !is Player) {
                     return true
                 }
+                plugin.gameManager.builderLocations[sender.uniqueId] = sender.location.clone()
                 sender.teleportUpdated(game.data.lobby)
                 return true
             }
