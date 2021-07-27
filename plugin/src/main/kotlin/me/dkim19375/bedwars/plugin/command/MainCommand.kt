@@ -63,7 +63,8 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                     sender.sendMessage(ErrorMessages.MUST_BE_PLAYER)
                     return true
                 }
-                sender.sendMessage("Contents: ${sender.inventory.getAllContents()}")
+                sender.sendMessage("block: ${sender.getTargetBlock(setOf<Material>(), 5).state.getConfigItem() != null}, " +
+                        "item: ${sender.itemInHand?.getConfigItem() != null}")
                 return true
             }
             "help" -> {

@@ -87,6 +87,11 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         val game = this
         task = object : BukkitRunnable() {
             override fun run() {
+                if (task == null) {
+                    state = GameState.LOBBY
+                    cancel()
+                    return
+                }
                 if (!force && playersInLobby.size < data.minPlayers) {
                     broadcast("${ChatColor.RED}Start cancelled - not enough players!")
                     state = GameState.LOBBY
@@ -180,11 +185,8 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
 
     fun canStart(force: Boolean = false): Result {
         update()
-        if (isRunning()) {
+        if (GameState.STARTED == state) {
             return Result.GAME_RUNNING
-        }
-        if (plugin.gameManager.isGameRunning(data.world)) {
-            return Result.GAME_IN_WORLD
         }
         if (!force && playersInLobby.size < data.minPlayers) {
             return Result.NOT_ENOUGH_PLAYERS
@@ -194,8 +196,6 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         }
         return Result.SUCCESS
     }
-
-    fun isRunning() = state.running
 
     fun update() {
         if (state != GameState.STARTED) {
@@ -231,7 +231,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
 
     fun addPlayer(player: Player): Result {
         if (state != GameState.LOBBY && state != GameState.STARTING) {
-            if (isRunning()) {
+            if (state == GameState.STARTED) {
                 return Result.GAME_RUNNING
             }
             return Result.GAME_STOPPED
@@ -263,7 +263,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             }
             return
         }
-        if (!isRunning()) {
+        if (state != GameState.STARTED) {
             return
         }
         for (uuid in players.values.getCombinedValues()) {
@@ -517,7 +517,6 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         SUCCESS("Successful!"),
         GAME_RUNNING("The game is currently running!"),
         GAME_STOPPED("The game is not running!"),
-        GAME_IN_WORLD("The game is in the same world!"),
         NOT_ENOUGH_PLAYERS("Not enough players!"),
         REGENERATING_WORLD("The game world is regenerating!"),
         TOO_MANY_PLAYERS("Too many players!")

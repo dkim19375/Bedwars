@@ -182,7 +182,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
             player.inventory.boots = ItemStack(armorType.boots)
             player.inventory.leggings = ItemStack(armorType.leggings)
             game.upgradesManager.applyUpgrades(player)
-            player.playErrorSound()
+            player.playBoughtSound()
             return
         }
         if (player.inventory.hasItem(item.item.material) && (item.permanent || item.defaultOnSpawn)) {
@@ -194,7 +194,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
         val team = plugin.gameManager.getTeamOfPlayer(player)
         player.sendMessage("${ChatColor.GREEN}Successfully bought ${item.displayname}!")
         removeSword(item.item.material)
-        player.giveItem(true, item.item.toItemStack(team?.color))
+        player.giveItem(item.item.toItemStack(team?.color))
         player.playBoughtSound()
         game.upgradesManager.applyUpgrades(player)
     }

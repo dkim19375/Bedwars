@@ -27,7 +27,10 @@ package me.dkim19375.bedwars.plugin.data
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.gui.MainShopGUI
 import me.dkim19375.bedwars.plugin.util.enumValueOfOrNull
+import me.dkim19375.bedwars.plugin.util.getConfigItem
+import me.dkim19375.bedwars.plugin.util.setNBTData
 import me.dkim19375.dkimbukkitcore.function.logInfo
+import org.bukkit.Bukkit
 import org.bukkit.DyeColor
 import org.bukkit.Material
 import org.bukkit.configuration.ConfigurationSection
@@ -42,15 +45,15 @@ import org.bukkit.potion.PotionType
 import java.util.logging.Level
 
 data class ItemWrapper (
-    val material: Material, val amount: Int, val potionType: PotionType? = null,
-    val potionAmplifier: Int = 1, val enchants: List<Enchantment> = listOf()
+    val material: Material, val amount: Int, val potionType: PotionType? = null, val configItem: String? = null,
+    val potionAmplifier: Int = 1, val potionDuration: Int = 0, val enchants: List<Enchantment> = listOf()
 ) {
     fun toItemStack(color: DyeColor?): ItemStack {
         val plugin = JavaPlugin.getPlugin(BedwarsPlugin::class.java)
         val configManager = plugin.configManager
         if (potionType != null) {
             val potion = Potion(potionType, if (!(1..2).contains(potionAmplifier - 1)) 2 else (potionAmplifier - 1))
-            val item = potion.toItemStack(amount)
+            val item = potion.toItemStack(amount).setNBTData(configItem)
             enchants.forEach { e ->
                 if (e.canEnchantItem(item)) {
                     item.addEnchantment(e, 1)
@@ -64,18 +67,18 @@ data class ItemWrapper (
         }
         val item: ItemStack
         when (ItemStack(material, amount).itemMeta) {
-            is LeatherArmorMeta -> item = ItemStack(material, amount)
-            is Colorable -> item = ItemStack(material, amount)
+            is LeatherArmorMeta -> item = ItemStack(material, amount).setNBTData(configItem)
+            is Colorable -> item = ItemStack(material, amount).setNBTData(configItem)
             else -> {
                 @Suppress("DEPRECATION", "LiftReturnOrAssignment") // fix warning = error?!
                 if (color == null) {
-                    item = ItemStack(material, amount)
+                    item = ItemStack(material, amount).setNBTData(configItem)
                 } else {
-                    val type = configManager.getItemFromMaterial(material)
+                    val type = configManager.getItemFromName(configItem)
                     if (type != null && type.itemCategory == MainShopGUI.ItemType.BLOCKS) {
-                        item = ItemStack(material, amount, color.data.toShort())
+                        item = ItemStack(material, amount, color.data.toShort()).setNBTData(configItem)
                     } else {
-                        item = ItemStack(material, amount)
+                        item = ItemStack(material, amount).setNBTData(configItem)
                     }
                 }
             }
@@ -142,8 +145,9 @@ data class ItemWrapper (
             val amount = config.getInt("amount", 1)
             val potionType = enumValueOfOrNull<PotionType>(config.getString("potion-type"))
             val potionAmplifier = config.getInt("potion-amplifier", 1)
+            val potionDuration = config.getInt("potion-duration", 0)
             val enchants = config.getStringList("enchants").mapNotNull { Enchantment.getByName(it.uppercase()) }
-            return ItemWrapper(material, amount, potionType, potionAmplifier, enchants)
+            return ItemWrapper(material, amount, potionType, config.name, potionAmplifier, potionDuration, enchants)
         }
     }
 }

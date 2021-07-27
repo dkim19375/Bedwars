@@ -30,7 +30,6 @@ import me.dkim19375.bedwars.plugin.data.GameData
 import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.enumclass.Team
 import me.dkim19375.bedwars.plugin.util.getIgnoreCase
-import me.dkim19375.bedwars.plugin.util.getKeyFromStr
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Location
@@ -38,7 +37,6 @@ import org.bukkit.World
 import org.bukkit.entity.Player
 import org.bukkit.entity.Villager
 import org.bukkit.potion.PotionEffectType
-import org.jetbrains.annotations.Contract
 import java.util.*
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -94,16 +92,6 @@ class GameManager(private val plugin: BedwarsPlugin) {
     fun removeExplosive(entityUUID: UUID) = explosives.remove(entityUUID)
 
     fun getExplosives() = explosives.toMap()
-
-    fun isGameRunning(game: String): Boolean {
-        return (games[games.getKeyFromStr(game)] ?: return false).isRunning()
-    }
-
-    @Contract(pure = true, value = "null -> false")
-    fun isGameRunning(world: World?): Boolean {
-        world ?: return false
-        return isGameRunning(world.name)
-    }
 
     fun getGame(world: World): BedwarsGame? = getGame(world.name)
 
@@ -176,7 +164,7 @@ class GameManager(private val plugin: BedwarsPlugin) {
     fun getRunningGames(): Map<String, BedwarsGame> {
         val map = mutableMapOf<String, BedwarsGame>()
         for (entry in games.entries) {
-            if (entry.value.isRunning()) {
+            if (setOf(GameState.STARTED, GameState.STARTING).contains(entry.value.state)) {
                 map[entry.key] = entry.value
             }
         }

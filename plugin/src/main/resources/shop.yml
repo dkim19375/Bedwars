@@ -11,6 +11,7 @@
 #   amount: 2
 #   potion-type: 'STRENGTH' (Only needed if "material" is POTION)
 #   potion-amplifier: 2 (Only needed if "material" is POTION)
+#   potion-duration: 600 (in TICKS (20 ticks per second, only needed if "material" is POTION)
 #   enchants: (Optional)
 #     - 'DAMAGE_ALL'
 #   cost: 10
@@ -88,7 +89,7 @@ wood-sword:
 stone-sword:
   slot: 19
   material: 'STONE_SWORD'
-  amount: 10
+  amount: 1
   cost: 10
   cost-item: 'IRON'
   display-name: 'Stone Sword'
@@ -287,6 +288,7 @@ speed:
   amount: 1
   potion-type: 'SPEED'
   potion-amplifier: 2
+  potion-duration: 900
   cost: 1
   cost-item: 'EMERALD'
   display-name: 'Speed II Potion'
@@ -298,6 +300,7 @@ jump:
   amount: 1
   potion-type: 'JUMP'
   potion-amplifier: 5
+  potion-duration: 900
   cost: 1
   cost-item: 'EMERALD'
   display-name: 'Jump V Potion'
@@ -309,6 +312,7 @@ invisibility:
     amount: 1
     potion-type: 'INVISIBILITY'
     potion-amplifier: 1
+    potion-duration: 600
     cost: 2
     cost-item: 'EMERALD'
     display-name: 'Invisibility Potion'
@@ -330,7 +334,7 @@ golden-apple:
   cost: 3
   cost-item: 'GOLD'
   display-name: 'GOLDEN_APPLE'
-  type: 'UTILITY'
+  item-category: 'UTILITY'
 
 fireball:
   slot: 21

@@ -27,7 +27,9 @@ package me.dkim19375.bedwars.plugin.listener
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.util.getBedHead
+import me.dkim19375.bedwars.plugin.util.getConfigItem
 import me.dkim19375.bedwars.plugin.util.getWrapper
+import me.dkim19375.bedwars.plugin.util.setNBTData
 import me.dkim19375.dkimbukkitcore.data.LocationWrapper
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -48,6 +50,15 @@ class BlockBreakListener(private val plugin: BedwarsPlugin) : Listener {
         }
         if (block.type != Material.BED_BLOCK && block.type != Material.BED) {
             if (LocationWrapper(block.location) in game.placedBlocks) {
+                val configItem = block.state.getConfigItem()
+                if (configItem != null) {
+                    Bukkit.broadcastMessage("configItem is not null for block")
+                    isCancelled = true
+                    block.drops.forEach {
+                        block.world.dropItem(block.location, it.setNBTData(configItem))
+                    }
+                    block.type = Material.AIR
+                }
                 return
             }
             isCancelled = true

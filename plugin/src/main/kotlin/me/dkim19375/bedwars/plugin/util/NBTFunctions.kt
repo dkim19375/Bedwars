@@ -29,9 +29,16 @@ package me.dkim19375.bedwars.plugin.util
 import de.tr7zw.changeme.nbtapi.NBTCompound
 import de.tr7zw.changeme.nbtapi.NBTEntity
 import de.tr7zw.changeme.nbtapi.NBTItem
+import de.tr7zw.changeme.nbtapi.NBTTileEntity
 import de.tr7zw.nbtinjector.NBTInjector
+import me.dkim19375.bedwars.plugin.BedwarsPlugin
+import me.dkim19375.bedwars.plugin.data.MainShopConfigItem
+import org.bukkit.block.BlockState
 import org.bukkit.entity.Entity
 import org.bukkit.inventory.ItemStack
+import org.bukkit.plugin.java.JavaPlugin
+
+private val plugin: BedwarsPlugin by lazy { JavaPlugin.getPlugin(BedwarsPlugin::class.java) }
 
 fun <T : Entity> T.getNBT(): NBTCompound {
     NBTInjector.patchEntity(this)
@@ -40,9 +47,9 @@ fun <T : Entity> T.getNBT(): NBTCompound {
 
 fun <T : Entity> T.getVanillaNBT(): NBTCompound = NBTEntity(this)
 
-fun ItemStack.getNBT(): NBTCompound {
-    return NBTItem(this)
-}
+fun ItemStack.getNBT(): NBTItem = NBTItem(this)
+
+fun <T : BlockState> T.getNBT(): NBTTileEntity = NBTTileEntity(this)
 
 fun <T : Entity> T.addAI() {
     getVanillaNBT().setInteger("NoAI", 0)
@@ -51,3 +58,22 @@ fun <T : Entity> T.addAI() {
 fun <T : Entity> T.removeAI() {
     getVanillaNBT().setInteger("NoAI", 1)
 }
+
+fun ItemStack.setNBTData(item: MainShopConfigItem?): ItemStack = setNBTData(item?.name)
+
+fun ItemStack.setNBTData(item: String?): ItemStack {
+    item ?: return this
+    return getNBT().apply { setString("bedwars", item) }.item
+}
+
+fun ItemStack.getConfigItem(): MainShopConfigItem? = plugin.configManager.getItemFromName(getNBT().getString("bedwars"))
+
+fun <T : BlockState> T.setNBTData(item: MainShopConfigItem?) = setNBTData(item?.name)
+
+fun <T : BlockState> T.setNBTData(item: String?) {
+    item ?: return
+    getNBT().apply { setString("bedwars", item) }
+    update(false, false)
+}
+
+fun <T : BlockState> T.getConfigItem(): MainShopConfigItem? = plugin.configManager.getItemFromName(getNBT().getString("bedwars"))

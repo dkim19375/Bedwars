@@ -230,27 +230,25 @@ private fun <T : Entity> T.getTarget(
     return target
 }
 
-fun Player.giveItem(compareType: Boolean, vararg items: ItemStack?) {
-    for (item in items) {
-        item ?: continue
-        val potion = item.toPotion()
-        var newItem: ItemStack = item
-        inventory.contents.forEach { invItem ->
-            invItem ?: return@forEach
-            val invPot = invItem.toPotion()
-            if (invItem.isSimilar(newItem)
-                || ((compareType && (invItem.type == newItem.type))
-                        && (if (potion == null || invPot == null) {
-                    true
-                } else {
-                    potion.type == invPot.type
-                }))
-            ) {
-                newItem = invItem.clone()
-            }
+fun ItemStack.getNewItem(player: Player?): ItemStack {
+    player ?: return clone()
+    val configItem = getConfigItem() ?: return clone()
+    var newItem: ItemStack = clone()
+    player.inventory.contents.forEach contentLoop@{ invItem ->
+        invItem ?: return@contentLoop
+        val invConfigItem = invItem.getConfigItem() ?: return@contentLoop
+        if (invConfigItem.name != configItem.name) {
+            return@contentLoop
         }
-        newItem.amount = item.amount
-        inventory.addItem(newItem)
+        newItem = invItem.clone()
+    }
+    newItem.amount = amount
+    return newItem
+}
+
+fun Player.giveItem(vararg items: ItemStack?) {
+    for (item in items) {
+        item?.getNewItem(this)?.let { inventory.addItem(it) }
     }
 }
 
