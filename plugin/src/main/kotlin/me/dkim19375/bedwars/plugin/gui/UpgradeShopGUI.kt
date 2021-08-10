@@ -18,15 +18,15 @@
 
 package me.dkim19375.bedwars.plugin.gui
 
+import dev.triumphteam.gui.builder.item.ItemBuilder
+import dev.triumphteam.gui.guis.Gui
+import dev.triumphteam.gui.guis.GuiItem
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.enumclass.Team
 import me.dkim19375.bedwars.plugin.enumclass.TrapType
 import me.dkim19375.bedwars.plugin.enumclass.UpgradeType
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
 import me.dkim19375.bedwars.plugin.util.*
-import me.mattstudios.mfgui.gui.components.util.ItemBuilder
-import me.mattstudios.mfgui.gui.guis.Gui
-import me.mattstudios.mfgui.gui.guis.GuiItem
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.DyeColor
@@ -35,7 +35,11 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 class UpgradeShopGUI(private val player: Player, private val team: Team, private val plugin: BedwarsPlugin) {
-    private val menu = Gui(5, "Upgrades & Traps")
+    val menu: Gui = Gui.gui()
+        .rows(5)
+        .title("Upgrades & Traps".toComponent())
+        .disableAllInteractions()
+        .create()
 
     private val itsATrapLore = listOf(
         "${ChatColor.GRAY}Inflicts Blindness and Slowness",
@@ -129,8 +133,8 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
             )
         )
         return ItemBuilder.from(ItemStack(trapType.material, number))
-            .setName("${ChatColor.GREEN}Trap #$number: ${trapType.displayName} Trap")
-            .setLore(lore)
+            .name("${ChatColor.GREEN}Trap #$number: ${trapType.displayName} Trap")
+            .lore(lore)
             .asGuiItem { event ->
                 event.isCancelled = true
                 showMainScreen()
@@ -334,8 +338,8 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
         name: String,
         type: TrapType
     ): GuiItem = ItemBuilder.from(material)
-        .setName("$${ChatColor.RED}$name")
-        .setLore(firstLore.plus(getCostList(cost, hasEnough)))
+        .name("$${ChatColor.RED}$name")
+        .lore(firstLore.plus(getCostList(cost, hasEnough)))
         .asGuiItem {
             it.isCancelled = true
             onTrapClick(type)

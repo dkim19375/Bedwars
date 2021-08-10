@@ -18,11 +18,10 @@
 
 package me.dkim19375.bedwars.plugin.util
 
-import me.mattstudios.mfgui.gui.components.util.ItemBuilder
+import dev.triumphteam.gui.builder.item.ItemBuilder
 
-fun ItemBuilder.addLore(vararg lore: String): ItemBuilder {
-    val lores = build().itemMeta!!.lore.default(mutableListOf())
-    lores.addAll(lore)
-    setLore(*lores.toTypedArray())
-    return this
-}
+fun ItemBuilder.name(name: String): ItemBuilder = name(name.toComponent())
+
+fun ItemBuilder.lore(vararg lore: String): ItemBuilder = lore { it.addAll(lore.toList().toComponents()) }
+
+fun ItemBuilder.lore(lore: List<String>): ItemBuilder = lore { it.addAll(lore.toComponents()) }
