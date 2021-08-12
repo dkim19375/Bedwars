@@ -247,7 +247,6 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                         worldManager.removePlayersFromWorld(game.data.world.name)
                         return@let
                     }
-
                 }
                 game.saveMap()
                 plugin.dataFileManager.setEditing(game.data, false)

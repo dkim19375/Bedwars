@@ -19,6 +19,7 @@
 package me.dkim19375.bedwars.plugin.data
 
 import me.dkim19375.bedwars.plugin.enumclass.SpawnerType
+import me.dkim19375.dkimcore.extension.runCatchingOrNull
 import org.bukkit.Location
 import org.bukkit.configuration.serialization.ConfigurationSerializable
 
@@ -28,30 +29,17 @@ data class SpawnerData(val type: SpawnerType, val location: Location) : Configur
         "location" to location
     )
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as SpawnerData
-
-        if (type != other.type) return false
-        if (location != other.location) return false
-
-        return true
+    override fun toString(): String {
+        return "SpawnerData(type=${type.name}, location=$location)"
     }
-
-    override fun hashCode(): Int {
-        var result = type.hashCode()
-        result = 31 * result + location.hashCode()
-        return result
-    }
-
 
     companion object {
         @Suppress("unused")
         @JvmStatic
-        fun deserialize(map: Map<String, Any>): SpawnerData {
-            return SpawnerData(SpawnerType.valueOf(map["type"] as String), map["location"] as Location)
+        fun deserialize(map: Map<String, Any>): SpawnerData? {
+            val type = runCatchingOrNull { SpawnerType.valueOf(map["type"] as String) } ?: return null
+            val location = map["location"] as? Location ?: return null
+            return SpawnerData(type, location)
         }
     }
 }

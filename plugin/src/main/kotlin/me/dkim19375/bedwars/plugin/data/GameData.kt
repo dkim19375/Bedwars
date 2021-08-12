@@ -21,7 +21,7 @@ package me.dkim19375.bedwars.plugin.data
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
 import me.dkim19375.bedwars.plugin.util.update
-import me.dkim19375.dkimbukkitcore.function.toUUID
+import me.dkim19375.dkimcore.extension.toUUID
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.World

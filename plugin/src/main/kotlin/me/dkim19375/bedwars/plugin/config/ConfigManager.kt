@@ -35,8 +35,6 @@ class ConfigManager(private val plugin: BedwarsPlugin) {
         get() = shopFile.config
     var mainItems = emptySet<MainShopConfigItem>()
         private set
-    val useMainLobby: Boolean
-        get() = config.getBoolean("use-main-lobby")
 
     fun update() {
         mainItems = shopConfig.getKeys(false)

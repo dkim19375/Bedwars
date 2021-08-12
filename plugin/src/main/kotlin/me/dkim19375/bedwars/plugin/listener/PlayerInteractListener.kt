@@ -21,12 +21,11 @@ package me.dkim19375.bedwars.plugin.listener
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.gui.MainShopGUI
 import me.dkim19375.bedwars.plugin.gui.UpgradeShopGUI
-import me.dkim19375.bedwars.plugin.util.default
-import me.dkim19375.bedwars.plugin.util.isArmor
-import me.dkim19375.bedwars.plugin.util.isTool
-import me.dkim19375.bedwars.plugin.util.isWeapon
+import me.dkim19375.bedwars.plugin.manager.BedwarsGame
+import me.dkim19375.bedwars.plugin.util.*
 import org.bukkit.Bukkit
 import org.bukkit.Material
+import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Fireball
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -55,6 +54,11 @@ class PlayerInteractListener(private val plugin: BedwarsPlugin) : Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     private fun PlayerInteractAtEntityEvent.onInteractAtEntity() {
         val game = plugin.gameManager.getGame(player) ?: return
+        checkShops(game)
+        checkHolograms()
+    }
+
+    private fun PlayerInteractAtEntityEvent.checkShops(game: BedwarsGame) {
         if (game.npcManager.getShopVillagersUUID().contains(rightClicked.uniqueId)) {
             isCancelled = true
             MainShopGUI(player, plugin).showPlayer()
@@ -71,6 +75,13 @@ class PlayerInteractListener(private val plugin: BedwarsPlugin) : Listener {
         UpgradeShopGUI(player, team, plugin).showPlayer()
         Bukkit.getScheduler().runTask(plugin) {
             UpgradeShopGUI(player, team, plugin).showPlayer()
+        }
+    }
+
+    private fun PlayerInteractAtEntityEvent.checkHolograms() {
+        val rightClicked = rightClicked as? ArmorStand ?: return
+        if (rightClicked.isHologram()) {
+            isCancelled = true
         }
     }
 

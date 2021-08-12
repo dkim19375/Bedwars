@@ -19,6 +19,7 @@
 package me.dkim19375.bedwars.plugin.enumclass
 
 import me.dkim19375.bedwars.plugin.util.Delay
+import me.dkim19375.dkimcore.extension.runCatchingOrNull
 import org.bukkit.Material
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -37,11 +38,7 @@ enum class SpawnerType(val material: Material, val maxAmount: Int, val delayFirs
     companion object {
         fun fromString(str: String?): SpawnerType? {
             str ?: return null
-            return try {
-                valueOf(str.uppercase())
-            } catch (_: IllegalArgumentException) {
-                return null
-            }
+            return runCatchingOrNull { valueOf(str.uppercase()) }
         }
     }
 }

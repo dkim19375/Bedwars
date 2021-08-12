@@ -52,11 +52,12 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     val spawnerManager = SpawnerManager(plugin, this)
     val placedBlocks = mutableSetOf<LocationWrapper>()
     val beforeData = mutableMapOf<UUID, PlayerData>()
+    val hologramManager = SpawnerHologramManager(plugin, this)
 
     var data = data
         private set
         get() {
-            return plugin.dataFileManager.getGameData(worldName)!!
+            return plugin.dataFileManager.getGameData(worldName) ?: throw IllegalStateException("Game data is null!")
         }
 
     init {
@@ -73,6 +74,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         if (result != Result.SUCCESS) {
             return result
         }
+        hologramManager.start()
         state = GameState.STARTING
         countdown = 10
         logInfo("Game ${data.world.name} is starting!")
@@ -164,6 +166,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         time = 0
         spawnerManager.reset()
         upgradesManager.stop()
+        hologramManager.stop()
         placedBlocks.clear()
         revertBack()
         beforeData.clear()

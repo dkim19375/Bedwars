@@ -28,9 +28,16 @@ data class TeamData(val team: Team, val spawn: Location) : ConfigurationSerializ
         "spawn" to spawn
     )
 
+    override fun toString(): String = "TeamData(team=${team.name}, spawn=$spawn)"
+
+
     companion object {
         @Suppress("unused")
         @JvmStatic
-        fun deserialize(map: Map<String, Any>): TeamData = TeamData(Team.fromString(map["team"] as String)!!, map["spawn"] as Location)
+        fun deserialize(map: Map<String, Any>): TeamData? {
+            val team = Team.fromString(map["team"] as String) ?: return null
+            val spawn = map["spawn"] as? Location ?: return null
+            return TeamData(team, spawn)
+        }
     }
 }

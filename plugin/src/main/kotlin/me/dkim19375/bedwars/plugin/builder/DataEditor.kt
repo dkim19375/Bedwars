@@ -75,7 +75,7 @@ class DataEditor(private val plugin: BedwarsPlugin, game: BedwarsGame?, builder:
         }
         val newGameData = newData.build() ?: return newData
         val newGame = BedwarsGame(plugin, newGameData)
-        newGame.state = GameState.LOBBY
+        newGame.state = GameState.STOPPED
         plugin.gameManager.addGame(newGame)
         plugin.dataFileManager.setGameData(newGameData)
         return newData

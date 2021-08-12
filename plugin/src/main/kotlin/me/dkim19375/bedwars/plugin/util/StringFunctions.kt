@@ -18,6 +18,8 @@
 
 package me.dkim19375.bedwars.plugin.util
 
+import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.apache.commons.lang.StringUtils
 import org.bukkit.ChatColor
 
@@ -26,3 +28,9 @@ fun String.setGray(): String {
 }
 
 fun String.capAndFormat(): String = StringUtils.capitalize(this.lowercase().replace("_", " "))
+
+fun String.toComponent(): TextComponent = LegacyComponentSerializer.legacySection().deserialize(this)
+
+fun List<String>.toComponents(): List<TextComponent> = map(String::toComponent)
+
+fun Array<String>.toComponents(): Array<TextComponent> = map(String::toComponent).toTypedArray()

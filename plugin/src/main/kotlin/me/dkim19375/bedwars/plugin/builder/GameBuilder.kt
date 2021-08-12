@@ -28,7 +28,7 @@ import org.bukkit.World
 import java.util.*
 
 @Suppress("MemberVisibilityCanBePrivate")
-class GameBuilder(
+data class GameBuilder(
     var world: World,
     var minPlayers: Int = 2,
     var maxPlayers: Int = 8,
@@ -63,23 +63,31 @@ class GameBuilder(
         return errors.toSet()
     }
 
-    fun build(): GameData? {
-        val spec = spec ?: return null
-        val lobby = lobby ?: return null
-        if (canBuild().isNotEmpty()) {
+    fun build(force: Boolean = false): GameData? {
+        if (canBuild().isNotEmpty() && !force) {
             return null
         }
         return GameData(
-            world,
-            minPlayers,
-            maxPlayers,
-            teams,
-            shopVillagers,
-            upgradeVillagers,
-            spawners,
-            beds,
-            spec,
-            lobby
+            gameWorld = world,
+            minPlayers = minPlayers,
+            maxPlayers = maxPlayers,
+            gameTeams = teams,
+            shopVillagers = shopVillagers,
+            upgradeVillagers = upgradeVillagers,
+            gameSpawners = spawners,
+            gameBeds = beds,
+            gameSpec = spec ?: run {
+                if (!force) {
+                    return null
+                }
+                Location(null, 0.0, 0.0, 0.0)
+            },
+            gameLobby = lobby ?: run {
+                if (!force) {
+                    return null
+                }
+                Location(null, 0.0, 0.0, 0.0)
+            }
         )
     }
 }

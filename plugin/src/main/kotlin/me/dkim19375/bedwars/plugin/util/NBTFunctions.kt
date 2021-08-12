@@ -28,11 +28,16 @@ import de.tr7zw.nbtinjector.NBTInjector
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.MainShopConfigItem
 import org.bukkit.block.BlockState
+import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Entity
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 
 private val plugin: BedwarsPlugin by lazy { JavaPlugin.getPlugin(BedwarsPlugin::class.java) }
+
+private const val HOLOGRAM_KEY = "BedwarsArmorStand"
+private const val CONFIG_ITEM_KEY = "BedwarsConfigItem"
+private const val NO_AI_KEY = "NoAI"
 
 fun <T : Entity> T.getNBT(): NBTCompound {
     NBTInjector.patchEntity(this)
@@ -46,11 +51,11 @@ fun ItemStack.getNBT(): NBTItem = NBTItem(this)
 fun <T : BlockState> T.getNBT(): NBTTileEntity = NBTTileEntity(this)
 
 fun <T : Entity> T.addAI() {
-    getVanillaNBT().setInteger("NoAI", 0)
+    getVanillaNBT().setInteger(NO_AI_KEY, 0)
 }
 
 fun <T : Entity> T.removeAI() {
-    getVanillaNBT().setInteger("NoAI", 1)
+    getVanillaNBT().setInteger(NO_AI_KEY, 1)
 }
 
 fun ItemStack.setNBTData(item: MainShopConfigItem?): ItemStack = setNBTData(item?.name)
@@ -60,8 +65,6 @@ fun ItemStack.setNBTData(item: String?): ItemStack {
     return getNBT().apply { setString("bedwars", item) }.item
 }
 
-fun ItemStack.getConfigItem(): MainShopConfigItem? = plugin.configManager.getItemFromName(getNBT().getString("bedwars"))
-
 fun <T : BlockState> T.setNBTData(item: MainShopConfigItem?) = setNBTData(item?.name)
 
 fun <T : BlockState> T.setNBTData(item: String?) {
@@ -70,4 +73,17 @@ fun <T : BlockState> T.setNBTData(item: String?) {
     update(false, false)
 }
 
-fun <T : BlockState> T.getConfigItem(): MainShopConfigItem? = plugin.configManager.getItemFromName(getNBT().getString("bedwars"))
+fun NBTCompound.getStringOrNull(key: String): String? = if (keys.contains(key)) getString(key) else null
+
+
+// custom
+
+fun ItemStack.getConfigItem(): MainShopConfigItem? =
+    plugin.configManager.getItemFromName(getNBT().getStringOrNull(CONFIG_ITEM_KEY))
+
+fun <T : BlockState> T.getConfigItem(): MainShopConfigItem? =
+    plugin.configManager.getItemFromName(getNBT().getStringOrNull(CONFIG_ITEM_KEY))
+
+fun ArmorStand.isHologram(): Boolean = getNBT().keys.contains(HOLOGRAM_KEY)
+
+fun ArmorStand.setHologramNBT(holo: Boolean) = if (holo) getNBT().setByte(HOLOGRAM_KEY, 0) else Unit

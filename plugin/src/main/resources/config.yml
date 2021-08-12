@@ -1,2 +1,15 @@
-use-main-lobby: true
-kick-world: 'world' # Used when kicking players out of the world if use-main-lobby is false or there is no lobby set
+holograms:
+  display-spawners:
+    iron: false
+    gold: false
+    diamond: true
+    emerald: true
+  heights:
+    spawn-time: 2.5
+    spawner-type: 2.8
+  spawner-type-text:
+    iron: '&7&lIron'
+    gold: '&6&lGold'
+    diamond: '&b&lDiamond'
+    emerald: '&a&lEmerald'
+  spawner-time-text: '&eSpawns in &c%time% &eseconds'

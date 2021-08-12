@@ -98,7 +98,7 @@ subprojects {
         implementation 'de.tr7zw:nbt-injector:2.8.0'
         implementation 'commons-io:commons-io:2.11.0'
         implementation 'net.kyori:adventure-api:4.8.1'
-        implementation 'io.github.dkim19375:dkim-bukkit-core:3.1.4'
+        implementation 'io.github.dkim19375:dkim-bukkit-core:3.2.1'
         implementation 'me.mattstudios:triumph-config:1.0.5-SNAPSHOT'
         implementation 'dev.triumphteam:triumph-gui:3.0.3'
         implementation 'net.kyori:adventure-text-serializer-gson:4.8.1'
