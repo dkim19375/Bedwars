@@ -40,8 +40,8 @@ private const val CONFIG_ITEM_KEY = "BedwarsConfigItem"
 private const val NO_AI_KEY = "NoAI"
 
 fun <T : Entity> T.getNBT(): NBTCompound {
-    NBTInjector.patchEntity(this)
-    return NBTInjector.getNbtData(this)
+    val patched = NBTInjector.patchEntity(this)
+    return NBTInjector.getNbtData(patched)
 }
 
 fun <T : Entity> T.getVanillaNBT(): NBTCompound = NBTEntity(this)
