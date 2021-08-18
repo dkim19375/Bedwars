@@ -69,7 +69,6 @@ val commands = listOf(
         Permission.INFO.permission
     ),
     HelpMessage("setup <name> ready", "Detects if the game can be saved", Permission.SETUP.permission),
-    HelpMessage("setup <name> finish", "Finishes a game setup, also saves it", Permission.SETUP.permission),
     HelpMessage("setup <name> lobby", "Set the lobby location", Permission.SETUP.permission),
     HelpMessage("setup <name> spec", "Set the spectator spot", Permission.SETUP.permission),
     HelpMessage("setup <name> minplayers [min]", "Set the minimum players", Permission.SETUP.permission),
