@@ -96,7 +96,8 @@ class GameManager(private val plugin: BedwarsPlugin) {
 
     fun getGame(player: Player): BedwarsGame? = getGame(player.uniqueId)
 
-    fun getGame(name: String): BedwarsGame? = games.getIgnoreCase(name)
+    fun getGame(name: String?, player: Player? = null): BedwarsGame? = name?.let { games.getIgnoreCase(it) }
+        ?: player?.world?.name?.let(this::getGame)
 
     fun getGames(): Map<String, BedwarsGame> = games.toMap()
 
