@@ -22,6 +22,10 @@ import dev.triumphteam.gui.builder.item.ItemBuilder
 
 fun ItemBuilder.name(name: String): ItemBuilder = name(name.toComponent())
 
-fun ItemBuilder.lore(vararg lore: String): ItemBuilder = lore { it.addAll(lore.toList().toComponents()) }
+fun ItemBuilder.lore(vararg lore: String): ItemBuilder = lore(lore.toList())
 
-fun ItemBuilder.lore(lore: List<String>): ItemBuilder = lore { it.addAll(lore.toComponents()) }
+fun ItemBuilder.lore(lore: List<String>): ItemBuilder = ItemBuilder.from(build().apply {
+    itemMeta = itemMeta?.apply {
+        this.lore.addAll(lore)
+    }
+})
