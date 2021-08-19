@@ -28,22 +28,31 @@ class SpawnerHologramManager(private val plugin: BedwarsPlugin, private val game
                 .map(SpawnerData::location)
                 .map(Location::update)
             for (location in locations) {
-                val getEntity: (String, Double) -> ArmorStand = { configKey, default ->
+                val getEntity: (String, Double) -> Pair<ArmorStand, Location> = { configKey, default ->
                     val height = (plugin.config.get("holograms.heights.$configKey") as? Number)?.toDouble() ?: default
-                    val newLoc = location.add(0.0, height, 0.0)
-                    location.world.spawn(newLoc, ArmorStand::class.java).apply {
-                        setHologramNBT(true)
+                    val newLoc = location.clone().add(0.0, height, 0.0)
+                    newLoc.world.spawn(newLoc, ArmorStand::class.java).setHologramNBT(true).apply {
                         setBasePlate(false)
+                        setGravity(false)
                         isMarker = true
                         isVisible = false
                         isCustomNameVisible = true
                         removeWhenFarAway = false
                         canPickupItems = false
-                    }
+                        customName = "TEST"
+                    } to newLoc.clone()
                 }
                 val timeEntity = getEntity("spawn-time", 2.5)
-                val spawnerEntity = getEntity("spawner-type", 2.8)
-                holograms.add(SpawnerHologram(type, timeEntity.uniqueId, spawnerEntity.uniqueId))
+                val typeEntity = getEntity("spawner-type", 2.8)
+                holograms.add(
+                    SpawnerHologram(
+                        type = type,
+                        spawnTimeStand = timeEntity.first.uniqueId,
+                        typeArmorStand = typeEntity.first.uniqueId,
+                        timePos = timeEntity.second,
+                        typePos = typeEntity.second
+                    )
+                )
             }
         }
         task = Bukkit.getScheduler().runTaskTimer(plugin, this::update, 2L, 5L)
@@ -64,22 +73,22 @@ class SpawnerHologramManager(private val plugin: BedwarsPlugin, private val game
                 }
             }
             if (reset) {
-                start()
                 update()
                 return
             }
         }
         for (hologram in holograms.toSet()) {
             val section = plugin.config.getConfigurationSection("holograms.spawner-type-text")
-            hologram.getTypeArmorStand()?.customName = when (hologram.type) {
-                SpawnerType.IRON -> (section.getString("iron") ?: "&7&lIron").formatAll()
-                SpawnerType.GOLD -> (section.getString("gold") ?: "&6&lGold").formatAll()
-                SpawnerType.DIAMOND -> (section.getString("diamond") ?: "&b&lDiamond").formatAll()
-                SpawnerType.EMERALD -> (section.getString("emerald") ?: "&a&lEmerald").formatAll()
-            }
+            hologram.getTypeArmorStand()?.customName = (when (hologram.type) {
+                SpawnerType.IRON -> (section.getString("iron") ?: "&7&lIron")
+                SpawnerType.GOLD -> (section.getString("gold") ?: "&6&lGold")
+                SpawnerType.DIAMOND -> (section.getString("diamond") ?: "&b&lDiamond")
+                SpawnerType.EMERALD -> (section.getString("emerald") ?: "&a&lEmerald")
+            }).formatAll()
             val format = plugin.config.getString("holograms.spawner-time-text") ?: "&eSpawns in &c%time% &eseconds"
-            val text =
-                format.replace("%time%", game.spawnerManager.getTimeUntilNextDrop(hologram.type).seconds.toString())
+            val text = format
+                .replace("%time%", game.spawnerManager.getTimeUntilNextDrop(hologram.type).seconds.toString())
+                .formatAll()
             hologram.getTimeArmorStand()?.customName = text
         }
     }

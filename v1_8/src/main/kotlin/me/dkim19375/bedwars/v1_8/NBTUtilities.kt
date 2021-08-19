@@ -3,12 +3,8 @@ package me.dkim19375.bedwars.v1_8
 import de.tr7zw.changeme.nbtapi.NBTCompound
 import de.tr7zw.changeme.nbtapi.NBTEntity
 import de.tr7zw.changeme.nbtapi.NBTItem
-import de.tr7zw.changeme.nbtapi.NBTTileEntity
 import de.tr7zw.nbtinjector.NBTInjector
 import me.dkim19375.bedwars.compat.abstract.NBTUtilitiesAbstract
-import me.dkim19375.bedwars.plugin.BedwarsPlugin
-import me.dkim19375.bedwars.plugin.data.MainShopConfigItem
-import org.bukkit.block.BlockState
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
@@ -16,10 +12,11 @@ import org.bukkit.inventory.ItemStack
 
 private const val NO_AI_KEY = "NoAI"
 
-class NBTUtilities(plugin: BedwarsPlugin) : NBTUtilitiesAbstract(plugin) {
-    private fun <T : LivingEntity> T.getNBT(): NBTCompound {
-        val patched = NBTInjector.patchEntity(this)
-        return NBTInjector.getNbtData(patched)
+@Suppress("unused", "UNCHECKED_CAST")
+class NBTUtilities : NBTUtilitiesAbstract() {
+    private fun <T : LivingEntity> T.getNBT(): Pair<T, NBTCompound> {
+        val patched = NBTInjector.patchEntity(this) as T
+        return patched to NBTInjector.getNbtData(patched)
     }
 
     private fun NBTCompound.getStringOrNull(key: String): String? = if (keys.contains(key)) getString(key) else null
@@ -37,16 +34,19 @@ class NBTUtilities(plugin: BedwarsPlugin) : NBTUtilitiesAbstract(plugin) {
         return itemStack.getNBT().apply { setString(BEDWARS_BLOCK_KEY, item) }.item
     }
 
-    override fun getConfigItem(item: ItemStack): MainShopConfigItem? =
-        plugin.configManager.getItemFromName(item.getNBT().getStringOrNull(CONFIG_ITEM_KEY))
+    override fun getConfigItem(item: ItemStack): String? = item.getNBT().getStringOrNull(CONFIG_ITEM_KEY)
 
-    override fun isHologram(armorStand: ArmorStand): Boolean = armorStand.getNBT().keys.contains(HOLOGRAM_KEY)
+    override fun isHologram(armorStand: ArmorStand): Boolean = armorStand.getNBT().second.keys.contains(HOLOGRAM_KEY)
 
-    override fun setHologramNBT(armorStand: ArmorStand, holo: Boolean) {
-        if (holo) {
-            armorStand.getNBT().setByte(HOLOGRAM_KEY, 0)
-        } else {
-            armorStand.getNBT().removeKey(HOLOGRAM_KEY)
+    override fun setHologramNBT(armorStand: ArmorStand, holo: Boolean): ArmorStand = if (holo) {
+        armorStand.getNBT().let {
+            it.second.setByte(HOLOGRAM_KEY, 0)
+            it.first
+        }
+    } else {
+        armorStand.getNBT().let {
+            it.second.removeKey(HOLOGRAM_KEY)
+            it.first
         }
     }
 }

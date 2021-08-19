@@ -33,6 +33,7 @@ import me.dkim19375.bedwars.plugin.data.SpawnerData
 import me.dkim19375.bedwars.plugin.data.TeamData
 import me.dkim19375.bedwars.plugin.listener.*
 import me.dkim19375.bedwars.plugin.manager.*
+import me.dkim19375.bedwars.plugin.util.initNBTVariables
 import me.dkim19375.dkimbukkitcore.config.ConfigFile
 import me.dkim19375.dkimbukkitcore.function.logInfo
 import me.dkim19375.dkimbukkitcore.javaplugin.CoreJavaPlugin
@@ -73,6 +74,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
 
     override fun onLoad() {
         val time = measureTimeMillis {
+            initNBTVariables(this)
             serializable.forEach(ConfigurationSerialization::registerClass)
             NBTInjector.inject()
             ScoreboardLib.setPluginInstance(this)

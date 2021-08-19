@@ -43,12 +43,15 @@ private val entities = mutableMapOf<UUID, Entity>()
 private val plugin: BedwarsPlugin by lazy { JavaPlugin.getPlugin(BedwarsPlugin::class.java) }
 
 fun UUID.getEntity(): Entity? {
-    val entityInList = entities[this] ?: return getEntityFromLoop(this)
+    val entityInList = entities[this] ?: run {
+        getEntityFromLoop(this)
+        return getEntity()
+    }
     if (entityInList.isValid) {
         return entityInList
     }
     entities.remove(this)
-    return getEntityFromLoop(this)
+    return getEntity()
 }
 
 fun PlayerInventory.hasArmor(vararg types: ArmorType?): Boolean {

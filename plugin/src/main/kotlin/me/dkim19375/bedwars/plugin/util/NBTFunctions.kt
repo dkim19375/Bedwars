@@ -26,23 +26,27 @@ import me.dkim19375.bedwars.plugin.data.MainShopConfigItem
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.LivingEntity
 import org.bukkit.inventory.ItemStack
-import org.bukkit.plugin.java.JavaPlugin
 
-private val plugin: BedwarsPlugin by lazy { JavaPlugin.getPlugin(BedwarsPlugin::class.java) }
-private val nbtUtils: NBTUtilitiesAbstract by lazy { NBTUtilitiesAbstract.getInstance(plugin) }
+private lateinit var plugin: BedwarsPlugin
+private lateinit var nbtUtils: NBTUtilitiesAbstract
+
+fun initNBTVariables(bedwarsPlugin: BedwarsPlugin) {
+    plugin = bedwarsPlugin
+    nbtUtils = NBTUtilitiesAbstract.getInstance(plugin)
+}
 
 fun <T : LivingEntity> T.addAI() = nbtUtils.addAI(this)
 
 fun <T : LivingEntity> T.removeAI() = nbtUtils.removeAI(this)
 
-fun ItemStack.setNBTData(item: MainShopConfigItem?): ItemStack = nbtUtils.setNBTData(this, item)
+fun ItemStack.setNBTData(item: MainShopConfigItem?): ItemStack = nbtUtils.setNBTData(this, item?.name)
 
 fun ItemStack.setNBTData(item: String?): ItemStack = nbtUtils.setNBTData(this, item)
 
 
 // custom
 
-fun ItemStack.getConfigItem(): MainShopConfigItem? = nbtUtils.getConfigItem(this)
+fun ItemStack.getConfigItem(): MainShopConfigItem? = plugin.configManager.getItemFromName(nbtUtils.getConfigItem(this))
 
 fun ArmorStand.isHologram(): Boolean = nbtUtils.isHologram(this)
 

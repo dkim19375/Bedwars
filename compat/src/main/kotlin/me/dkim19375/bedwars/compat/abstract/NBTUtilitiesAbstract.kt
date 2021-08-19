@@ -1,21 +1,23 @@
 package me.dkim19375.bedwars.compat.abstract
 
 import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion
-import me.dkim19375.bedwars.plugin.BedwarsPlugin
-import me.dkim19375.bedwars.plugin.data.MainShopConfigItem
-import me.dkim19375.bedwars.v1_8.NBTUtilities
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.LivingEntity
 import org.bukkit.inventory.ItemStack
+import org.bukkit.plugin.java.JavaPlugin
 
 @Suppress("PropertyName")
-abstract class NBTUtilitiesAbstract(protected val plugin: BedwarsPlugin) {
+abstract class NBTUtilitiesAbstract {
 
     companion object {
-        fun getInstance(plugin: BedwarsPlugin): NBTUtilitiesAbstract = if (MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_16_R1)) {
-            NBTUtilities(plugin)
+        fun getInstance(plugin: JavaPlugin): NBTUtilitiesAbstract = if (MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_16_R1)) {
+            Class.forName("me.dkim19375.bedwars.v1_16.NBTUtilities")
+                .getConstructor(JavaPlugin::class.java)
+                .newInstance(plugin) as NBTUtilitiesAbstract
         } else {
-            me.dkim19375.bedwars.v1_16.NBTUtilities(plugin)
+            Class.forName("me.dkim19375.bedwars.v1_8.NBTUtilities")
+                .getConstructor()
+                .newInstance() as NBTUtilitiesAbstract
         }
     }
 
@@ -27,15 +29,13 @@ abstract class NBTUtilitiesAbstract(protected val plugin: BedwarsPlugin) {
 
     abstract fun <T : LivingEntity> removeAI(entity: T)
 
-    fun setNBTData(itemStack: ItemStack, item: MainShopConfigItem?): ItemStack = setNBTData(itemStack, item?.name)
-
     abstract fun setNBTData(itemStack: ItemStack, item: String?): ItemStack
 
     // custom
 
-    abstract fun getConfigItem(item: ItemStack): MainShopConfigItem?
+    abstract fun getConfigItem(item: ItemStack): String?
 
     abstract fun isHologram(armorStand: ArmorStand): Boolean
 
-    abstract fun setHologramNBT(armorStand: ArmorStand, holo: Boolean)
+    abstract fun setHologramNBT(armorStand: ArmorStand, holo: Boolean): ArmorStand
 }

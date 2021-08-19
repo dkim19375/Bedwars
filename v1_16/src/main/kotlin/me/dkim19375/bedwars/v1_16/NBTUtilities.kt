@@ -1,16 +1,15 @@
 package me.dkim19375.bedwars.v1_16
 
 import me.dkim19375.bedwars.compat.abstract.NBTUtilitiesAbstract
-import me.dkim19375.bedwars.plugin.BedwarsPlugin
-import me.dkim19375.bedwars.plugin.data.MainShopConfigItem
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.LivingEntity
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
+import org.bukkit.plugin.java.JavaPlugin
 
-@Suppress("PrivatePropertyName")
-class NBTUtilities(plugin: BedwarsPlugin) : NBTUtilitiesAbstract(plugin) {
+@Suppress("PrivatePropertyName", "unused")
+class NBTUtilities(plugin: JavaPlugin) : NBTUtilitiesAbstract() {
 
     private val HOLOGRAM_NS_KEY = NamespacedKey(plugin, HOLOGRAM_KEY)
     private val CONFIG_ITEM_NS_KEY = NamespacedKey(plugin, CONFIG_ITEM_KEY)
@@ -32,14 +31,16 @@ class NBTUtilities(plugin: BedwarsPlugin) : NBTUtilitiesAbstract(plugin) {
         return itemStack
     }
 
-    override fun getConfigItem(item: ItemStack): MainShopConfigItem? =
-        plugin.configManager.getItemFromName(item.itemMeta?.persistentDataContainer?.get(CONFIG_ITEM_NS_KEY, PDT_STRING))
+    override fun getConfigItem(item: ItemStack): String? =
+        item.itemMeta?.persistentDataContainer?.get(CONFIG_ITEM_NS_KEY, PDT_STRING)
 
-    override fun isHologram(armorStand: ArmorStand): Boolean = armorStand.persistentDataContainer.keys.contains(HOLOGRAM_NS_KEY)
+    override fun isHologram(armorStand: ArmorStand): Boolean =
+        armorStand.persistentDataContainer.keys.contains(HOLOGRAM_NS_KEY)
 
-    override fun setHologramNBT(armorStand: ArmorStand, holo: Boolean) {
+    override fun setHologramNBT(armorStand: ArmorStand, holo: Boolean): ArmorStand {
         if (holo) {
             armorStand.persistentDataContainer.set(HOLOGRAM_NS_KEY, PDT_BYTE, 0)
         }
+        return armorStand
     }
 }

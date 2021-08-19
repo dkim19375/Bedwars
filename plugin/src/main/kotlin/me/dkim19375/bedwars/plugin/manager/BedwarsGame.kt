@@ -477,7 +477,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
                     }
                     val world = result.second ?: throw IllegalStateException("Could not load world ${data.world.name}!")
                     data.copy(gameWorld = world).save(plugin)
-                    println("${world.name} has finished regenerating!")
+                    logInfo("${world.name} has finished regenerating!")
                     whenDone()
                 }
             }

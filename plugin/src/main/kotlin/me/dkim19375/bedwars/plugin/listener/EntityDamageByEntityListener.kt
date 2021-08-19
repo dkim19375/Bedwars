@@ -19,6 +19,8 @@
 package me.dkim19375.bedwars.plugin.listener
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
+import me.dkim19375.bedwars.plugin.util.isHologram
+import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -28,6 +30,11 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent
 class EntityDamageByEntityListener(private val plugin: BedwarsPlugin) : Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private fun EntityDamageByEntityEvent.onDamage() {
+        checkExplosive()
+        checkHolo()
+    }
+
+    private fun EntityDamageByEntityEvent.checkExplosive() {
         val entity = entity
         val damager = damager
         if (entity.type != EntityType.PLAYER) {
@@ -41,5 +48,12 @@ class EntityDamageByEntityListener(private val plugin: BedwarsPlugin) : Listener
             return
         }
         damage = finalDamage * 0.1
+    }
+
+    private fun EntityDamageByEntityEvent.checkHolo() {
+        val clicked = entity as? ArmorStand ?: return
+        if (clicked.isHologram()) {
+            isCancelled = true
+        }
     }
 }

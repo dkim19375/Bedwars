@@ -2,10 +2,17 @@ package me.dkim19375.bedwars.plugin.data
 
 import me.dkim19375.bedwars.plugin.enumclass.SpawnerType
 import me.dkim19375.bedwars.plugin.util.getEntity
+import org.bukkit.Location
 import org.bukkit.entity.ArmorStand
 import java.util.*
 
-data class SpawnerHologram(val type: SpawnerType, val spawnTimeStand: UUID, val typeArmorStand: UUID) {
+data class SpawnerHologram(
+    val type: SpawnerType,
+    val spawnTimeStand: UUID,
+    val typeArmorStand: UUID,
+    val timePos: Location,
+    val typePos: Location
+) {
     fun getTimeArmorStand(): ArmorStand? = spawnTimeStand.getEntity() as? ArmorStand
     fun getTypeArmorStand(): ArmorStand? = typeArmorStand.getEntity() as? ArmorStand
 

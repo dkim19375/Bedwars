@@ -35,6 +35,7 @@ import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.EntityType
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import java.util.*
 import kotlin.system.measureTimeMillis
@@ -53,24 +54,6 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
         }
         @Suppress("LiftReturnOrAssignment")
         when (args[0].lowercase()) {
-            "test" -> {
-                if (sender !is Player) {
-                    sender.sendMessage(ErrorMessages.MUST_BE_PLAYER)
-                    return true
-                }
-                val loc = sender.location
-                loc.world.spawn(loc, ArmorStand::class.java).apply {
-                    setHologramNBT(true)
-                    setBasePlate(false)
-                    isMarker = true
-                    isVisible = false
-                    isCustomNameVisible = true
-                    removeWhenFarAway = false
-                    canPickupItems = false
-                    customName = "TEST"
-                }
-                return true
-            }
             "remove" -> {
                 if (sender !is Player) {
                     sender.sendMessage(ErrorMessages.MUST_BE_PLAYER)
@@ -729,7 +712,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
             entity.teleportUpdated(if (teleport) sender.location else loc)
             editor.save()
             for (villager in villagers) {
-                val e = villager.getEntity() ?: continue
+                val e = villager.getEntity() as? LivingEntity ?: continue
                 e.removeAI()
             }
             plugin.gameManager.getGames().values.forEach { g -> g.npcManager.disableAI() }

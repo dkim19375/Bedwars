@@ -5,8 +5,8 @@ holograms:
     diamond: true
     emerald: true
   heights:
-    spawn-time: 2.5
-    spawner-type: 2.8
+    spawn-time: 3.5
+    spawner-type: 3.8
   spawner-type-text:
     iron: '&7&lIron'
     gold: '&6&lGold'
