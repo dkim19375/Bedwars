@@ -21,7 +21,6 @@ package me.dkim19375.bedwars.plugin.listener
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.util.getBedHead
-import me.dkim19375.bedwars.plugin.util.getConfigItem
 import me.dkim19375.bedwars.plugin.util.getWrapper
 import me.dkim19375.bedwars.plugin.util.setNBTData
 import me.dkim19375.dkimbukkitcore.data.LocationWrapper
@@ -43,25 +42,21 @@ class BlockBreakListener(private val plugin: BedwarsPlugin) : Listener {
             return
         }
         if (block.type != Material.BED_BLOCK && block.type != Material.BED) {
-            if (LocationWrapper(block.location) in game.placedBlocks) {
-                val configItem = block.state.getConfigItem()
-                if (configItem != null) {
-                    Bukkit.broadcastMessage("configItem is not null for block")
-                    isCancelled = true
-                    block.drops.forEach {
-                        block.world.dropItem(block.location, it.setNBTData(configItem))
-                    }
-                    block.type = Material.AIR
-                }
+            val loc = LocationWrapper(block.location)
+            if (loc in game.placedBlocks) {
+                val configItem = game.placedBlocks[loc]
+                isCancelled = true
+                block.drops.forEach { block.world.dropItem(block.location, it.setNBTData(configItem)) }
+                block.type = Material.AIR
                 return
             }
             isCancelled = true
             return
         }
-        val team = game.getTeamOfPlayer(player)?: return
+        val team = game.getTeamOfPlayer(player) ?: return
         val location = block.getBedHead()
         val beds = game.data.beds
-        val bed = beds.firstOrNull { data -> data.location.getWrapper() == location.getWrapper() }?: return
+        val bed = beds.firstOrNull { data -> data.location.getWrapper() == location.getWrapper() } ?: return
         if (bed.team == team) {
             player.sendMessage("${ChatColor.RED}You cannot break your own bed!")
             isCancelled = true

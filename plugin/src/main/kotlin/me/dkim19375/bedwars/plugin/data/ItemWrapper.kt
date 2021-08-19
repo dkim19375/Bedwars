@@ -21,10 +21,8 @@ package me.dkim19375.bedwars.plugin.data
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.gui.MainShopGUI
 import me.dkim19375.bedwars.plugin.util.enumValueOfOrNull
-import me.dkim19375.bedwars.plugin.util.getConfigItem
 import me.dkim19375.bedwars.plugin.util.setNBTData
 import me.dkim19375.dkimbukkitcore.function.logInfo
-import org.bukkit.Bukkit
 import org.bukkit.DyeColor
 import org.bukkit.Material
 import org.bukkit.configuration.ConfigurationSection

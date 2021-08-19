@@ -118,7 +118,6 @@ subprojects {
         implementation 'net.kyori:adventure-platform-bukkit:4.0.0-SNAPSHOT'
 
 
-        compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
         compileOnly('com.onarandombox.multiversecore:Multiverse-Core:2.5') {
             exclude group: 'org.mcstats.bukkit'
             exclude group: 'org.spigotmc'
@@ -152,17 +151,22 @@ task copyFile(type: Copy) {
     include('*.jar')
 }
 
-task copyFile_16(type: Copy) {
-    if (!new File('../.TestServers/1.16/plugins/').exists()) {
+task copyFile_17(type: Copy) {
+    if (!new File('../.TestServers/1.17/plugins/').exists()) {
         return
     }
-    new File('../.TestServers/1.16/plugins/' + project.name + '-' + project.version + '-all.jar').delete()
+    new File('../.TestServers/1.17/plugins/' + project.name + '-' + project.version + '-all.jar').delete()
     from('build/libs/' + project.name + '-' + project.version + '-all.jar')
-    into('../.TestServers/1.16/plugins')
+    into('../.TestServers/1.17/plugins')
     include('*.jar')
 }
 
 task deleteAll() {
+    for (File file : new File('../.TestServers/1.17/plugins').listFiles()) {
+        if (file.name.startsWith(project.name)) {
+            file.delete()
+        }
+    }
     for (File file : new File('../.TestServers/1.16/plugins').listFiles()) {
         if (file.name.startsWith(project.name)) {
             file.delete()

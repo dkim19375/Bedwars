@@ -1,3 +1,5 @@
 rootProject.name = "Bedwars"
 include(":plugin")
-
+include(":v1_8")
+include(":v1_16")
+include(":compat")

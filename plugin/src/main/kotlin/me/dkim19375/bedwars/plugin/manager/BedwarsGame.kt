@@ -20,6 +20,7 @@ package me.dkim19375.bedwars.plugin.manager
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.GameData
+import me.dkim19375.bedwars.plugin.data.MainShopConfigItem
 import me.dkim19375.bedwars.plugin.data.PlayerData
 import me.dkim19375.bedwars.plugin.enumclass.ArmorType
 import me.dkim19375.bedwars.plugin.enumclass.GameState
@@ -50,7 +51,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     val npcManager = NPCManager(plugin, data)
     val upgradesManager = UpgradesManager(plugin, this)
     val spawnerManager = SpawnerManager(plugin, this)
-    val placedBlocks = mutableSetOf<LocationWrapper>()
+    val placedBlocks = mutableMapOf<LocationWrapper, MainShopConfigItem?>()
     val beforeData = mutableMapOf<UUID, PlayerData>()
     val hologramManager = SpawnerHologramManager(plugin, this)
 
