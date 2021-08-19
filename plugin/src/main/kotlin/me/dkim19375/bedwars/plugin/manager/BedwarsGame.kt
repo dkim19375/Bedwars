@@ -183,7 +183,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
 
     fun canStart(force: Boolean = false): Result {
         update()
-        if (GameState.STARTED == state) {
+        if (state in listOf(GameState.STARTED, GameState.STARTING)) {
             return Result.GAME_RUNNING
         }
         if (!force && playersInLobby.size < data.minPlayers) {
