@@ -18,9 +18,9 @@
 
 package me.dkim19375.bedwars.plugin.enumclass
 
-enum class Permission(val permission: String) {
+enum class Permissions(val permission: String) {
+    COMMAND("bedwars.command"),
     START("bedwars.start"),
-    HELP("bedwars.help"),
     LIST("bedwars.list"),
     RELOAD("bedwars.reload"),
     JOIN("bedwars.join"),

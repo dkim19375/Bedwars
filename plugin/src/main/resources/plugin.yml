@@ -16,14 +16,13 @@ commands:
     description: Main command
     aliases:
       - bw
-    permission: bedwars.command
     usage: Use /bedwars help
 
 permissions:
   bedwars.permpack.player:
     description: Grant all permissions recommended for all players
     children:
-      - bedwars.help
+      - bedwars.command
       - bedwars.list
       - bedwars.join
       - bedwars.leave
@@ -41,10 +40,10 @@ permissions:
       - bedwars.setup
       - bedwars.info
 
+  bedwars.command:
+    description: Run the command
   bedwars.start:
     description: Start a bedwars game
-  bedwars.help:
-    description: See the help menu
   bedwars.list:
     description: See the list of bedwars games
   bedwars.reload:

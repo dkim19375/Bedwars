@@ -48,6 +48,10 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
         label: String,
         args: Array<out String>
     ): Boolean {
+        if (!sender.hasPermission(Permissions.COMMAND)) {
+            sender.sendMessage(ErrorMessages.NO_PERMISSION)
+            return true
+        }
         if (args.isEmpty()) {
             sender.showHelpMsg(label)
             return true
@@ -67,10 +71,6 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 return true
             }
             "help" -> {
-                if (!sender.hasPermission(Permission.HELP)) {
-                    sender.sendMessage(ErrorMessages.NO_PERMISSION)
-                    return true
-                }
                 if (args.size > 1) {
                     sender.showHelpMsg(
                         label,
@@ -82,7 +82,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 return true
             }
             "sound" -> {
-                if (!check(sender, args, 3, Permission.SETUP, true)) {
+                if (!check(sender, args, 3, Permissions.SETUP, true)) {
                     return true
                 }
                 val player = sender as Player
@@ -102,7 +102,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 return true
             }
             "list" -> {
-                if (!sender.hasPermission(Permission.LIST)) {
+                if (!sender.hasPermission(Permissions.LIST)) {
                     sender.sendMessage(ErrorMessages.NO_PERMISSION)
                     return true
                 }
@@ -126,7 +126,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 return true
             }
             "join" -> {
-                if (!check(sender, args, 2, Permission.JOIN, true)) {
+                if (!check(sender, args, 2, Permissions.JOIN, true)) {
                     return true
                 }
                 val player = sender as Player
@@ -159,7 +159,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 }
             }
             "quickjoin" -> {
-                if (!check(sender, args, 1, Permission.JOIN, true)) {
+                if (!check(sender, args, 1, Permissions.JOIN, true)) {
                     return true
                 }
                 val player = sender as Player
@@ -189,7 +189,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 return true
             }
             "leave" -> {
-                if (!check(sender, args, 1, Permission.LEAVE, true)) {
+                if (!check(sender, args, 1, Permissions.LEAVE, true)) {
                     return true
                 }
                 val player = sender as Player
@@ -203,7 +203,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 return true
             }
             "reload" -> {
-                if (!sender.hasPermission(Permission.RELOAD)) {
+                if (!sender.hasPermission(Permissions.RELOAD)) {
                     sender.sendMessage(ErrorMessages.NO_PERMISSION)
                     return true
                 }
@@ -213,7 +213,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 return true
             }
             "create" -> {
-                if (!check(sender, args, 1, Permission.SETUP, true)) {
+                if (!check(sender, args, 1, Permissions.SETUP, true)) {
                     return true
                 }
                 val player = sender as Player
@@ -287,7 +287,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 return true
             }
             "stop" -> {
-                if (!check(sender, args, 2, Permission.STOP, false)) {
+                if (!check(sender, args, 2, Permissions.STOP, false)) {
                     return true
                 }
                 if (args[1].equals("all", ignoreCase = true)) {
@@ -328,7 +328,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 return true
             }
             "start" -> {
-                if (!check(sender, args, 2, Permission.START, false)) {
+                if (!check(sender, args, 2, Permissions.START, false)) {
                     return true
                 }
                 @Suppress("DuplicatedCode")
@@ -369,7 +369,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 return true
             }
             "info" -> {
-                if (!check(sender, args, 2, Permission.INFO, false)) {
+                if (!check(sender, args, 2, Permissions.INFO, false)) {
                     return true
                 }
                 val world = Bukkit.getWorld(args[1])
@@ -426,7 +426,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 return true
             }
             "setup" -> {
-                if (!check(sender, args, 3, Permission.SETUP, true)) {
+                if (!check(sender, args, 3, Permissions.SETUP, true)) {
                     return true
                 }
                 val player = sender as Player
@@ -739,7 +739,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
         sender: CommandSender,
         args: Array<out String>,
         minArgs: Int,
-        permission: Permission,
+        permission: Permissions,
         bePlayer: Boolean
     ): Boolean {
         if (!sender.hasPermission(permission)) {
@@ -764,7 +764,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
         editing: Boolean = false
     ): BedwarsGame? {
         val player = sender as? Player
-        if (!check(sender, args, if (player == null) 2 else 1, Permission.SETUP, !editing)) {
+        if (!check(sender, args, if (player == null) 2 else 1, Permissions.SETUP, !editing)) {
             return null
         }
         val game = plugin.gameManager.getGame(args.getOrNull(1), player)
