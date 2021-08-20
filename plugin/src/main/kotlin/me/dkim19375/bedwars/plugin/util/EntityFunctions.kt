@@ -31,10 +31,7 @@ import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.kyori.adventure.title.Title
 import net.kyori.adventure.util.Ticks
-import org.bukkit.Bukkit
-import org.bukkit.Location
-import org.bukkit.Material
-import org.bukkit.Sound
+import org.bukkit.*
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
@@ -251,4 +248,51 @@ fun PlayerInventory.clearAll() {
     for (i in 0..39) {
         setItem(i, ItemStack(Material.AIR))
     }
+}
+
+
+// https://www.spigotmc.org/threads/95872/
+
+private const val CENTER_PX = 154
+
+fun Player.sendCenteredMessage(message: String?) {
+    if (message.isNullOrEmpty()) {
+        player.sendMessage("")
+        return
+    }
+    var messagePxSize = 0
+    var previousCode = false
+    var isBold = false
+    for (char in message.toCharArray()) {
+        when {
+            char == ChatColor.COLOR_CHAR -> {
+                previousCode = true
+                continue
+            }
+            previousCode -> {
+                previousCode = false
+                if (char == 'l' || char == 'L') {
+                    isBold = true
+                    continue
+                }
+                isBold = false
+            }
+            else -> {
+                val info = DefaultFontInfo.getDefaultFontInfo(char)
+                messagePxSize += if (isBold) info.boldLength else info.length
+                messagePxSize++
+            }
+        }
+    }
+    val halvedMessageSize = messagePxSize / 2
+    val toCompensate = CENTER_PX - halvedMessageSize
+    val spaceLength = DefaultFontInfo.SPACE.length + 1
+    var compensated = 0
+    val sb = StringBuilder()
+    ChatColor.COLOR_CHAR
+    while (compensated < toCompensate) {
+        sb.append(" ")
+        compensated += spaceLength
+    }
+    player.sendMessage("$sb$message")
 }
