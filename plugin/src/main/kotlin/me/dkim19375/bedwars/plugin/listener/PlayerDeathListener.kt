@@ -39,6 +39,7 @@ class PlayerDeathListener(private val plugin: BedwarsPlugin) : Listener {
         if (killer != null) {
             game.kills[killer.uniqueId] = game.kills.getOrElse(killer.uniqueId) { 0 } + 1
         }
+        game.trackers.remove(entity.uniqueId)
         val location = entity.location.clone()
         entity.spigot().respawn() // auto respawn
         droppedExp = 0

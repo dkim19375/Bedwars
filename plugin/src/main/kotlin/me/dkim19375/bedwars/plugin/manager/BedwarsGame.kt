@@ -56,6 +56,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     val beforeData = mutableMapOf<UUID, PlayerData>()
     val hologramManager = SpawnerHologramManager(plugin, this)
     val kills = mutableMapOf<UUID, Int>()
+    val trackers = mutableMapOf<UUID, Team>()
 
     var data = data
         private set
@@ -65,11 +66,6 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
 
     init {
         npcManager.disableAI()
-        Bukkit.getScheduler().runTaskTimer(plugin, {
-            for (player in getPlayersInGame().getPlayers()) {
-                player.foodLevel = 20
-            }
-        }, 20L, 20L)
     }
 
     fun start(force: Boolean): Result {
@@ -81,6 +77,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         state = GameState.STARTING
         countdown = 10
         kills.clear()
+        trackers.clear()
         logInfo("Game ${data.world.name} is starting!")
         task?.cancel()
         plugin.scoreboardManager.update(this)

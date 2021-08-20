@@ -167,7 +167,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
                 return
             }
             player.inventory.removeItem(ItemStack(item.costItem.material, item.cost))
-            player.sendMessage("${ChatColor.GREEN}Successfully bought ${item.displayname}!")
+            player.sendMessage("${ChatColor.GREEN}You purchased ${ChatColor.GOLD}${item.displayname}!")
             val armorType = ArmorType.fromMaterial(item.item.material) ?: return
             player.inventory.boots = ItemStack(armorType.boots)
             player.inventory.leggings = ItemStack(armorType.leggings)
@@ -182,7 +182,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
         }
         player.inventory.removeItem(ItemStack(item.costItem.material, item.cost))
         val team = plugin.gameManager.getTeamOfPlayer(player)
-        player.sendMessage("${ChatColor.GREEN}Successfully bought ${item.displayname}!")
+        player.sendMessage("${ChatColor.GREEN}You purchased ${ChatColor.GOLD}${item.displayname}!")
         removeSword(item.item.material)
         player.giveItem(item.item.toItemStack(team?.color))
         player.playBoughtSound()

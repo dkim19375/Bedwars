@@ -31,6 +31,7 @@ class NBTUtilities(plugin: JavaPlugin) : NBTUtilitiesAbstract() {
 
     private val HOLOGRAM_NS_KEY = NamespacedKey(plugin, HOLOGRAM_KEY)
     private val CONFIG_ITEM_NS_KEY = NamespacedKey(plugin, CONFIG_ITEM_KEY)
+    private val TRACKER_NS_KEY = NamespacedKey(plugin, TRACKER_KEY)
     private val PDT_STRING: PersistentDataType<String, String>
         get() = PersistentDataType.STRING
     private val PDT_BYTE: PersistentDataType<Byte, Byte>

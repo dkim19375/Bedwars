@@ -24,6 +24,8 @@ import me.dkim19375.bedwars.plugin.data.GameData
 import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.enumclass.Team
 import me.dkim19375.bedwars.plugin.util.getIgnoreCase
+import me.dkim19375.bedwars.plugin.util.getPlayers
+import me.dkim19375.bedwars.plugin.util.sendActionBar
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Location
@@ -50,6 +52,40 @@ class GameManager(private val plugin: BedwarsPlugin) {
                     continue
                 }
                 invisPlayers.remove(player.uniqueId)
+            }
+
+            for (game in getGames().values) {
+                for (player in game.getPlayersInGame().getPlayers()) {
+                    player.foodLevel = 20
+                }
+                if (game.state != GameState.STARTED) {
+                    continue
+                }
+                for ((uuid, team) in game.trackers) {
+                    val player = Bukkit.getPlayer(uuid) ?: continue
+                    if (game.beds[team] != true) {
+                        continue
+                    }
+                    var nearestPlayer: Pair<Player, Double>? = null
+                    for (otherPlayer in game.getPlayersInTeam(team).getPlayers()) {
+                        val distance = player.location.distance(otherPlayer.location)
+                        if (nearestPlayer == null) {
+                            nearestPlayer = otherPlayer to distance
+                            continue
+                        }
+                        if (nearestPlayer.second > distance) {
+                            nearestPlayer = otherPlayer to distance
+                        }
+                    }
+                    player.sendActionBar(
+                        if (nearestPlayer == null) {
+                            null
+                        } else {
+                            "Tracking: ${team.chatColor}${nearestPlayer.first} ${ChatColor.WHITE}- " +
+                                    "Distance: ${ChatColor.GREEN}${ChatColor.BOLD}${nearestPlayer.second}m"
+                        }
+                    )
+                }
             }
         }, 20L, 20L)
         Bukkit.getScheduler().runTask(plugin, this::reloadData)

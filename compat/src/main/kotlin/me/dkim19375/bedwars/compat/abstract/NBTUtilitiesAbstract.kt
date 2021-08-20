@@ -41,6 +41,7 @@ abstract class NBTUtilitiesAbstract {
 
     protected val HOLOGRAM_KEY = "BedwarsArmorStand"
     protected val CONFIG_ITEM_KEY = "BedwarsConfigItem"
+    protected val TRACKER_KEY = "BedwarsPlayerTracker"
 
     abstract fun <T : LivingEntity> addAI(entity: T)
 

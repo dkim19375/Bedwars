@@ -26,7 +26,6 @@ import me.dkim19375.bedwars.plugin.enumclass.ErrorMessages
 import me.dkim19375.bedwars.plugin.enumclass.Permissions
 import me.dkim19375.dkimbukkitcore.data.HelpMessage
 import me.dkim19375.dkimbukkitcore.function.showHelpMessage
-import me.dkim19375.dkimbukkitcore.javaplugin.CoreJavaPlugin
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.kyori.adventure.title.Title
@@ -42,6 +41,8 @@ import org.bukkit.permissions.Permissible
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.*
 import kotlin.math.ceil
+
+private val plugin: BedwarsPlugin by lazy { JavaPlugin.getPlugin(BedwarsPlugin::class.java) }
 
 val commands = listOf(
     HelpMessage("help [page]", "Show this help menu", Permissions.COMMAND.permission),
@@ -108,13 +109,8 @@ val commands = listOf(
     HelpMessage("setup <name> bed remove <color>", "Unsets the bed of the team color", Permissions.SETUP.permission),
 )
 
-fun CommandSender.showHelpMsg(label: String, page: Int = 1) = showHelpMsg(label, null, page)
-
-fun CommandSender.showHelpMsg(label: String, error: ErrorMessages) = showHelpMsg(label, error.message)
-
-fun CommandSender.showHelpMsg(label: String, error: String?, page: Int = 1) = showHelpMessage(
-    label, error, page, commands,
-    JavaPlugin.getProvidingPlugin(BedwarsPlugin::class.java) as CoreJavaPlugin
+fun CommandSender.showHelpMsg(label: String, page: Int = 1) = showHelpMessage(
+    label, null, page, commands, plugin
 )
 
 fun Permissible.getMaxHelpPages(): Int =
@@ -297,3 +293,9 @@ fun Player.sendCenteredMessage(message: String?) {
     }
     player.sendMessage("$sb$message")
 }
+
+fun Player.sendActionBar(
+    text: String? = null,
+) = BukkitAudiences.create(plugin).player(this).sendActionBar(
+    LegacyComponentSerializer.legacySection().deserialize(text ?: "")
+)
