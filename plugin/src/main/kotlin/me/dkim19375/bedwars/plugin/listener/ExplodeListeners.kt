@@ -21,6 +21,7 @@ package me.dkim19375.bedwars.plugin.listener
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
 import me.dkim19375.bedwars.plugin.util.getWrapper
+import me.dkim19375.dkimbukkitcore.data.toWrapper
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Entity
@@ -51,7 +52,7 @@ class ExplodeListeners(private val plugin: BedwarsPlugin) : Listener {
 
     private fun removeBlocks(blockList: MutableList<Block>, game: BedwarsGame) {
         for (block in blockList.toList()) {
-            if (block.location.getWrapper() !in game.placedBlocks) {
+            if (block.location?.toWrapper() !in game.placedBlocks) {
                 blockList.remove(block)
             }
             if (setOf(Material.BED_BLOCK, Material.BED, Material.ENDER_STONE).contains(block.type)) {

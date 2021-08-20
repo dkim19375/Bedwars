@@ -111,7 +111,7 @@ subprojects {
         implementation 'net.kyori:adventure-api:4.8.1'
         implementation 'org.jetbrains:annotations:22.0.0'
         implementation 'dev.triumphteam:triumph-gui:3.0.3'
-        implementation 'io.github.dkim19375:dkim-bukkit-core:3.2.1'
+        implementation 'io.github.dkim19375:dkim-bukkit-core:3.2.2'
         implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.21'
         implementation 'net.kyori:adventure-text-serializer-gson:4.8.1'
         implementation 'net.kyori:adventure-text-serializer-legacy:4.8.1'

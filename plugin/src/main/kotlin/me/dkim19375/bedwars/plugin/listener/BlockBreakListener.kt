@@ -24,6 +24,7 @@ import me.dkim19375.bedwars.plugin.util.getBedHead
 import me.dkim19375.bedwars.plugin.util.getWrapper
 import me.dkim19375.bedwars.plugin.util.setNBTData
 import me.dkim19375.dkimbukkitcore.data.LocationWrapper
+import me.dkim19375.dkimbukkitcore.data.toWrapper
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -56,7 +57,7 @@ class BlockBreakListener(private val plugin: BedwarsPlugin) : Listener {
         val team = game.getTeamOfPlayer(player) ?: return
         val location = block.getBedHead()
         val beds = game.data.beds
-        val bed = beds.firstOrNull { data -> data.location.getWrapper() == location.getWrapper() } ?: return
+        val bed = beds.firstOrNull { data -> data.location.toWrapper() == location.toWrapper() } ?: return
         if (bed.team == team) {
             player.sendMessage("${ChatColor.RED}You cannot break your own bed!")
             isCancelled = true

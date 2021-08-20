@@ -7,9 +7,11 @@ holograms:
   heights:
     spawn-time: 3.5
     spawner-type: 3.8
+    tier-type: 4.1
   spawner-type-text:
     iron: '&7&lIron'
     gold: '&6&lGold'
     diamond: '&b&lDiamond'
     emerald: '&a&lEmerald'
   spawner-time-text: '&eSpawns in &c%time% &eseconds'
+  spawner-tier-text: '&eTier &c%tier%'

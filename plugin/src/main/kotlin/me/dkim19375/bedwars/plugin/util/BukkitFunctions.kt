@@ -170,9 +170,6 @@ fun Material.isWeapon() = when (this) {
     else -> false
 }
 
-@Suppress("unused")
-fun Location.getWrapper() = LocationWrapper(this)
-
 fun Location.getOppositeYaw(): Location {
     val clone = clone()
     clone.yaw = clone.yaw - 180

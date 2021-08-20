@@ -165,6 +165,7 @@ fun Player.playSound(sound: Sound, volume: Float = 0.85f, pitch: Float = 1.0f) =
 fun PlayerInventory.getAllContents(): List<ItemStack?> = (0..39).map(this::getItem)
 
 fun PlayerInventory.setAllContents(items: List<ItemStack?>) {
+    clearAll()
     items.forEachIndexed { index, itemStack ->
         setItem(index, itemStack)
     }

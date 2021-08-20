@@ -23,11 +23,35 @@ import me.dkim19375.dkimcore.extension.runCatchingOrNull
 import org.bukkit.Material
 
 @Suppress("MemberVisibilityCanBePrivate")
-enum class SpawnerType(val material: Material, val maxAmount: Int, val delayFirst: Delay, val delaySecond: Delay = delayFirst, val delayThird: Delay = delaySecond) {
+enum class SpawnerType(
+    val material: Material,
+    val maxAmount: Int,
+    val delayFirst: Delay,
+    val delaySecond: Delay = delayFirst,
+    val delayThird: Delay = delaySecond,
+    val secondTime: Delay? = null,
+    val thirdTime: Delay? = null
+) {
     IRON(Material.IRON_INGOT, 48, Delay.fromMillis(1800)),
     GOLD(Material.GOLD_INGOT, 12, Delay.fromMillis(7500)),
-    DIAMOND(Material.DIAMOND, 4, Delay.fromSeconds(30), Delay.fromSeconds(23), Delay.fromSeconds(18)),
-    EMERALD(Material.EMERALD, 2, Delay.fromSeconds(65), Delay.fromSeconds(50), Delay.fromSeconds(40));
+    DIAMOND(
+        material = Material.DIAMOND,
+        maxAmount = 4,
+        delayFirst = Delay.fromSeconds(30),
+        delaySecond = Delay.fromSeconds(23),
+        delayThird = Delay.fromSeconds(12),
+        secondTime = Delay.fromMinutes(5),
+        thirdTime = Delay.fromMinutes(17),
+    ),
+    EMERALD(
+        material = Material.EMERALD,
+        maxAmount = 2,
+        delayFirst = Delay.fromMinutes(1),
+        delaySecond = Delay.fromSeconds(45),
+        delayThird = Delay.fromSeconds(30),
+        secondTime = Delay.fromMinutes(11),
+        thirdTime = Delay.fromMinutes(23)
+    );
 
     fun getDelay(delay: Int) = when (delay) {
         1 -> delayFirst

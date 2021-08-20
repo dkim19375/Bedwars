@@ -20,8 +20,8 @@ package me.dkim19375.bedwars.plugin.listener
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.util.getConfigItem
-import me.dkim19375.bedwars.plugin.util.getWrapper
 import me.dkim19375.dkimbukkitcore.data.LocationWrapper
+import me.dkim19375.dkimbukkitcore.data.toWrapper
 import org.bukkit.Material
 import org.bukkit.entity.TNTPrimed
 import org.bukkit.event.EventHandler
@@ -37,7 +37,7 @@ class BlockPlaceListener(private val plugin: BedwarsPlugin) : Listener {
             game.placedBlocks[LocationWrapper(block.location)] = itemInHand.getConfigItem()
             return
         }
-        val blockLocation = block.location.getWrapper().getLocation()
+        val blockLocation = block.location.toWrapper().getLocation()
         block.type = Material.AIR
         val tnt = block.world.spawn(blockLocation, TNTPrimed::class.java)
         tnt.fuseTicks = 50

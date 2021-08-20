@@ -29,6 +29,7 @@ class Delay private constructor(time: Long) : Cloneable {
         fun fromMillis(time: Long) = Delay(time)
         fun fromTicks(time: Long) = Delay(time * 50)
         fun fromSeconds(time: Long) = Delay(time * 1000)
+        fun fromMinutes(time: Long) = Delay(time * 60000)
         fun fromTime(before: Long) = fromTime(before, System.currentTimeMillis())
         fun fromTime(before: Long, after: Long) = fromMillis(after - before)
     }
@@ -41,4 +42,26 @@ class Delay private constructor(time: Long) : Cloneable {
     fun clone(millis: Long = this.millis): Delay {
         return Delay(millis)
     }
+
+    operator fun minus(other: Delay): Delay = Delay(millis - other.millis)
+
+    operator fun minus(other: Long): Delay = Delay(millis - other)
+
+    operator fun plus(other: Delay): Delay = Delay(millis + other.millis)
+
+    operator fun plus(other: Long): Delay = Delay(millis + other)
+
+    operator fun div(other: Delay): Delay = Delay(millis / other.millis)
+
+    operator fun div(other: Long): Delay = Delay(millis / other)
+
+    operator fun times(other: Delay): Delay = Delay(millis / other.millis)
+
+    operator fun times(other: Long): Delay = Delay(millis / other)
+
+    operator fun compareTo(other: Delay): Int = millis.compareTo(other.millis)
+
+    operator fun compareTo(other: Long): Int = millis.compareTo(other)
+
+    fun formatTime(): String = seconds.formatTime()
 }

@@ -24,6 +24,7 @@ import me.dkim19375.bedwars.plugin.data.SpawnerHologram
 import me.dkim19375.bedwars.plugin.enumclass.SpawnerType
 import me.dkim19375.bedwars.plugin.util.isHologram
 import me.dkim19375.bedwars.plugin.util.setHologramNBT
+import me.dkim19375.bedwars.plugin.util.toRomanNumeral
 import me.dkim19375.bedwars.plugin.util.update
 import me.dkim19375.dkimbukkitcore.function.formatAll
 import org.bukkit.Bukkit
@@ -60,15 +61,18 @@ class SpawnerHologramManager(private val plugin: BedwarsPlugin, private val game
                         customName = "TEST"
                     } to newLoc.clone()
                 }
-                val timeEntity = getEntity("spawn-time", 2.5)
-                val typeEntity = getEntity("spawner-type", 2.8)
+                val timeEntity = getEntity("spawn-time", 3.5)
+                val typeEntity = getEntity("spawner-type", 3.8)
+                val tierEntity = getEntity("tier-type", 4.1)
                 holograms.add(
                     SpawnerHologram(
                         type = type,
                         spawnTimeStand = timeEntity.first.uniqueId,
                         typeArmorStand = typeEntity.first.uniqueId,
+                        tierArmorStand = tierEntity.first.uniqueId,
                         timePos = timeEntity.second,
-                        typePos = typeEntity.second
+                        typePos = typeEntity.second,
+                        tierPos = tierEntity.second
                     )
                 )
             }
@@ -84,13 +88,10 @@ class SpawnerHologramManager(private val plugin: BedwarsPlugin, private val game
 
     private fun update(check: Boolean = true) {
         if (check) {
-            var reset = false
-            for (holo in holograms.toSet()) {
-                if (holo.getTimeArmorStand() == null || holo.getTypeArmorStand() == null) {
-                    reset = true
+            if (holograms.any { holo ->
+                    holo.getTimeArmorStand() == null || holo.getTypeArmorStand() == null || holo.getTierArmorStand() == null
                 }
-            }
-            if (reset) {
+            ) {
                 update()
                 return
             }
@@ -98,16 +99,21 @@ class SpawnerHologramManager(private val plugin: BedwarsPlugin, private val game
         for (hologram in holograms.toSet()) {
             val section = plugin.config.getConfigurationSection("holograms.spawner-type-text")
             hologram.getTypeArmorStand()?.customName = (when (hologram.type) {
-                SpawnerType.IRON -> (section.getString("iron") ?: "&7&lIron")
-                SpawnerType.GOLD -> (section.getString("gold") ?: "&6&lGold")
-                SpawnerType.DIAMOND -> (section.getString("diamond") ?: "&b&lDiamond")
-                SpawnerType.EMERALD -> (section.getString("emerald") ?: "&a&lEmerald")
+                SpawnerType.IRON -> (section?.getString("iron") ?: "&7&lIron")
+                SpawnerType.GOLD -> (section?.getString("gold") ?: "&6&lGold")
+                SpawnerType.DIAMOND -> (section?.getString("diamond") ?: "&b&lDiamond")
+                SpawnerType.EMERALD -> (section?.getString("emerald") ?: "&a&lEmerald")
             }).formatAll()
-            val format = plugin.config.getString("holograms.spawner-time-text") ?: "&eSpawns in &c%time% &eseconds"
-            val text = format
+            val timeFormat = plugin.config.getString("holograms.spawner-time-text") ?: "&eSpawns in &c%time% &eseconds"
+            val timeText = timeFormat
                 .replace("%time%", game.spawnerManager.getTimeUntilNextDrop(hologram.type).seconds.toString())
                 .formatAll()
-            hologram.getTimeArmorStand()?.customName = text
+            hologram.getTimeArmorStand()?.customName = timeText
+            val tierFormat = plugin.config.getString("holograms.spawner-tier-text") ?: "&eTier &c%tier%"
+            val tierText = tierFormat
+                .replace("%tier%", game.spawnerManager.upgradeLevels.getOrDefault(hologram.type, 1).toRomanNumeral())
+                .formatAll()
+            hologram.getTierArmorStand()?.customName = tierText
         }
     }
 

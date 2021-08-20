@@ -26,6 +26,7 @@ import me.dkim19375.bedwars.plugin.data.TeamData
 import me.dkim19375.bedwars.plugin.enumclass.*
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
 import me.dkim19375.bedwars.plugin.util.*
+import me.dkim19375.dkimbukkitcore.data.toWrapper
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -386,14 +387,14 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 sender.sendMessage("${ChatColor.AQUA}World name: ${ChatColor.GOLD}${data.world.name}")
                 sender.sendMessage("${ChatColor.AQUA}Minimum players: ${ChatColor.GOLD}${data.minPlayers}")
                 sender.sendMessage("${ChatColor.AQUA}Maximum players: ${ChatColor.GOLD}${data.maxPlayers}")
-                sender.sendMessage("${ChatColor.AQUA}Lobby: ${ChatColor.GOLD}${data.lobby?.getWrapper()?.format() ?: "None"}")
-                sender.sendMessage("${ChatColor.AQUA}Spectator location: ${ChatColor.GOLD}${data.spec?.getWrapper()?.format() ?: "None"}")
+                sender.sendMessage("${ChatColor.AQUA}Lobby: ${ChatColor.GOLD}${data.lobby?.toWrapper()?.format() ?: "None"}")
+                sender.sendMessage("${ChatColor.AQUA}Spectator location: ${ChatColor.GOLD}${data.spec?.toWrapper()?.format() ?: "None"}")
                 sender.sendMessage(
                     "${ChatColor.AQUA}Teams: ${ChatColor.GOLD}\n- ${
                         if (data.teams.isEmpty()) "None" else {
                             data.teams.joinToString("\n- ") { d
                                 ->
-                                "team: ${d.team.displayName}, spawn: ${d.spawn.getWrapper().format()}"
+                                "team: ${d.team.displayName}, spawn: ${d.spawn.toWrapper().format()}"
                             }
                         }
                     }"
@@ -403,7 +404,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                         if (data.beds.isEmpty()) "None" else {
                             data.beds.joinToString("\n- ") { d
                                 ->
-                                "team: ${d.team.displayName}, location: ${d.location.getWrapper().format()}"
+                                "team: ${d.team.displayName}, location: ${d.location.toWrapper().format()}"
                             }
                         }
                     }"
@@ -413,7 +414,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                         if (data.spawners.isEmpty()) "None" else {
                             data.spawners.joinToString("\n- ") { d
                                 ->
-                                "type: ${d.type.material.name.capAndFormat()}, location: ${d.location.getWrapper().format()}"
+                                "type: ${d.type.material.name.capAndFormat()}, location: ${d.location.toWrapper().format()}"
                             }
                         }
                     }"
@@ -640,7 +641,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                                     player.sendMessage("${ChatColor.RED}A bed for that team already exists!")
                                     return true
                                 }
-                                if (bed.location.getWrapper() == block.getBedHead().getWrapper()) {
+                                if (bed.location.toWrapper() == block.getBedHead().toWrapper()) {
                                     player.sendMessage("${ChatColor.RED}A bed for that team already exists!")
                                     return true
                                 }

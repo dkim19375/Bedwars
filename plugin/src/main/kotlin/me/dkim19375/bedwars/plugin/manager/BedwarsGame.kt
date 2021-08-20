@@ -29,6 +29,7 @@ import me.dkim19375.bedwars.plugin.enumclass.getColored
 import me.dkim19375.bedwars.plugin.util.*
 import me.dkim19375.dkimbukkitcore.data.LocationWrapper
 import me.dkim19375.dkimbukkitcore.function.logInfo
+import me.dkim19375.dkimcore.extension.runCatchingOrNull
 import org.apache.commons.io.FileUtils
 import org.bukkit.*
 import org.bukkit.entity.Player
@@ -521,7 +522,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             return
         }
         Bukkit.getScheduler().runTaskLater(plugin, {
-            val originalCreator = WorldCreator(data.world.name).copy(data.world)
+            val originalCreator = runCatchingOrNull { WorldCreator(worldName).copy(data.world) } ?: return@runTaskLater
             if (!data.world.name.unloadWorld()) {
                 throw IllegalStateException("Could not unload world ${data.world.name}!")
             }

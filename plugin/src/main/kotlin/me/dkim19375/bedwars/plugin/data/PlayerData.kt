@@ -20,6 +20,7 @@ package me.dkim19375.bedwars.plugin.data
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.util.*
+import me.dkim19375.dkimbukkitcore.data.toWrapper
 import me.dkim19375.dkimbukkitcore.function.logInfo
 import org.bukkit.GameMode
 import org.bukkit.Location
@@ -38,8 +39,8 @@ data class PlayerData(
 ) {
     fun apply(player: Player) {
         player.gameMode = gamemode
-        player.inventory.armorContents = armor
         player.inventory.setAllContents(inventory)
+        player.inventory.armorContents = armor
         player.enderChest.contents = enderChest
         player.teleportUpdated(location)
         player.activePotionEffects.forEach { e -> player.removePotionEffect(e.type) }
@@ -109,7 +110,7 @@ data class PlayerData(
                 val plugin = JavaPlugin.getPlugin(BedwarsPlugin::class.java)
                 plugin.worldManager?.getMVWorld(newLoc.world)?.setKeepSpawnInMemory(true)
                 if (!newLoc.chunk.load(true)) {
-                    logInfo("Could not load chunk: ${newLoc.getWrapper().format()}!", Level.SEVERE)
+                    logInfo("Could not load chunk: ${newLoc.toWrapper().format()}!", Level.SEVERE)
                 }
                 if (!player.teleportUpdated(newLoc)) {
                     logInfo("Could not teleport player ${player.name} successfully!", Level.SEVERE)

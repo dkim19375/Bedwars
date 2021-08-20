@@ -31,7 +31,7 @@ import org.bukkit.scheduler.BukkitRunnable
 
 class SpawnerManager(private val plugin: BedwarsPlugin, private val game: BedwarsGame) {
     private val timeFromLast = mutableMapOf<SpawnerType, Long>()
-    private val upgradeLevels = mutableMapOf<SpawnerType, Int>()
+    val upgradeLevels = mutableMapOf<SpawnerType, Int>()
 
     @Suppress("MemberVisibilityCanBePrivate")
     var runnable: BukkitRunnable? = null
@@ -45,11 +45,22 @@ class SpawnerManager(private val plugin: BedwarsPlugin, private val game: Bedwar
                     return
                 }
                 val types = mutableSetOf<SpawnerType>()
+                val time = System.currentTimeMillis()
                 for (type in SpawnerType.values()) {
                     if (getTimeUntilNextDrop(type).millis <= 0) {
                         types.add(type)
-                        timeFromLast[type] = System.currentTimeMillis()
+                        timeFromLast[type] = time
                     }
+                    val second = type.secondTime?.millis ?: continue
+                    val third = type.thirdTime?.millis ?: continue
+                    if (game.time + third <= time) {
+                        upgradeLevels[type] = 3
+                        continue
+                    }
+                    if (game.time + second > time) {
+                        continue
+                    }
+                    upgradeLevels[type] = 2
                 }
 
                 val spawners = game.data.spawners
