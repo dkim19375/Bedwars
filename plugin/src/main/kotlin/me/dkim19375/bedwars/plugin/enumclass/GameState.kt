@@ -23,5 +23,6 @@ enum class GameState {
     LOBBY,
     STARTING,
     STARTED,
-    REGENERATING_WORLD;
+    REGENERATING_WORLD,
+    GAME_END;
 }

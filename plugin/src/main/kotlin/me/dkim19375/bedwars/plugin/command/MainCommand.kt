@@ -117,6 +117,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                                 GameState.STARTED -> "${ChatColor.YELLOW}Running"
                                 GameState.STOPPED -> "${ChatColor.RED}Stopped"
                                 GameState.REGENERATING_WORLD -> "${ChatColor.RED}Restarting"
+                                GameState.GAME_END -> "${ChatColor.RED}Game Ended"
                             }
                         }"
                     )

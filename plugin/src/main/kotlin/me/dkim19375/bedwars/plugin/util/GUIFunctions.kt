@@ -26,6 +26,6 @@ fun ItemBuilder.lore(vararg lore: String): ItemBuilder = lore(lore.toList())
 
 fun ItemBuilder.lore(lore: List<String>): ItemBuilder = ItemBuilder.from(build().apply {
     itemMeta = itemMeta?.apply {
-        this.lore.addAll(lore)
+        this.lore = (this.lore ?: mutableListOf()).apply { addAll(lore) }
     }
 })

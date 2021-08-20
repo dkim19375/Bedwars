@@ -54,6 +54,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     val placedBlocks = mutableMapOf<LocationWrapper, MainShopConfigItem?>()
     val beforeData = mutableMapOf<UUID, PlayerData>()
     val hologramManager = SpawnerHologramManager(plugin, this)
+    val kills = mutableMapOf<UUID, Int>()
 
     var data = data
         private set
@@ -78,6 +79,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         hologramManager.start()
         state = GameState.STARTING
         countdown = 10
+        kills.clear()
         logInfo("Game ${data.world.name} is starting!")
         task?.cancel()
         plugin.scoreboardManager.update(this)
@@ -152,8 +154,60 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     fun stop(winner: Player?, team: Team) {
-        Bukkit.broadcastMessage("${team.chatColor}${winner?.displayName ?: team.displayName} has won BedWars!")
-        forceStop()
+        state = GameState.GAME_END
+        logInfo("${team.chatColor}${winner?.displayName ?: team.displayName} has won BedWars!")
+        val sorted = kills.toList()
+            .sortedBy { (_, value) -> value }
+            .map { Bukkit.getPlayer(it.first) to it.second }
+            .filter { it.first != null }
+            .toMutableList()
+        val firstKiller: Pair<Player, Int>? = sorted.firstOrNull()
+        sorted.removeFirstOrNull()
+        val secondKiller: Pair<Player, Int>? = sorted.firstOrNull()
+        sorted.removeFirstOrNull()
+        val thirdKiller: Pair<Player, Int>? = sorted.firstOrNull()
+        for (player in getPlayersInGame().getPlayers()) {
+            player.inventory.clearAll()
+            player.gameMode = GameMode.SPECTATOR
+            player.teleport(data.spec)
+            player.sendTitle(
+                title = if (getTeamOfPlayer(player) == team) {
+                    "${ChatColor.GOLD}${ChatColor.BOLD}VICTORY!"
+                } else {
+                    "${ChatColor.RED}${ChatColor.BOLD}GAME OVER!"
+                },
+                stay = 80
+            )
+            val divider = "${ChatColor.GREEN}-----------------------------------------------------"
+            player.sendMessage(divider)
+            player.sendMessage(" ")
+            player.sendCenteredMessage("${ChatColor.WHITE}${ChatColor.BOLD}Bed Wars")
+            player.sendMessage(" ")
+            player.sendCenteredMessage(
+                "${team.chatColor}${team.displayName} ${ChatColor.GRAY}${
+                    if (winner != null) {
+                        " - ${ChatColor.WHITE}${winner.displayName}"
+                    } else ""
+                }"
+            )
+            player.sendMessage(" ")
+            val sendMessage = msg@{ color: ChatColor, num: String, killer: Pair<Player, Int>? ->
+                if (killer == null) {
+                    return@msg
+                }
+                player.sendCenteredMessage("$color${ChatColor.BOLD}$num Killer ${ChatColor.GRAY}- ${killer.first.displayName} ${ChatColor.GRAY}- ${killer.second}")
+            }
+            sendMessage(ChatColor.YELLOW, "1st", firstKiller)
+            sendMessage(ChatColor.GOLD, "2nd", secondKiller)
+            sendMessage(ChatColor.RED, "3rd", thirdKiller)
+            player.sendMessage(" ")
+            player.sendMessage(divider)
+        }
+        Bukkit.getScheduler().runTaskLater(plugin, {
+            if (state == GameState.GAME_END) {
+                forceStop()
+            }
+        }, 100L)
     }
 
     fun forceStop(whenDone: () -> Unit = {}) {
@@ -182,8 +236,8 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     fun isEditing() = plugin.dataFileManager.isEditing(data)
 
     fun canStart(force: Boolean = false): Result {
-        update()
-        if (state in listOf(GameState.STARTED, GameState.STARTING)) {
+        update(force)
+        if (state in listOf(GameState.STARTED, GameState.STARTING, GameState.GAME_END)) {
             return Result.GAME_RUNNING
         }
         if (!force && playersInLobby.size < data.minPlayers) {
@@ -195,9 +249,9 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         return Result.SUCCESS
     }
 
-    fun update() {
+    fun update(force: Boolean = false) {
         if (state != GameState.STARTED) {
-            if (state != GameState.STARTING) {
+            if (state != GameState.STARTING || force) {
                 return
             }
             if (playersInLobby.size >= data.minPlayers) {
@@ -223,7 +277,11 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         }
         if (getPlayersInGame().size == 1) {
             val player = Bukkit.getPlayer(getPlayersInGame().first())
-            stop(player, getTeamOfPlayer(player)!!)
+            val team = getTeamOfPlayer(player) ?: run {
+                forceStop()
+                return
+            }
+            stop(player, team)
         }
     }
 

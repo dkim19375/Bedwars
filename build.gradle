@@ -93,6 +93,7 @@ subprojects {
     license {
         header = rootProject.file 'HEADER'
         include '**/*.kt'
+        exclude '**/DefaultFontInfo.kt'
     }
 
     repositories {

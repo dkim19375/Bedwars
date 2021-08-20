@@ -35,6 +35,10 @@ class PlayerDeathListener(private val plugin: BedwarsPlugin) : Listener {
         if (game.state != GameState.STARTED) {
             return
         }
+        val killer = entity.killer
+        if (killer != null) {
+            game.kills[killer.uniqueId] = game.kills.getOrElse(killer.uniqueId) { 0 } + 1
+        }
         val location = entity.location.clone()
         entity.spigot().respawn() // auto respawn
         droppedExp = 0
@@ -48,7 +52,6 @@ class PlayerDeathListener(private val plugin: BedwarsPlugin) : Listener {
             item.type.isWeapon()
         }
         logInfo("drops: $newDrops")
-        val killer = entity.killer
         killer?.inventory?.let {
             it.addItem(*newDrops.toTypedArray())
             logInfo("added $newDrops to player inventory!")
