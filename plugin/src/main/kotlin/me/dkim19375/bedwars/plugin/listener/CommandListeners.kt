@@ -51,6 +51,11 @@ class CommandListeners(private val plugin: BedwarsPlugin) : Listener {
         if (args.isEmpty()) {
             return
         }
+        if (args[0].equals("reload", ignoreCase = true)) {
+            event.isCancelled = true
+            sender.sendMessage("${ChatColor.RED}Reloads disabled due to known bugs with reloading!")
+            return
+        }
         if (!args[0].equals("stop", ignoreCase = true)) {
             return
         }
