@@ -30,23 +30,36 @@ import org.bukkit.event.Listener
 class PartiesListeners(private val plugin: BedwarsPlugin) : Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private fun BukkitPartiesPlayerPreTeleportEvent.onTeleport() {
-        Bukkit.broadcastMessage("Got event 1")
+        checkLeaveGame()
+        checkJoinGame()
+    }
+
+    private fun BukkitPartiesPlayerPreTeleportEvent.checkLeaveGame() {
         val player = Bukkit.getPlayer(partyPlayer.playerUUID) ?: return
-        val game = plugin.gameManager.getGame(partyPlayer.playerUUID) ?: return
-        Bukkit.broadcastMessage("Got event 2")
+        if (destination.world.name == player.world.name) {
+            return
+        }
+        val game = plugin.gameManager.getGame(player) ?: return
+        game.leavePlayer(player)
+    }
+
+    private fun BukkitPartiesPlayerPreTeleportEvent.checkJoinGame() {
+        val leader = party.leader?.let(Bukkit::getPlayer) ?: return
+        val game = plugin.gameManager.getGame(leader) ?: return
         val players = party.getOnlineMembers(true)
         if (game.state != GameState.LOBBY && game.state != GameState.STARTING) {
-            player.sendMessage("You must be in the lobby!")
+            leader.sendMessage("You must be in the lobby!")
             isCancelled = true
             return
         }
         if ((players.size - 1) > (game.data.maxPlayers - game.playersInLobby.size)) {
             isCancelled = true
-            player.sendMessage("The party is too large to join the game!")
+            leader.sendMessage("The party is too large to join the game!")
             return
         }
-        Bukkit.broadcastMessage("Got event 3")
-        for (partyPlayer in players.map(PartyPlayer::getPlayerUUID).map(Bukkit::getPlayer)) {
+        for (partyPlayer in players.map(PartyPlayer::getPlayerUUID)
+            .map(Bukkit::getPlayer)
+            .filter { !game.playersInLobby.contains(it.uniqueId) }) {
             plugin.gameManager.getGame(partyPlayer)?.leavePlayer(partyPlayer)
             game.addPlayer(partyPlayer)
         }
