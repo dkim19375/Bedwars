@@ -93,7 +93,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
                     "${ChatColor.GRAY}will scale based on the",
                     "${ChatColor.GRAY}number of traps queued.",
                     "${ChatColor.GRAY}Next trap: ${ChatColor.AQUA}$number Diamond${if (number == 1) "" else "s"}"
-                ).flags(*ItemFlag.values())
+                ).addAllFlags()
                 .asGuiItem { event ->
                     event.isCancelled = true
                     showMainScreen()
@@ -136,7 +136,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
         return ItemBuilder.from(ItemStack(trapType.material, number))
             .name("${ChatColor.GREEN}Trap #$number: ${trapType.displayName} Trap")
             .lore(lore)
-            .flags(*ItemFlag.values())
+            .addAllFlags()
             .asGuiItem { event ->
                 event.isCancelled = true
                 showMainScreen()
@@ -155,7 +155,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
             3, 1, 3, 9, ItemBuilder.from(grayGlass)
                 .setName("${ChatColor.DARK_GRAY}\u2191 ${ChatColor.GRAY}Purchasable")
                 .setLore("${ChatColor.DARK_GRAY}\u2193 ${ChatColor.GRAY}Traps Queue")
-                .flags(*ItemFlag.values())
+                .addAllFlags()
                 .asGuiItem {
                     it.isCancelled = true
                 }
@@ -180,7 +180,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
                     (if (sharpness) "${ChatColor.GREEN}UNLOCKED" else {
                         "${ChatColor.YELLOW}Click to purchase!"
                     })
-                ).flags(*ItemFlag.values())
+                ).addAllFlags()
             val armor = ItemBuilder.from(Material.IRON_CHESTPLATE)
                 .setName(
                     "${(protection.zeroNonNull() >= 4).getGreenOrRed()}Reinforced Armor ${
@@ -201,7 +201,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
                     (if (protection.zeroNonNull() >= 4) "${ChatColor.GREEN}UNLOCKED" else {
                         "${ChatColor.YELLOW}Click to purchase!"
                     })
-                ).flags(*ItemFlag.values())
+                ).addAllFlags()
             val maniacMiner = ItemBuilder.from(Material.GOLD_PICKAXE)
                 .setName(
                     "${(haste.zeroNonNull() >= 4).getGreenOrRed()}Maniac Miner ${
@@ -218,7 +218,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
                     (if (haste.zeroNonNull() >= 2) "${ChatColor.GREEN}UNLOCKED" else {
                         "${ChatColor.YELLOW}Click to purchase!"
                     })
-                ).flags(*ItemFlag.values())
+                ).addAllFlags()
             val healPoolItem = ItemBuilder.from(Material.BEACON)
                 .setName("${healPool.getGreenOrRed()}Heal Pool")
                 .setLore(
@@ -230,7 +230,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
                     (if (healPool) "${ChatColor.GREEN}UNLOCKED" else {
                         "${ChatColor.YELLOW}Click to purchase!"
                     })
-                ).flags(*ItemFlag.values())
+                ).addAllFlags()
             val buyTrapItem = ItemBuilder.from(Material.LEATHER)
                 .setName("${ChatColor.YELLOW}Buy a trap")
                 .setLore(
@@ -238,7 +238,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
                     "queued on the right.".setGray(),
                     " ",
                     "${ChatColor.YELLOW}Click to browse!"
-                ).flags(*ItemFlag.values())
+                ).addAllFlags()
             menu.setItem(2, 3, sharpSword.asGuiItem { event ->
                 event.isCancelled = true
                 onClick(UpgradeType.SHARPNESS)
@@ -343,7 +343,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
     ): GuiItem = ItemBuilder.from(material)
         .name("$${ChatColor.RED}$name")
         .lore(firstLore.plus(getCostList(cost, hasEnough)))
-        .flags(*ItemFlag.values())
+        .addAllFlags()
         .asGuiItem {
             it.isCancelled = true
             onTrapClick(type)

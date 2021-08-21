@@ -20,6 +20,7 @@
 
 package me.dkim19375.bedwars.plugin.util
 
+import dev.triumphteam.gui.builder.item.ItemBuilder
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.ItemWrapper
 import me.dkim19375.bedwars.plugin.enumclass.ArmorType
@@ -31,8 +32,10 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Item
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
+import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.material.Bed
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.potion.Potion
@@ -242,4 +245,15 @@ fun ConfigurationSection.getIntOrNull(path: String): Int? = if (isSet(path) && i
 @Suppress("UNUSED_PARAMETER") // temp
 fun World.kickPlayer(player: Player, useLobby: Boolean = false) {
 
+}
+
+fun ItemMeta.addAllFlags() = ItemFlag.values().toList()
+    .minus(listOf(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_POTION_EFFECTS))
+    .forEach { addItemFlags(it) }
+
+fun ItemBuilder.addAllFlags(): ItemBuilder {
+    ItemFlag.values().toList()
+        .minus(listOf(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_POTION_EFFECTS))
+        .forEach { flags(it) }
+    return this
 }

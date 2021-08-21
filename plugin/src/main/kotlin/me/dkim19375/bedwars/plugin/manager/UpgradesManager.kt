@@ -27,7 +27,6 @@ import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemFlag
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import org.bukkit.scheduler.BukkitTask
@@ -100,10 +99,6 @@ class UpgradesManager(plugin: BedwarsPlugin, val game: BedwarsGame) {
         val sharpness = sharpness.contains(team)
         val protection = protection[team]
         for (item in player.inventory.getAllContents().toList().filterNotNull()) {
-            item.itemMeta?.let {
-                it.removeItemFlags(*ItemFlag.values())
-                item.itemMeta = it
-            }
             if (item.type.isArmor() && protection != null) {
                 item.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, protection)
             }

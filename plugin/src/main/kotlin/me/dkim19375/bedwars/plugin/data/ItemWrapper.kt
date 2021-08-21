@@ -20,6 +20,7 @@ package me.dkim19375.bedwars.plugin.data
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.gui.MainShopGUI
+import me.dkim19375.bedwars.plugin.util.addAllFlags
 import me.dkim19375.bedwars.plugin.util.enumValueOfOrNull
 import me.dkim19375.bedwars.plugin.util.setConfigItem
 import me.dkim19375.bedwars.plugin.util.setUnbreakable
@@ -28,7 +29,6 @@ import org.bukkit.DyeColor
 import org.bukkit.Material
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.enchantments.Enchantment
-import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.LeatherArmorMeta
 import org.bukkit.material.Colorable
@@ -53,7 +53,7 @@ data class ItemWrapper(
                 }
             }
             item.itemMeta?.let { meta ->
-                meta.addItemFlags(*ItemFlag.values())
+                meta.addAllFlags()
                 item.itemMeta = meta
             }
             return item
@@ -87,7 +87,7 @@ data class ItemWrapper(
             if (it is LeatherArmorMeta && color != null) {
                 it.color = color.color
             }
-            it.addItemFlags(*ItemFlag.values())
+            it.addAllFlags()
             it
         }
         return item

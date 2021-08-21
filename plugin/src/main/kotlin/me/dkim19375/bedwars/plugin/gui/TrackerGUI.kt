@@ -54,7 +54,7 @@ class TrackerGUI(private val player: Player, private val game: BedwarsGame) {
                         } else {
                             "${ChatColor.RED}You do not have enough ${MainShopGUI.CostType.EMERALD.color}Emeralds!"
                         }
-                    ).flags(*ItemFlag.values())
+                    ).addAllFlags()
                     .asGuiItem {
                         val amount = player.getItemAmount(Material.EMERALD)
                         if (amount < 2) {

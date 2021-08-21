@@ -34,7 +34,6 @@ import me.dkim19375.dkimcore.extension.runCatchingOrNull
 import org.apache.commons.io.FileUtils
 import org.bukkit.*
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.scheduler.BukkitTask
@@ -396,7 +395,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         player.inventory.setItem(
             17, ItemBuilder.from(Material.COMPASS)
                 .name("${ChatColor.GREEN}Compass ${ChatColor.GRAY}(Right Click)")
-                .flags(*ItemFlag.values())
+                .addAllFlags()
                 .build()
         )
         player.inventory.helmet = team.getColored(ItemStack(Material.LEATHER_HELMET))

@@ -3,14 +3,10 @@ package me.dkim19375.bedwars.plugin.gui
 import dev.triumphteam.gui.builder.item.ItemBuilder
 import dev.triumphteam.gui.guis.Gui
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
-import me.dkim19375.bedwars.plugin.util.lore
-import me.dkim19375.bedwars.plugin.util.name
-import me.dkim19375.bedwars.plugin.util.setGray
-import me.dkim19375.bedwars.plugin.util.toComponent
+import me.dkim19375.bedwars.plugin.util.*
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemFlag
 
 class CompassGUI(private val player: Player, private val game: BedwarsGame) {
     val menu: Gui = Gui.gui()
@@ -42,7 +38,7 @@ class CompassGUI(private val player: Player, private val game: BedwarsGame) {
                 "die.".setGray(),
                 " ",
                 "${ChatColor.YELLOW}Click to open!"
-            ).flags(*ItemFlag.values())
+            ).addAllFlags()
             .asGuiItem {
                 TrackerGUI(player, game).showPlayer()
             }
