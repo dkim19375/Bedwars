@@ -43,6 +43,7 @@ import me.tigerhix.lib.scoreboard.ScoreboardLib
 import org.bukkit.configuration.serialization.ConfigurationSerialization
 import org.bukkit.plugin.Plugin
 import java.io.FileInputStream
+import java.io.IOException
 import java.util.*
 import kotlin.system.measureTimeMillis
 
@@ -88,14 +89,21 @@ class BedwarsPlugin : CoreJavaPlugin() {
                 }ms!"
             )
             val properties = Properties()
+            val catch = { e: Throwable ->
+                e.printStackTrace()
+                mainWorld = "world"
+            }
             try {
                 FileInputStream("server.properties").use { stream ->
                     properties.load(stream)
                     mainWorld = properties.getProperty("level-name", "world")
                 }
-            } catch (e: Throwable) {
-                e.printStackTrace()
-                mainWorld = "world"
+            } catch (e: IOException) {
+                catch(e)
+            } catch (e: SecurityException) {
+                catch(e)
+            } catch (e: IllegalArgumentException) {
+                catch(e)
             }
             initNBTVariables(this)
             serializable.forEach(ConfigurationSerialization::registerClass)
