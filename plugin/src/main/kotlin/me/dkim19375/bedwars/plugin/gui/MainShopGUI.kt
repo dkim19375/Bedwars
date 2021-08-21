@@ -389,3 +389,12 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
         EMERALD(Material.EMERALD, ChatColor.GREEN, "Emerald")
     }
 }
+
+fun Material.toCostType(): MainShopGUI.CostType? {
+    for (cost in MainShopGUI.CostType.values()) {
+        if (cost.material == this) {
+            return cost
+        }
+    }
+    return null
+}

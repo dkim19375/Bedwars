@@ -47,7 +47,7 @@ class NBTUtilities : NBTUtilitiesAbstract() {
 
     override fun <T : LivingEntity> removeAI(entity: T): Unit = entity.getVanillaNBT().setInteger(NO_AI_KEY, 1)
 
-    override fun setNBTData(itemStack: ItemStack, item: String?): ItemStack {
+    override fun setConfigItem(itemStack: ItemStack, item: String?): ItemStack {
         item ?: return itemStack
         return itemStack.getNBT().apply { setString(CONFIG_ITEM_KEY, item) }.item
     }
@@ -67,4 +67,7 @@ class NBTUtilities : NBTUtilitiesAbstract() {
             it.first
         }
     }
+
+    override fun setUnbreakable(item: ItemStack, unbreakable: Boolean): ItemStack =
+        item.getNBT().apply { setInteger("Unbreakable", if (unbreakable) 1 else 0) }.item
 }

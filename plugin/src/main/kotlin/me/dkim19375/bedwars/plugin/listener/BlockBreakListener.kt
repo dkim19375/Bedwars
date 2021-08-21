@@ -21,8 +21,7 @@ package me.dkim19375.bedwars.plugin.listener
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.util.getBedHead
-import me.dkim19375.bedwars.plugin.util.getWrapper
-import me.dkim19375.bedwars.plugin.util.setNBTData
+import me.dkim19375.bedwars.plugin.util.setConfigItem
 import me.dkim19375.dkimbukkitcore.data.LocationWrapper
 import me.dkim19375.dkimbukkitcore.data.toWrapper
 import org.bukkit.Bukkit
@@ -47,7 +46,7 @@ class BlockBreakListener(private val plugin: BedwarsPlugin) : Listener {
             if (loc in game.placedBlocks) {
                 val configItem = game.placedBlocks[loc]
                 isCancelled = true
-                block.drops.forEach { block.world.dropItem(block.location, it.setNBTData(configItem)) }
+                block.drops.forEach { block.world.dropItem(block.location, it.setConfigItem(configItem)) }
                 block.type = Material.AIR
                 return
             }

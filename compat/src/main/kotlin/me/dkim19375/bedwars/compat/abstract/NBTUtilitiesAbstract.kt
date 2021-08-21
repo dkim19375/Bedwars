@@ -47,7 +47,7 @@ abstract class NBTUtilitiesAbstract {
 
     abstract fun <T : LivingEntity> removeAI(entity: T)
 
-    abstract fun setNBTData(itemStack: ItemStack, item: String?): ItemStack
+    abstract fun setConfigItem(itemStack: ItemStack, item: String?): ItemStack
 
     // custom
 
@@ -56,4 +56,6 @@ abstract class NBTUtilitiesAbstract {
     abstract fun isHologram(armorStand: ArmorStand): Boolean
 
     abstract fun setHologramNBT(armorStand: ArmorStand, holo: Boolean): ArmorStand
+
+    abstract fun setUnbreakable(item: ItemStack, unbreakable: Boolean): ItemStack
 }

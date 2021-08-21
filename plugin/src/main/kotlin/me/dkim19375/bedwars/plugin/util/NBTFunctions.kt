@@ -39,9 +39,9 @@ fun <T : LivingEntity> T.addAI() = nbtUtils.addAI(this)
 
 fun <T : LivingEntity> T.removeAI() = nbtUtils.removeAI(this)
 
-fun ItemStack.setNBTData(item: MainShopConfigItem?): ItemStack = nbtUtils.setNBTData(this, item?.name)
+fun ItemStack.setConfigItem(item: MainShopConfigItem?): ItemStack = nbtUtils.setConfigItem(this, item?.name)
 
-fun ItemStack.setNBTData(item: String?): ItemStack = nbtUtils.setNBTData(this, item)
+fun ItemStack.setConfigItem(item: String?): ItemStack = nbtUtils.setConfigItem(this, item)
 
 
 // custom
@@ -50,4 +50,6 @@ fun ItemStack.getConfigItem(): MainShopConfigItem? = plugin.configManager.getIte
 
 fun ArmorStand.isHologram(): Boolean = nbtUtils.isHologram(this)
 
-fun ArmorStand.setHologramNBT(holo: Boolean) = nbtUtils.setHologramNBT(this, holo)
+fun ArmorStand.setHologramNBT(holo: Boolean): ArmorStand = nbtUtils.setHologramNBT(this, holo)
+
+fun ItemStack.setUnbreakable(unbreakable: Boolean): ItemStack = nbtUtils.setUnbreakable(this, unbreakable)

@@ -158,7 +158,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
             PlayerItemDamageListener(this), CommandListeners(this), AsyncPlayerChatListener(this),
             PlayerCoordsChangeListener(this), EntityDamageByEntityListener(this), CraftItemListener(this),
             PlayerInteractListener(this), ProjectileLaunchListener(this), PlayerPickupItemListener(this),
-            partiesListeners, scoreboardManager
+            WorldInitListener(this), partiesListeners, scoreboardManager
         )
     }
 }

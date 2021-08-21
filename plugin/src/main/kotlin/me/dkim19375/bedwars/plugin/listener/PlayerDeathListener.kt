@@ -20,6 +20,8 @@ package me.dkim19375.bedwars.plugin.listener
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.enumclass.GameState
+import me.dkim19375.bedwars.plugin.gui.MainShopGUI
+import me.dkim19375.bedwars.plugin.gui.toCostType
 import me.dkim19375.bedwars.plugin.util.dropItem
 import me.dkim19375.bedwars.plugin.util.isWeapon
 import me.dkim19375.dkimbukkitcore.function.logInfo
@@ -57,8 +59,16 @@ class PlayerDeathListener(private val plugin: BedwarsPlugin) : Listener {
             it.addItem(*newDrops.toTypedArray())
             logInfo("added $newDrops to player inventory!")
         }
+        val materials = mutableMapOf<MainShopGUI.CostType, Int>()
+        for (drop in newDrops) {
+            val cost = drop.type.toCostType() ?: continue
+            materials[cost] = materials.getOrDefault(cost, 0) + drop.amount
+        }
         killer ?: logInfo("killer is null!")
         killer ?: newDrops.forEach { drop -> location.dropItem(drop) }
         game.playerKilled(entity, originalDrops)
+        for ((cost, amount) in materials) {
+            entity.sendMessage("${cost.color}+$amount ${cost.displayname}")
+        }
     }
 }

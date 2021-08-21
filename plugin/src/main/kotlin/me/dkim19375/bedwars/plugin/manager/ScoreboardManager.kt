@@ -118,26 +118,26 @@ class ScoreboardManager(private val plugin: BedwarsPlugin) : ScoreboardHandler, 
             val spawner = closest.first
             val delay = closest.second
             val tier = (tiers.getOrDefault(spawner, 1) + 1).toRomanNumeral()
-            entry.next("${StringUtils.capitalize(closest.first.name.lowercase())} $tier in ${ChatColor.GREEN}${delay.formatTime()}")
+            entry.next("${StringUtils.capitalize(closest.first.name.lowercase())} $tier in${ChatColor.GREEN} ${delay.formatTime()}")
                 .blank()
         }
         for (data in game.data.teams) {
             val team = data.team
             val stringBuilder = StringBuilder(team.chatColor.toString())
             stringBuilder.append(team.name[0].toString().uppercase())
-                .append(" ${ChatColor.WHITE}${team.displayName}: ")
+                .append("${ChatColor.WHITE} ${team.displayName}:")
             if (game.getPlayersInTeam(team).isEmpty()) {
-                stringBuilder.append("${ChatColor.RED}${ChatColor.BOLD}\u3024")
+                stringBuilder.append("${ChatColor.RED}${ChatColor.BOLD} 〤")
             } else {
                 val bed = game.beds[team]
                 if (bed == null || bed == false) {
-                    stringBuilder.append("${ChatColor.GREEN}${game.getPlayersInTeam(team).size}")
+                    stringBuilder.append("${ChatColor.GREEN} ${game.getPlayersInTeam(team).size}")
                 } else {
-                    stringBuilder.append("${ChatColor.GREEN}\u2714")
+                    stringBuilder.append("${ChatColor.GREEN} ✔")
                 }
             }
             if (game.getPlayersInTeam(team).contains(player.uniqueId)) {
-                stringBuilder.append(" ${ChatColor.GRAY}YOU")
+                stringBuilder.append("${ChatColor.GRAY} YOU")
             }
             entry.next(stringBuilder.toString())
         }

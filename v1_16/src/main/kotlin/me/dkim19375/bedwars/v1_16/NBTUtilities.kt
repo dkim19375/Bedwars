@@ -41,7 +41,7 @@ class NBTUtilities(plugin: JavaPlugin) : NBTUtilitiesAbstract() {
 
     override fun <T : LivingEntity> removeAI(entity: T): Unit = entity.setAI(false)
 
-    override fun setNBTData(itemStack: ItemStack, item: String?): ItemStack {
+    override fun setConfigItem(itemStack: ItemStack, item: String?): ItemStack {
         item ?: return itemStack
         itemStack.itemMeta = itemStack.itemMeta?.apply {
             persistentDataContainer.set(CONFIG_ITEM_NS_KEY, PDT_STRING, item)
@@ -60,5 +60,9 @@ class NBTUtilities(plugin: JavaPlugin) : NBTUtilitiesAbstract() {
             armorStand.persistentDataContainer.set(HOLOGRAM_NS_KEY, PDT_BYTE, 0)
         }
         return armorStand
+    }
+
+    override fun setUnbreakable(item: ItemStack, unbreakable: Boolean): ItemStack = item.apply {
+        itemMeta = itemMeta?.apply { isUnbreakable = true }
     }
 }

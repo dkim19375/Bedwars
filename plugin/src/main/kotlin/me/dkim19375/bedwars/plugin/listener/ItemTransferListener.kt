@@ -47,15 +47,20 @@ class ItemTransferListener(private val plugin: BedwarsPlugin) : Listener {
         if (!type.isFromSelf) {
             return
         }
-        if (items.map(ItemStack::getType).any(Material::isTool)) {
+        val materials = items.map(ItemStack::getType)
+        if (materials.contains(Material.COMPASS)) {
             isCancelled = true
             return
         }
-        if (items.map(ItemStack::getType).any(Material::isWeapon)) {
+        if (materials.any(Material::isTool)) {
             isCancelled = true
             return
         }
-        if (items.map(ItemStack::getType).any(Material::isArmor)) {
+        if (materials.any(Material::isWeapon)) {
+            isCancelled = true
+            return
+        }
+        if (materials.any(Material::isArmor)) {
             isCancelled = true
             return
         }

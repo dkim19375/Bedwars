@@ -30,8 +30,10 @@ import org.bukkit.event.Listener
 class PartiesListeners(private val plugin: BedwarsPlugin) : Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private fun BukkitPartiesPlayerPreTeleportEvent.onTeleport() {
+        Bukkit.broadcastMessage("Got event 1")
         val player = Bukkit.getPlayer(partyPlayer.playerUUID) ?: return
         val game = plugin.gameManager.getGame(partyPlayer.playerUUID) ?: return
+        Bukkit.broadcastMessage("Got event 2")
         val players = party.getOnlineMembers(true)
         if (game.state != GameState.LOBBY && game.state != GameState.STARTING) {
             player.sendMessage("You must be in the lobby!")
@@ -43,6 +45,7 @@ class PartiesListeners(private val plugin: BedwarsPlugin) : Listener {
             player.sendMessage("The party is too large to join the game!")
             return
         }
+        Bukkit.broadcastMessage("Got event 3")
         for (partyPlayer in players.map(PartyPlayer::getPlayerUUID).map(Bukkit::getPlayer)) {
             plugin.gameManager.getGame(partyPlayer)?.leavePlayer(partyPlayer)
             game.addPlayer(partyPlayer)

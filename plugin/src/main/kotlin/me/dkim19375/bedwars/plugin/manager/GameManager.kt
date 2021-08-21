@@ -77,12 +77,13 @@ class GameManager(private val plugin: BedwarsPlugin) {
                             nearestPlayer = otherPlayer to distance
                         }
                     }
+                    player.compassTarget = (nearestPlayer?.first?.location ?: player.world.spawnLocation).clone()
                     player.sendActionBar(
                         if (nearestPlayer == null) {
                             null
                         } else {
-                            "Tracking: ${team.chatColor}${nearestPlayer.first} ${ChatColor.WHITE}- " +
-                                    "Distance: ${ChatColor.GREEN}${ChatColor.BOLD}${nearestPlayer.second}m"
+                            "Tracking: ${team.chatColor}${nearestPlayer.first.name} ${ChatColor.WHITE}- " +
+                                    "Distance: ${ChatColor.GREEN}${ChatColor.BOLD}${nearestPlayer.second.toInt()}m"
                         }
                     )
                 }

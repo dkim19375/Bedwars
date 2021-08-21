@@ -19,9 +19,7 @@
 package me.dkim19375.bedwars.plugin.listener
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
-import me.dkim19375.bedwars.plugin.util.isArmor
-import me.dkim19375.bedwars.plugin.util.isTool
-import me.dkim19375.bedwars.plugin.util.isWeapon
+import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerItemDamageEvent
@@ -29,10 +27,8 @@ import org.bukkit.event.player.PlayerItemDamageEvent
 class PlayerItemDamageListener(private val plugin: BedwarsPlugin) : Listener {
     @EventHandler
     fun PlayerItemDamageEvent.onDamage() {
-        plugin.gameManager.getGame(player)?: return
-        isCancelled = true
-        if (item.type.isTool() || item.type.isArmor() || item.type.isWeapon()) {
-            item.durability = 0
-        }
+        plugin.gameManager.getGame(player) ?: return
+        Bukkit.broadcastMessage("Cancelled")
+        // isCancelled = true
     }
 }

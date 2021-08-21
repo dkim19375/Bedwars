@@ -38,11 +38,13 @@ data class PlayerData(
     val health: Double
 ) {
     fun apply(player: Player) {
+        player.compassTarget = player.world.spawnLocation.clone()
         player.gameMode = gamemode
         player.inventory.setAllContents(inventory)
         player.inventory.armorContents = armor
         player.enderChest.contents = enderChest
         player.teleportUpdated(location)
+        player.compassTarget = player.world.spawnLocation.clone()
         player.activePotionEffects.forEach { e -> player.removePotionEffect(e.type) }
         player.health = health
     }
@@ -96,7 +98,12 @@ data class PlayerData(
                 player.health
             )
 
-        fun createDataAndReset(player: Player, default: Location?, location: Location?, gamemode: GameMode = GameMode.SURVIVAL): PlayerData {
+        fun createDataAndReset(
+            player: Player,
+            default: Location?,
+            location: Location?,
+            gamemode: GameMode = GameMode.SURVIVAL
+        ): PlayerData {
             val data = createData(player, default)
             player.gameMode = gamemode
             player.inventory.clearAll()
