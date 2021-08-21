@@ -89,14 +89,12 @@ class DataFileManager(private val plugin: BedwarsPlugin) {
     }
 
     @Suppress("unused")
-    fun setLobby(location: Location) {
+    fun setLobby(location: Location?) {
         plugin.dataFile.config.set("lobby", location)
         save = true
     }
 
-    fun getLobby(): Location? {
-        return plugin.dataFile.config.get("lobby") as? Location
-    }
+    fun getLobby(): Location? = plugin.dataFile.config.get("lobby") as? Location
 
     fun isEditing(data: GameData) = plugin.dataFile.config.getBoolean("editing.${data.world.name}")
 

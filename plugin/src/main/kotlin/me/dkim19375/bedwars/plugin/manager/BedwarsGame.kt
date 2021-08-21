@@ -480,9 +480,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             val player = Bukkit.getPlayer(uuid) ?: continue
             leavePlayer(player)
         }
-        for (player in data.world.players) {
-            player.teleportUpdated(Bukkit.getWorld("world").spawnLocation)
-        }
+        data.world.players.forEach(Player::kickPlayerFromWorld)
         val folder = data.world.worldFolder
         val originalCreator = WorldCreator(data.world.name).copy(data.world)
         if (!Bukkit.unloadWorld(data.world, true)) {
@@ -517,9 +515,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             val player = Bukkit.getPlayer(uuid) ?: continue
             leavePlayer(player)
         }
-        for (player in data.world.players) {
-            player.teleportUpdated(Bukkit.getWorld("world").spawnLocation)
-        }
+        data.world.players.forEach(Player::kickPlayerFromWorld)
         state = GameState.REGENERATING_WORLD
         val folder = data.world.worldFolder
         if (!plugin.isEnabled) {

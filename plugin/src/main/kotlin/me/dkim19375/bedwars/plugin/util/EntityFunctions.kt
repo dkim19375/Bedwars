@@ -56,6 +56,7 @@ val commands = listOf(
     HelpMessage("save <name>", "Save a bedwars game", Permissions.SETUP.permission),
     HelpMessage("start <name>", "Start a bedwars game", Permissions.START.permission),
     HelpMessage("stop <name>", "Stop a bedwars game", Permissions.STOP.permission),
+    HelpMessage("lobby [disable]", "Set or disable the main lobby", Permissions.SETUP.permission),
     HelpMessage(
         "edit <name>",
         "Prevents a bedwars game from being started (used when editing.permission)",

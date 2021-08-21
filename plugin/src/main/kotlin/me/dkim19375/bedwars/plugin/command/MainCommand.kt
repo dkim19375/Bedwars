@@ -327,6 +327,24 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 }
                 return true
             }
+            "lobby" -> {
+                if (!sender.hasPermission(Permissions.SETUP)) {
+                    sender.sendMessage(ErrorMessages.NO_PERMISSION)
+                    return true
+                }
+                if (sender !is Player) {
+                    sender.sendMessage(ErrorMessages.MUST_BE_PLAYER)
+                    return true
+                }
+                if (args.getOrNull(1)?.contains("disable", true) == true) {
+                    plugin.dataFileManager.setLobby(null)
+                    sender.sendMessage("${ChatColor.GREEN}Successfully disabled the lobby!")
+                    return true
+                }
+                plugin.dataFileManager.setLobby(sender.location.clone())
+                sender.sendMessage("${ChatColor.GREEN}Successfully set the lobby!")
+                return true
+            }
             "start" -> {
                 if (!check(sender, args, 2, Permissions.START, false)) {
                     return true

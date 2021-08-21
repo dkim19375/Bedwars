@@ -18,15 +18,12 @@
 
 package me.dkim19375.bedwars.plugin.data
 
-import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.util.*
-import me.dkim19375.dkimbukkitcore.data.toWrapper
 import me.dkim19375.dkimbukkitcore.function.logInfo
 import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.bukkit.plugin.java.JavaPlugin
 import java.util.logging.Level
 
 data class PlayerData(
@@ -114,11 +111,6 @@ data class PlayerData(
             player.health = 20.0
             val newLoc = location?.update()
             if (newLoc != null) {
-                val plugin = JavaPlugin.getPlugin(BedwarsPlugin::class.java)
-                plugin.worldManager?.getMVWorld(newLoc.world)?.setKeepSpawnInMemory(true)
-                if (!newLoc.chunk.load(true)) {
-                    logInfo("Could not load chunk: ${newLoc.toWrapper().format()}!", Level.SEVERE)
-                }
                 if (!player.teleportUpdated(newLoc)) {
                     logInfo("Could not teleport player ${player.name} successfully!", Level.SEVERE)
                 }

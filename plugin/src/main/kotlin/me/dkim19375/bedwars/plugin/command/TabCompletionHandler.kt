@@ -38,12 +38,8 @@ class TabCompletionHandler(private val plugin: BedwarsPlugin) : TabCompleter {
     private val completesListMap: HashMultimap<String, String> = HashMultimap.create()
 
     init {
-        add(
-            "core", "help", "list", "join", "quickjoin", "leave", "reload", "create", "delete", "save",
-            "start", "stop", "edit", "info", "setup"
-        )
         add("spawners", "iron", "gold", "diamond", "emerald")
-        add("colors", *Team.values().map(Team::displayName).toTypedArray())
+        add("colors", Team.values().map(Team::displayName))
         add(
             "setup", "ready", "lobby", "spec", "minplayers", "maxplayers", "shop", "upgrades", "spawner",
             "team", "bed"
@@ -52,9 +48,10 @@ class TabCompletionHandler(private val plugin: BedwarsPlugin) : TabCompleter {
         add("tp", "tp", "teleport")
     }
 
-    private fun add(key: String, vararg args: String) {
-        completesListMap.putAll(key, listOf(*args))
-    }
+    private fun add(key: String, vararg args: String) = completesListMap.putAll(key, listOf(*args))
+
+    @Suppress("SameParameterValue")
+    private fun add(key: String, args: List<String>) = completesListMap.putAll(key, args)
 
     private fun getPartial(token: String, collection: Iterable<String>): List<String> {
         return StringUtil.copyPartialMatches(token, collection, ArrayList())
@@ -121,8 +118,11 @@ class TabCompletionHandler(private val plugin: BedwarsPlugin) : TabCompleter {
         if (!sender.hasPermission(Permissions.SETUP)) {
             return list
         }
-        list.add("setup")
+        list.add("create")
+        list.add("delete")
         list.add("save")
+        list.add("lobby")
+        list.add("setup")
         list.add("edit")
         return list
     }
@@ -142,6 +142,7 @@ class TabCompletionHandler(private val plugin: BedwarsPlugin) : TabCompleter {
                     "save", "setup" -> getPartialPerm(args[1], getAllGames(), sender)
                     "start" -> getPartialPerm(args[1], getBedwarsGames(), sender, Permissions.START)
                     "stop" -> getPartialPerm(args[1], getBedwarsGames(), sender, Permissions.STOP)
+                    "lobby" -> getPartialPerm(args[1], listOf("disable"), sender)
                     "info" -> getPartialPerm(args[1], getBedwarsGames(), sender, Permissions.INFO)
                     else -> emptyList()
                 }

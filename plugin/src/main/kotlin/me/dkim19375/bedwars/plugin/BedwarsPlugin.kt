@@ -24,6 +24,7 @@ import com.comphenix.protocol.ProtocolLibrary
 import com.onarandombox.MultiverseCore.MultiverseCore
 import com.onarandombox.MultiverseCore.api.MVWorldManager
 import de.tr7zw.nbtinjector.NBTInjector
+import io.github.slimjar.app.builder.ApplicationBuilder
 import me.dkim19375.bedwars.plugin.command.MainCommand
 import me.dkim19375.bedwars.plugin.command.TabCompletionHandler
 import me.dkim19375.bedwars.plugin.config.ConfigManager
@@ -41,6 +42,8 @@ import me.dkim19375.itemmovedetectionlib.ItemMoveDetectionLib
 import me.tigerhix.lib.scoreboard.ScoreboardLib
 import org.bukkit.configuration.serialization.ConfigurationSerialization
 import org.bukkit.plugin.Plugin
+import java.io.FileInputStream
+import java.util.*
 import kotlin.system.measureTimeMillis
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -61,6 +64,8 @@ class BedwarsPlugin : CoreJavaPlugin() {
         private set
     var worldManager: MVWorldManager? = null
         private set
+    lateinit var mainWorld: String
+        private set
 
     var partiesAPI: PartiesAPI? = null
     var protocolLibSupport = false
@@ -74,6 +79,24 @@ class BedwarsPlugin : CoreJavaPlugin() {
 
     override fun onLoad() {
         val time = measureTimeMillis {
+            logInfo("Loading libraries... (This may take a few seconds up to a minute)")
+            logInfo(
+                "Finished loading libraries in ${
+                    measureTimeMillis {
+                        ApplicationBuilder.appending(description.name).build()
+                    }
+                }ms!"
+            )
+            val properties = Properties()
+            try {
+                FileInputStream("server.properties").use { stream ->
+                    properties.load(stream)
+                    mainWorld = properties.getProperty("level-name", "world")
+                }
+            } catch (e: Throwable) {
+                e.printStackTrace()
+                mainWorld = "world"
+            }
             initNBTVariables(this)
             serializable.forEach(ConfigurationSerialization::registerClass)
             NBTInjector.inject()

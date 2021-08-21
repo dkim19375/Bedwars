@@ -246,12 +246,12 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
         builder = if (amount >= item.cost) {
             ItemBuilder.from(itemstack)
                 .name("${ChatColor.GREEN}${item.displayname}")
-                .lore(*loreToAdd.toTypedArray())
+                .lore(loreToAdd)
                 .lore("${ChatColor.YELLOW}Click to purchase!")
         } else {
             ItemBuilder.from(itemstack)
                 .name("${ChatColor.RED}${item.displayname}")
-                .lore(*loreToAdd.toTypedArray())
+                .lore(loreToAdd)
                 .lore("${ChatColor.RED}You do not have enough ${item.costItem.color}${item.costItem.displayname}!")
         }
         if (getRemainingQuickSlots() < 1) {

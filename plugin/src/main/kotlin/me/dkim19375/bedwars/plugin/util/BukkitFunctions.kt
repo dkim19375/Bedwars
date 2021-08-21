@@ -242,10 +242,8 @@ fun LocationWrapper.format(): String = "${"world: ${world.name}, "}($x, $y, $z)"
 
 fun ConfigurationSection.getIntOrNull(path: String): Int? = if (isSet(path) && isInt(path)) getInt(path) else null
 
-@Suppress("UNUSED_PARAMETER") // temp
-fun World.kickPlayer(player: Player, useLobby: Boolean = false) {
-
-}
+fun Player.kickPlayerFromWorld() =
+    player.teleport(plugin.dataFileManager.getLobby() ?: Bukkit.getWorld(plugin.mainWorld).spawnLocation)
 
 fun ItemMeta.addAllFlags() = ItemFlag.values().toList()
     .minus(listOf(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_POTION_EFFECTS))
