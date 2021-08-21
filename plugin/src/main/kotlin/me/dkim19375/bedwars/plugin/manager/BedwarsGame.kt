@@ -486,7 +486,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         val folder = data.world.worldFolder
         val originalCreator = WorldCreator(data.world.name).copy(data.world)
         if (!Bukkit.unloadWorld(data.world, true)) {
-            throw RuntimeException("Could not unload world!")
+            throw IllegalStateException("Could not unload world!")
         }
         Bukkit.getScheduler().runTaskLater(plugin, {
             Bukkit.getScheduler().runTaskAsynchronously(plugin) {

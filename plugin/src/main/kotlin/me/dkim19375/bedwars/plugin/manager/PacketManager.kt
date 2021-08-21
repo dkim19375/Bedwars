@@ -97,7 +97,6 @@ class PacketManager(private val plugin: BedwarsPlugin) {
                 manager.sendServerPacket(observer, packet)
             } catch (e: InvocationTargetException) {
                 e.printStackTrace()
-                throw RuntimeException("Cannot send packet.", e)
             }
         }
     }
