@@ -18,6 +18,7 @@
 
 package me.dkim19375.bedwars.plugin.manager
 
+import dev.triumphteam.gui.builder.item.ItemBuilder
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.GameData
 import me.dkim19375.bedwars.plugin.data.MainShopConfigItem
@@ -33,6 +34,7 @@ import me.dkim19375.dkimcore.extension.runCatchingOrNull
 import org.apache.commons.io.FileUtils
 import org.bukkit.*
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.scheduler.BukkitTask
@@ -391,6 +393,12 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         configManager.getItemFromMaterial(Material.WOOD_SWORD)?.item?.toItemStack(team.color)?.let {
             player.inventory.addItem(it)
         }
+        player.inventory.setItem(
+            17, ItemBuilder.from(Material.COMPASS)
+                .name("${ChatColor.GREEN}Compass ${ChatColor.GRAY}(Right Click)")
+                .flags(*ItemFlag.values())
+                .build()
+        )
         player.inventory.helmet = team.getColored(ItemStack(Material.LEATHER_HELMET))
         player.inventory.chestplate = team.getColored(ItemStack(Material.LEATHER_CHESTPLATE))
         player.inventory.leggings = team.getColored(ItemStack(armorType.leggings))

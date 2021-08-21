@@ -19,6 +19,7 @@
 package me.dkim19375.bedwars.plugin.listener
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
+import me.dkim19375.bedwars.plugin.gui.CompassGUI
 import me.dkim19375.bedwars.plugin.gui.MainShopGUI
 import me.dkim19375.bedwars.plugin.gui.UpgradeShopGUI
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
@@ -38,7 +39,11 @@ import org.bukkit.inventory.ItemStack
 class PlayerInteractListener(private val plugin: BedwarsPlugin) : Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     private fun PlayerInteractEvent.onInteract() {
-        plugin.gameManager.getGame(player) ?: return
+        val game = plugin.gameManager.getGame(player) ?: return
+        if (item?.type == Material.COMPASS) {
+            CompassGUI(player, game).showPlayer()
+            return
+        }
         makeItemUnbreakable()
         bedPrevention()
         setupFireballs()
