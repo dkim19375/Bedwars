@@ -26,7 +26,6 @@ import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.enumclass.SpawnerType
 import me.dkim19375.bedwars.plugin.util.Delay
 import me.dkim19375.bedwars.plugin.util.formatTime
-import me.dkim19375.bedwars.plugin.util.getPlayers
 import me.dkim19375.bedwars.plugin.util.toRomanNumeral
 import me.tigerhix.lib.scoreboard.ScoreboardLib
 import me.tigerhix.lib.scoreboard.common.EntryBuilder
@@ -53,15 +52,6 @@ class ScoreboardManager(private val plugin: BedwarsPlugin) : ScoreboardHandler, 
             }
             return board
         }
-    }
-
-    @Suppress("MemberVisibilityCanBePrivate")
-    fun update(player: Player) {
-        // getScoreboard(player, true).update()
-    }
-
-    fun update(game: BedwarsGame) {
-        game.getPlayersInGame().getPlayers().forEach { p -> update(p) }
     }
 
     override fun getTitle(player: Player): String {
