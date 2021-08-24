@@ -21,9 +21,11 @@ package me.dkim19375.bedwars.plugin.listener
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.gui.CompassGUI
 import me.dkim19375.bedwars.plugin.gui.MainShopGUI
+import me.dkim19375.bedwars.plugin.gui.TeleporterGUI
 import me.dkim19375.bedwars.plugin.gui.UpgradeShopGUI
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
-import me.dkim19375.bedwars.plugin.util.*
+import me.dkim19375.bedwars.plugin.util.default
+import me.dkim19375.bedwars.plugin.util.isHologram
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.ArmorStand
@@ -37,22 +39,39 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 
 class PlayerInteractListener(private val plugin: BedwarsPlugin) : Listener {
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private fun PlayerInteractEvent.onInteract() {
         val game = plugin.gameManager.getGame(player) ?: return
         if (item?.type == Material.COMPASS) {
             CompassGUI(player, game).showPlayer()
             return
         }
-        makeItemUnbreakable()
+        checkSpectator(game)
+        gameOverItems(game)
         bedPrevention()
         setupFireballs()
     }
 
-    private fun PlayerInteractEvent.makeItemUnbreakable() {
+    private fun PlayerInteractEvent.checkSpectator(game: BedwarsGame) {
+        if (!game.eliminated.contains(player.uniqueId)) {
+            return
+        }
+        isCancelled = true
+    }
+
+    private fun PlayerInteractEvent.gameOverItems(game: BedwarsGame) {
         item ?: return
-        if (item.type.isTool() || item.type.isArmor() || item.type.isWeapon()) {
-            item.durability = 0
+        if (!game.eliminated.contains(player.uniqueId)) {
+            return
+        }
+        when (material) {
+            Material.COMPASS -> TeleporterGUI(player, game).showPlayer()
+            Material.PAPER -> {
+                game.leavePlayer(player)
+                Bukkit.dispatchCommand(player, "bedwars quickjoin")
+            }
+            Material.BED -> game.leavePlayer(player)
+            else -> return
         }
     }
 

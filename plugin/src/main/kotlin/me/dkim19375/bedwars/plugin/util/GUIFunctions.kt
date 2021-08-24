@@ -18,9 +18,12 @@
 
 package me.dkim19375.bedwars.plugin.util
 
+import dev.triumphteam.gui.builder.item.BaseItemBuilder
 import dev.triumphteam.gui.builder.item.ItemBuilder
+import dev.triumphteam.gui.builder.item.SkullBuilder
+import org.bukkit.inventory.ItemFlag
 
-fun ItemBuilder.name(name: String): ItemBuilder = name(name.toComponent())
+fun <B : BaseItemBuilder<out B>> BaseItemBuilder<out B>.name(name: String): B = name(name.toComponent())
 
 fun ItemBuilder.lore(vararg lore: String): ItemBuilder = lore(lore.toList())
 
@@ -29,3 +32,16 @@ fun ItemBuilder.lore(lore: List<String>): ItemBuilder = ItemBuilder.from(build()
         this.lore = (this.lore ?: mutableListOf()).apply { addAll(lore) }
     }
 })
+
+fun SkullBuilder.lore(vararg lore: String): SkullBuilder = lore(lore.toList())
+
+fun SkullBuilder.lore(lore: List<String>): SkullBuilder = ItemBuilder.skull(build().apply {
+    itemMeta = itemMeta?.apply {
+        this.lore = (this.lore ?: mutableListOf()).apply { addAll(lore) }
+    }
+})
+
+fun <B : BaseItemBuilder<out B>> BaseItemBuilder<out B>.addAllFlags(): B = ItemFlag.values().toList()
+    .minus(listOf(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_POTION_EFFECTS))
+    .map { flags(it) }
+    .first()

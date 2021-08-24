@@ -34,6 +34,15 @@ class EntityDamageListener(private val plugin: BedwarsPlugin) : Listener {
         }
         playerAutoRespawn()
         lobbyDamage()
+        spectatorDamage()
+    }
+
+    private fun EntityDamageEvent.spectatorDamage() {
+        val player = entity as? Player ?: return
+        val game = plugin.gameManager.getGame(player) ?: return
+        if (game.eliminated.contains(player.uniqueId)) {
+            isCancelled = true
+        }
     }
 
     private fun EntityDamageEvent.playerAutoRespawn() {

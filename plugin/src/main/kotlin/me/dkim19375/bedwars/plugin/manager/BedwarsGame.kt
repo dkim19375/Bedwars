@@ -46,6 +46,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     var countdown = 10
     var time: Long = 0
     val players = mutableMapOf<Team, MutableSet<UUID>>()
+    val eliminated = mutableSetOf<UUID>()
     val playersInLobby = mutableSetOf<UUID>()
     var task: BukkitTask? = null
     private val worldName: String = data.world.name
@@ -74,6 +75,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         if (result != Result.SUCCESS) {
             return result
         }
+        eliminated.clear()
         hologramManager.start()
         state = GameState.STARTING
         countdown = 10
@@ -81,8 +83,6 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         trackers.clear()
         logInfo("Game ${data.world.name} is starting!")
         task?.cancel()
-        plugin.scoreboardManager.update(this)
-        val game = this
         task = object : BukkitRunnable() {
             override fun run() {
                 if (task == null) {
@@ -103,7 +103,6 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
                     return
                 }
                 broadcast("${ChatColor.GREEN}Starting in ${ChatColor.GOLD}$countdown")
-                plugin.scoreboardManager.update(game)
                 countdown--
             }
         }.runTaskTimer(plugin, 20L, 20L)
@@ -141,7 +140,6 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         }
         state = GameState.STARTED
         time = System.currentTimeMillis()
-        plugin.scoreboardManager.update(this)
         spawnerManager.start()
         for (entry in players.entries) {
             val team = entry.key
@@ -165,10 +163,13 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         val secondKiller: Pair<Player, Int>? = sorted.firstOrNull()
         sorted.removeFirstOrNull()
         val thirdKiller: Pair<Player, Int>? = sorted.firstOrNull()
-        for (player in getPlayersInGame().getPlayers()) {
+        for (player in getPlayersInGame().plus(eliminated).toSet().getPlayers()) {
             player.inventory.clearAll()
-            player.gameMode = GameMode.SPECTATOR
+            player.gameMode = GameMode.ADVENTURE
+            player.allowFlight = true
+            player.isFlying = true
             player.teleport(data.spec)
+            giveGameOverItems(player)
             player.sendTitle(
                 title = if (getTeamOfPlayer(player) == team) {
                     "${ChatColor.GOLD}${ChatColor.BOLD}VICTORY!"
@@ -206,11 +207,11 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             if (state == GameState.GAME_END) {
                 forceStop()
             }
-        }, 100L)
+        }, 200L)
     }
 
     fun forceStop(whenDone: () -> Unit = {}) {
-        getPlayersInGame().getPlayers().forEach { p -> leavePlayer(p, false) }
+        getPlayersInGame().plus(eliminated).toSet().getPlayers().forEach(this::revertPlayer)
         state = GameState.REGENERATING_WORLD
         players.clear()
         playersInLobby.clear()
@@ -330,7 +331,17 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     fun playerKilled(player: Player, inventory: List<ItemStack>) {
         val team = getTeamOfPlayer(player) ?: return
         if (!beds.getOrDefault(team, false)) {
-            leavePlayer(player)
+            eliminated.add(player.uniqueId)
+            player.playerListName = player.displayName
+            players.getOrDefault(team, mutableSetOf()).remove(player.uniqueId)
+            player.inventory.clearAll()
+            player.gameMode = GameMode.ADVENTURE
+            player.allowFlight = true
+            player.isFlying = true
+            player.teleport(data.spec)
+            player.sendTitle("${ChatColor.RED}${ChatColor.BOLD}GAME OVER!", stay = 80)
+            giveGameOverItems(player)
+            update()
             return
         }
         val teamData = data.teams.getTeam(team) ?: return
@@ -423,17 +434,38 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     fun revertPlayer(player: Player) {
         plugin.scoreboardManager.getScoreboard(player, false).deactivate()
         val data = beforeData[player.uniqueId] ?: return
+        if (!setOf(GameMode.SPECTATOR, GameMode.CREATIVE).contains(data.gamemode)) {
+            player.isFlying = false
+        }
         data.apply(player)
+    }
+
+    private fun giveGameOverItems(player: Player) {
+        player.inventory.setItem(0, ItemBuilder.from(Material.COMPASS)
+            .name("${ChatColor.GREEN}${ChatColor.BOLD}Teleporter ${ChatColor.GRAY}(Click)")
+            .lore("Click to teleport to players!")
+            .addAllFlags()
+            .build())
+        player.inventory.setItem(7, ItemBuilder.from(Material.PAPER)
+            .name("${ChatColor.AQUA}${ChatColor.BOLD}Play Again ${ChatColor.GRAY}(Click)")
+            .lore("Click to play another game!")
+            .addAllFlags()
+            .build())
+        player.inventory.setItem(8, ItemBuilder.from(Material.BED)
+            .name("${ChatColor.RED}${ChatColor.BOLD}Return to Lobby ${ChatColor.GRAY}(Click)")
+            .lore("Click to leave the lobby!")
+            .addAllFlags()
+            .build())
     }
 
     fun leavePlayer(player: Player, update: Boolean = true) {
         revertPlayer(player)
+        player.playerListName = player.displayName
         if (state == GameState.LOBBY || state == GameState.STARTING) {
             if (!playersInLobby.contains(player.uniqueId)) {
                 return
             }
             playersInLobby.remove(player.uniqueId)
-            plugin.scoreboardManager.update(this)
             broadcast("${player.displayName}${ChatColor.RED} has left the game! ${playersInLobby.size}/${data.maxPlayers}")
             if (playersInLobby.size < data.minPlayers) {
                 task?.cancel()
@@ -442,14 +474,16 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             }
             return
         }
+        if (state == GameState.GAME_END || eliminated.contains(player.uniqueId)) {
+            update()
+            return
+        }
         if (state != GameState.STARTED) {
             return
         }
         val team = getTeamOfPlayer(player) ?: return
-        revertPlayer(player)
         player.playerListName = player.displayName
         players.getOrDefault(team, mutableSetOf()).remove(player.uniqueId)
-        plugin.scoreboardManager.update(this)
         broadcast("${team.chatColor}${player.displayName}${ChatColor.RED} has left the game!")
         if (update) {
             update()
@@ -550,7 +584,6 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             return
         }
         beds[team] = false
-        plugin.scoreboardManager.update(this)
         getPlayersInTeam(team).getPlayers().forEach { p ->
             p.sendOtherTitle("${ChatColor.RED}BED DESTROYED!", "You will no longer respawn!")
         }

@@ -20,7 +20,6 @@
 
 package me.dkim19375.bedwars.plugin.util
 
-import dev.triumphteam.gui.builder.item.ItemBuilder
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.ItemWrapper
 import me.dkim19375.bedwars.plugin.enumclass.ArmorType
@@ -248,10 +247,3 @@ fun Player.kickPlayerFromWorld() =
 fun ItemMeta.addAllFlags() = ItemFlag.values().toList()
     .minus(listOf(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_POTION_EFFECTS))
     .forEach { addItemFlags(it) }
-
-fun ItemBuilder.addAllFlags(): ItemBuilder {
-    ItemFlag.values().toList()
-        .minus(listOf(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_POTION_EFFECTS))
-        .forEach { flags(it) }
-    return this
-}

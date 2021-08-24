@@ -40,5 +40,8 @@ class InventoryClickListener(private val plugin: BedwarsPlugin) : Listener {
                 isCancelled = true
             }
         }
+        if (game.eliminated.contains(whoClicked.uniqueId)) {
+            isCancelled = true
+        }
     }
 }

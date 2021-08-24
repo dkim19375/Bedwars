@@ -30,11 +30,12 @@ import org.bukkit.event.player.PlayerDropItemEvent
 class PlayerDropItemListener(private val plugin: BedwarsPlugin) : Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private fun PlayerDropItemEvent.onDrop() {
-        if (plugin.gameManager.getGame(player) == null) {
-            return
-        }
+        val game = plugin.gameManager.getGame(player) ?: return
         val type = itemDrop.itemStack.type
         if (type.isArmor() || type.isTool() || type.isWeapon()) {
+            isCancelled = true
+        }
+        if (game.eliminated.contains(player.uniqueId)) {
             isCancelled = true
         }
     }

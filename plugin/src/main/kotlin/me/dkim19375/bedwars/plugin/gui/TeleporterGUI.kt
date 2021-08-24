@@ -23,13 +23,16 @@ import dev.triumphteam.gui.guis.Gui
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
 import me.dkim19375.bedwars.plugin.util.*
 import org.bukkit.ChatColor
-import org.bukkit.Material
+import org.bukkit.GameMode
 import org.bukkit.entity.Player
+import kotlin.math.ceil
+import kotlin.math.max
+import kotlin.math.min
 
-class CompassGUI(private val player: Player, private val game: BedwarsGame) {
+class TeleporterGUI(private val player: Player, private val game: BedwarsGame) {
     val menu: Gui = Gui.gui()
-        .rows(3)
-        .title("Tracker & Communication".toComponent())
+        .rows(min(9, max(1, ceil(game.data.maxPlayers.toDouble() / 9.0).toInt())))
+        .title("Teleporter".toComponent())
         .disableAllInteractions()
         .create()
 
@@ -40,26 +43,28 @@ class CompassGUI(private val player: Player, private val game: BedwarsGame) {
     }
 
     fun showPlayer() {
-        showMain()
+        showMenu()
         menu.open(player)
     }
 
-    private fun showMain() {
+    private fun showMenu() {
         reset()
-        val shopItem = ItemBuilder.from(Material.COMPASS)
-            .name("${ChatColor.GREEN}Tracker Shop")
-            .lore(
-                "Purchase tracking upgrade".setGray(),
-                "for your compass which will".setGray(),
-                "track each player on a".setGray(),
-                "specific team until you".setGray(),
-                "die.".setGray(),
-                " ",
-                "${ChatColor.YELLOW}Click to open!"
-            ).addAllFlags()
-            .asGuiItem {
-                TrackerGUI(player, game).showPlayer()
-            }
-        menu.setItem(2, 5, shopItem)
+        for (player in game.getPlayersInGame().getPlayers().filter {
+            it.gameMode != GameMode.SPECTATOR
+        }) {
+            val item = ItemBuilder.skull()
+                .owner(player)
+                .name(player.displayName)
+                .lore(
+                    "Health: ${ChatColor.WHITE}${(player.health * 5).toInt()}%".setGray(),
+                    " ",
+                    "Click to teleport to the player!".setGray()
+                ).addAllFlags()
+                .asGuiItem {
+                    this.player.teleport(player)
+                    menu.close(this.player)
+                }
+            menu.addItem(item)
+        }
     }
 }
