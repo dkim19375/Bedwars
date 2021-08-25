@@ -163,21 +163,24 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         val secondKiller: Pair<Player, Int>? = sorted.firstOrNull()
         sorted.removeFirstOrNull()
         val thirdKiller: Pair<Player, Int>? = sorted.firstOrNull()
-        for (player in getPlayersInGame().plus(eliminated).toSet().getPlayers()) {
-            player.inventory.clearAll()
-            player.gameMode = GameMode.ADVENTURE
-            player.allowFlight = true
-            player.isFlying = true
-            player.teleport(data.spec)
-            giveGameOverItems(player)
-            player.sendTitle(
-                title = if (getTeamOfPlayer(player) == team) {
-                    "${ChatColor.GOLD}${ChatColor.BOLD}VICTORY!"
-                } else {
-                    "${ChatColor.RED}${ChatColor.BOLD}GAME OVER!"
-                },
-                stay = 80
-            )
+        for (player in getPlayersInGame().getPlayers()) {
+            val isEliminated = eliminated.contains(player.uniqueId)
+            if (!isEliminated) {
+                player.inventory.clearAll()
+                player.gameMode = GameMode.ADVENTURE
+                player.allowFlight = true
+                player.isFlying = true
+                player.teleport(data.spec)
+                giveGameOverItems(player)
+                player.sendTitle(
+                    title = if (getTeamOfPlayer(player) == team) {
+                        "${ChatColor.GOLD}${ChatColor.BOLD}VICTORY!"
+                    } else {
+                        "${ChatColor.RED}${ChatColor.BOLD}GAME OVER!"
+                    },
+                    stay = 80
+                )
+            }
             val divider = "${ChatColor.GREEN}-----------------------------------------------------"
             player.sendMessage(divider)
             player.sendMessage(" ")
@@ -331,7 +334,6 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     fun playerKilled(player: Player, inventory: List<ItemStack>) {
         val team = getTeamOfPlayer(player) ?: return
         if (!beds.getOrDefault(team, false)) {
-            eliminated.add(player.uniqueId)
             player.playerListName = player.displayName
             players.getOrDefault(team, mutableSetOf()).remove(player.uniqueId)
             player.inventory.clearAll()
@@ -342,6 +344,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             player.sendTitle("${ChatColor.RED}${ChatColor.BOLD}GAME OVER!", stay = 80)
             giveGameOverItems(player)
             update()
+            eliminated.add(player.uniqueId)
             return
         }
         val teamData = data.teams.getTeam(team) ?: return
@@ -492,9 +495,9 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     fun getPlayersInGame(): Set<UUID> = when (state) {
-        GameState.LOBBY -> playersInLobby.toSet()
-        GameState.STARTING -> playersInLobby.toSet()
+        GameState.LOBBY, GameState.STARTING -> playersInLobby.toSet()
         GameState.STARTED -> players.values.getCombinedValues().toSet()
+        GameState.GAME_END -> players.values.getCombinedValues().plus(eliminated).toSet()
         else -> setOf()
     }
 

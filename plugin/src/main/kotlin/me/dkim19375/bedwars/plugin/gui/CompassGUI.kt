@@ -48,7 +48,7 @@ class CompassGUI(private val player: Player, private val game: BedwarsGame) {
         reset()
         val shopItem = ItemBuilder.from(Material.COMPASS)
             .name("${ChatColor.GREEN}Tracker Shop")
-            .lore(
+            .lore(listOf(
                 "Purchase tracking upgrade".setGray(),
                 "for your compass which will".setGray(),
                 "track each player on a".setGray(),
@@ -56,7 +56,7 @@ class CompassGUI(private val player: Player, private val game: BedwarsGame) {
                 "die.".setGray(),
                 " ",
                 "${ChatColor.YELLOW}Click to open!"
-            ).addAllFlags()
+            )).addAllFlags()
             .asGuiItem {
                 TrackerGUI(player, game).showPlayer()
             }

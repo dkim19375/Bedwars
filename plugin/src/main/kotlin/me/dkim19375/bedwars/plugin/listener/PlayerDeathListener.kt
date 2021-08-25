@@ -64,7 +64,6 @@ class PlayerDeathListener(private val plugin: BedwarsPlugin) : Listener {
             val cost = drop.type.toCostType() ?: continue
             materials[cost] = materials.getOrDefault(cost, 0) + drop.amount
         }
-        killer ?: logInfo("killer is null!")
         killer ?: newDrops.forEach { drop -> location.dropItem(drop) }
         game.playerKilled(entity, originalDrops)
         for ((cost, amount) in materials) {
