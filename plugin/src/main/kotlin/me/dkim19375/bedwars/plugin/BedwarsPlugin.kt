@@ -109,6 +109,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
             serializable.forEach(ConfigurationSerialization::registerClass)
             NBTInjector.inject()
             ScoreboardLib.setPluginInstance(this)
+            BedwarsGame // initialize companion object variables
         }
         logInfo("Successfully loaded (not enabled) ${description.name} v${description.version} in ${time}ms!")
     }

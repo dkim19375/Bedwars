@@ -15,3 +15,5 @@ holograms:
     emerald: '&a&lEmerald'
   spawner-time-text: '&eSpawns in &c%time% &eseconds'
   spawner-tier-text: '&eTier &c%tier%'
+parties:
+  teleport-automatically: true # Make sure that teleports is enabled in the parties.yml in the Parties plugin!

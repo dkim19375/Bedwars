@@ -333,7 +333,7 @@ golden-apple:
   amount: 1
   cost: 3
   cost-item: 'GOLD'
-  display-name: 'GOLDEN_APPLE'
+  display-name: 'Golden Apple'
   item-category: 'UTILITY'
 
 fireball:
@@ -342,7 +342,7 @@ fireball:
   amount: 1
   cost: 40
   cost-item: 'IRON'
-  display-name: 'FIREBALL'
+  display-name: 'Fireball'
   item-category: 'UTILITY'
 
 TNT:

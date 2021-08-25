@@ -18,6 +18,7 @@
 
 package me.dkim19375.bedwars.plugin.manager
 
+import com.alessiodp.parties.api.interfaces.PartyPlayer
 import dev.triumphteam.gui.builder.item.ItemBuilder
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.GameData
@@ -37,6 +38,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.scheduler.BukkitTask
+import java.lang.reflect.Field
 import java.nio.file.Paths
 import java.util.*
 
@@ -68,6 +70,14 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
 
     init {
         npcManager.disableAI()
+    }
+
+    companion object {
+        private val teleportField: Field =
+            Class.forName("com.alessiodp.parties.common.configuration.data.ConfigParties")
+                .getField("ADDITIONAL_TELEPORT_ENABLE")
+        private val teleport: Boolean
+            get() = teleportField.getBoolean(null)
     }
 
     fun start(force: Boolean): Result {
@@ -163,6 +173,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         val secondKiller: Pair<Player, Int>? = sorted.firstOrNull()
         sorted.removeFirstOrNull()
         val thirdKiller: Pair<Player, Int>? = sorted.firstOrNull()
+        Bukkit.broadcastMessage("Players: ${getPlayersInGame().getPlayers().joinToString(transform = Player::getName)}")
         for (player in getPlayersInGame().getPlayers()) {
             val isEliminated = eliminated.contains(player.uniqueId)
             if (!isEliminated) {
@@ -181,7 +192,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
                     stay = 80
                 )
             }
-            val divider = "${ChatColor.GREEN}-----------------------------------------------------"
+            val divider = "${ChatColor.GREEN}${ChatColor.STRIKETHROUGH}------------------------------------------------"
             player.sendMessage(divider)
             player.sendMessage(" ")
             player.sendCenteredMessage("${ChatColor.WHITE}${ChatColor.BOLD}Bed Wars")
@@ -198,7 +209,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
                 if (killer == null) {
                     return@msg
                 }
-                player.sendCenteredMessage("$color${ChatColor.BOLD}$num Killer ${ChatColor.GRAY}- ${killer.first.displayName} ${ChatColor.GRAY}- ${killer.second}")
+                player.sendCenteredMessage("$color${ChatColor.BOLD}$num Killer ${ChatColor.GRAY}- ${ChatColor.WHITE}${killer.first.displayName} ${ChatColor.GRAY}- ${killer.second}")
             }
             sendMessage(ChatColor.YELLOW, "1st", firstKiller)
             sendMessage(ChatColor.GOLD, "2nd", secondKiller)
@@ -310,6 +321,27 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         plugin.scoreboardManager.getScoreboard(player, true) // activate
         if (playersInLobby.size >= data.minPlayers) {
             start(false).message
+        }
+        plugin.partiesAPI?.getPartyPlayer(player.uniqueId)?.let { partyPlayer ->
+            if (!teleport) {
+                return@let
+            }
+            if (!plugin.config.getBoolean("parties.teleport-automatically")) {
+                return@let
+            }
+            val party = partyPlayer.partyId?.let { plugin.partiesAPI?.getParty(it) } ?: return@let
+            if (party.leader != player.uniqueId) {
+                return@let
+            }
+            for (otherPlayer in party.onlineMembers.map(PartyPlayer::getPlayerUUID)
+                .filterNot(getPlayersInGame()::contains)
+                .filterNot(player.uniqueId::equals)
+                .toSet()
+                .getPlayers()) {
+                if (addPlayer(otherPlayer) != Result.SUCCESS) {
+                    break
+                }
+            }
         }
         return Result.SUCCESS
     }
@@ -444,21 +476,27 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     private fun giveGameOverItems(player: Player) {
-        player.inventory.setItem(0, ItemBuilder.from(Material.COMPASS)
-            .name("${ChatColor.GREEN}${ChatColor.BOLD}Teleporter ${ChatColor.GRAY}(Click)")
-            .lore("Click to teleport to players!")
-            .addAllFlags()
-            .build())
-        player.inventory.setItem(7, ItemBuilder.from(Material.PAPER)
-            .name("${ChatColor.AQUA}${ChatColor.BOLD}Play Again ${ChatColor.GRAY}(Click)")
-            .lore("Click to play another game!")
-            .addAllFlags()
-            .build())
-        player.inventory.setItem(8, ItemBuilder.from(Material.BED)
-            .name("${ChatColor.RED}${ChatColor.BOLD}Return to Lobby ${ChatColor.GRAY}(Click)")
-            .lore("Click to leave the lobby!")
-            .addAllFlags()
-            .build())
+        player.inventory.setItem(
+            0, ItemBuilder.from(Material.COMPASS)
+                .name("${ChatColor.GREEN}${ChatColor.BOLD}Teleporter ${ChatColor.GRAY}(Click)")
+                .lore("Click to teleport to players!")
+                .addAllFlags()
+                .build()
+        )
+        player.inventory.setItem(
+            7, ItemBuilder.from(Material.PAPER)
+                .name("${ChatColor.AQUA}${ChatColor.BOLD}Play Again ${ChatColor.GRAY}(Click)")
+                .lore("Click to play another game!")
+                .addAllFlags()
+                .build()
+        )
+        player.inventory.setItem(
+            8, ItemBuilder.from(Material.BED)
+                .name("${ChatColor.RED}${ChatColor.BOLD}Return to Lobby ${ChatColor.GRAY}(Click)")
+                .lore("Click to leave the lobby!")
+                .addAllFlags()
+                .build()
+        )
     }
 
     fun leavePlayer(player: Player, update: Boolean = true) {
