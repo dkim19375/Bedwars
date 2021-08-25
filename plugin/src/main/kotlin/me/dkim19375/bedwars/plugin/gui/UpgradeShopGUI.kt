@@ -32,7 +32,6 @@ import org.bukkit.ChatColor
 import org.bukkit.DyeColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 
 class UpgradeShopGUI(private val player: Player, private val team: Team, private val plugin: BedwarsPlugin) {
@@ -341,7 +340,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
         name: String,
         type: TrapType
     ): GuiItem = ItemBuilder.from(material)
-        .name("$${ChatColor.RED}$name")
+        .name("${ChatColor.RED}$name")
         .lore(firstLore.plus(getCostList(cost, hasEnough)))
         .addAllFlags()
         .asGuiItem {
