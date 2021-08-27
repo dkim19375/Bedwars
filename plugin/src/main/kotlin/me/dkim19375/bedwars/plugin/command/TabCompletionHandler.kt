@@ -65,7 +65,7 @@ class TabCompletionHandler(private val plugin: BedwarsPlugin) : TabCompleter {
         if (player !is Player) {
             return emptyList()
         }
-        val game = plugin.gameManager.getGame(gameName) ?: return Team.values().map(Team::displayName)
+        val game = plugin.gameManager.getGame(gameName) ?: return completesListMap["colors"].toList()
         return game.data.teams.map { data -> data.team.displayName }
     }
 
@@ -83,7 +83,7 @@ class TabCompletionHandler(private val plugin: BedwarsPlugin) : TabCompleter {
         token: String,
         collection: Iterable<String>,
         sender: Permissible,
-        perm: Permissions = Permissions.SETUP
+        perm: Permissions = Permissions.SETUP,
     ): List<String>? {
         if (!sender.hasPermission(perm)) {
             return null
@@ -127,6 +127,22 @@ class TabCompletionHandler(private val plugin: BedwarsPlugin) : TabCompleter {
         return list
     }
 
+    private fun getSecondArg(sender: CommandSender, args: Array<String>): List<String> = if (getBedwarsGames().none {
+            it.startsWith(args[1], true)
+        } && sender is Player) {
+        completesListMap["setup"].toList()
+    } else {
+        getBedwarsGames().plus(if (sender is Player) completesListMap["setup"].toList() else emptyList())
+    }
+
+    private fun getRestArgs(sender: CommandSender, args: Array<String>): Pair<String, List<String>> {
+        return if (sender is Player && plugin.gameManager.getGame(args[1]) == null) {
+            sender.world.name to args.drop(1)
+        } else {
+            args[1] to args.drop(2)
+        }
+    }
+
     override fun onTabComplete(sender: CommandSender, cmd: Command, label: String, args: Array<String>): List<String>? {
         if (!sender.hasPermission(Permissions.COMMAND)) {
             return null
@@ -139,7 +155,8 @@ class TabCompletionHandler(private val plugin: BedwarsPlugin) : TabCompleter {
                     "help" -> getPartial(args[1], getHelpTab(sender))
                     "join" -> getPartialPerm(args[1], getBedwarsGames(), sender, Permissions.JOIN)
                     "delete", "edit" -> getPartialPerm(args[1], getBedwarsGames(), sender)
-                    "save", "setup" -> getPartialPerm(args[1], getAllGames(), sender)
+                    "save" -> getPartialPerm(args[1], getAllGames(), sender)
+                    "setup" -> getPartialPerm(args[1], getSecondArg(sender, args), sender)
                     "start" -> getPartialPerm(args[1], getBedwarsGames(), sender, Permissions.START)
                     "stop" -> getPartialPerm(args[1], getBedwarsGames(), sender, Permissions.STOP)
                     "lobby" -> getPartialPerm(args[1], listOf("disable"), sender)
@@ -147,49 +164,49 @@ class TabCompletionHandler(private val plugin: BedwarsPlugin) : TabCompleter {
                     else -> emptyList()
                 }
             }
-            3 -> {
-                if (!args[0].equals("setup", ignoreCase = true) || !sender.hasPermission(Permissions.SETUP)) {
-                    return emptyList()
-                }
-                return getPartial(args[2], completesListMap["setup"])
+        }
+        if (!args[0].equals("setup", true) || !sender.hasPermission(Permissions.SETUP)) {
+            return emptyList()
+        }
+        val restArgs = getRestArgs(sender, args)
+        val worldName = restArgs.first
+        val newArgs = restArgs.second
+        when (newArgs.size) {
+            1 -> {
+                return getPartial(newArgs[0], completesListMap["setup"])
             }
-            4 -> {
-                if (!args[0].equals("setup", ignoreCase = true) || !sender.hasPermission(Permissions.SETUP)) {
-                    return emptyList()
-                }
-                val data = Bukkit.getWorld(args[1])?.let { DataEditor.findFromWorld(it, plugin) }?.data
-                return when (args[2].lowercase()) {
+            2 -> {
+                val data = Bukkit.getWorld(worldName)?.let { DataEditor.findFromWorld(it, plugin) }?.data
+                return when (newArgs[0].lowercase()) {
                     "minplayers" -> (data?.maxPlayers?.let { (1..it).map(Int::toString) })?.let {
-                        getPartial(args[3], it)
+                        getPartial(newArgs[1], it)
                     } ?: listOf("<min>")
                     "maxplayers" -> listOf("<max>")
                     "shop", "upgrades", "spawner",
-                    "team", "bed" -> getPartial(args[3], completesListMap["addRemove"])
+                    "team", "bed",
+                    -> getPartial(newArgs[1], completesListMap["addRemove"])
                     else -> emptyList()
                 }
             }
-            5 -> {
-                if (!args[0].equals("setup", ignoreCase = true) || !sender.hasPermission(Permissions.SETUP)) {
-                    return emptyList()
-                }
-                return when (args[2].lowercase()) {
+            3 -> {
+                return when (newArgs[0].lowercase()) {
                     "shop", "upgrades" -> {
-                        if (!args[3].equals("add", true)) {
+                        if (!newArgs[1].equals("add", true)) {
                             return emptyList()
                         }
-                        return getPartial(args[4], completesListMap["tp"])
+                        return getPartial(newArgs[2], completesListMap["tp"])
                     }
                     "spawner" -> {
-                        return if (args[3].lowercase() == "add") {
-                            getPartial(args[4], completesListMap["spawners"])
+                        return if (newArgs[1].lowercase() == "add") {
+                            getPartial(newArgs[2], completesListMap["spawners"])
                         } else {
                             emptyList()
                         }
                     }
                     "team", "bed" -> {
-                        return when (args[3].lowercase()) {
-                            "add" -> getPartial(args[4], getMissingTeams(sender, args[1]))
-                            "remove" -> getPartial(args[4], getTeams(sender, args[1]))
+                        return when (newArgs[1].lowercase()) {
+                            "add" -> getPartial(newArgs[2], getMissingTeams(sender, worldName))
+                            "remove" -> getPartial(newArgs[2], getTeams(sender, worldName))
                             else -> emptyList()
                         }
                     }
