@@ -162,8 +162,8 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
         plugin.gameManager.getGame(player)?.let { game ->
             val upgrades = game.upgradesManager
             val sharpness = upgrades.sharpness.contains(team)
-            val protection = upgrades.protection[team]
-            val haste = upgrades.haste[team]
+            val protection = upgrades.protection[team] ?: 0
+            val haste = upgrades.haste[team] ?: 0
             val healPool = upgrades.healPool.contains(team)
 
             // upgrades
@@ -182,41 +182,41 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
                 ).addAllFlags()
             val armor = ItemBuilder.from(Material.IRON_CHESTPLATE)
                 .setName(
-                    "${(protection.zeroNonNull() >= 4).getGreenOrRed()}Reinforced Armor ${
-                        (protection.zeroNonNull() + 1).limit(
-                            4
-                        ).toRomanNumeral()
+                    "${(protection >= 4).getGreenOrRed()}Reinforced Armor ${
+                        (protection + 1).coerceAtMost(4).toRomanNumeral()
                     }"
                 ).setLore(
                     "Your team permanently gains".setGray(),
                     "Protection on all armor pieces!".setGray(),
                     " ",
-                    "${(protection.zeroNonNull() >= 1).getGreenOrGray()}Tier 1: Protection I, ${ChatColor.AQUA}2 Diamonds",
-                    "${(protection.zeroNonNull() >= 2).getGreenOrGray()}Tier 2: Protection II, ${ChatColor.AQUA}4 Diamonds",
-                    "${(protection.zeroNonNull() >= 3).getGreenOrGray()}Tier 3: Protection III, ${ChatColor.AQUA}8 Diamonds",
-                    "${(protection.zeroNonNull() >= 4).getGreenOrGray()}Tier 4: Protection IV, ${ChatColor.AQUA}16 Diamonds",
+                    "${(protection >= 1).getGreenOrGray()}Tier 1: Protection I, ${ChatColor.AQUA}2 Diamonds",
+                    "${(protection >= 2).getGreenOrGray()}Tier 2: Protection II, ${ChatColor.AQUA}4 Diamonds",
+                    "${(protection >= 3).getGreenOrGray()}Tier 3: Protection III, ${ChatColor.AQUA}8 Diamonds",
+                    "${(protection >= 4).getGreenOrGray()}Tier 4: Protection IV, ${ChatColor.AQUA}16 Diamonds",
                     " ",
-                    (if (protection.zeroNonNull() >= 4) "${ChatColor.GREEN}UNLOCKED" else {
+                    (if (protection >= 4) "${ChatColor.GREEN}UNLOCKED" else {
                         "${ChatColor.YELLOW}Click to purchase!"
                     })
-                ).addAllFlags()
+                ).amount((protection + 1).coerceAtMost(4))
+                .addAllFlags()
             val maniacMiner = ItemBuilder.from(Material.GOLD_PICKAXE)
                 .setName(
-                    "${(haste.zeroNonNull() >= 4).getGreenOrRed()}Maniac Miner ${
-                        (haste.zeroNonNull() + 1).limit(2).toRomanNumeral()
+                    "${(haste >= 4).getGreenOrRed()}Maniac Miner ${
+                        (haste + 1).coerceAtMost(2).toRomanNumeral()
                     }"
                 )
                 .setLore(
                     "All players on your team".setGray(),
                     "permanently gain Haste.".setGray(),
                     " ",
-                    "${(haste.zeroNonNull() >= 1).getGreenOrGray()}Tier 1: Haste I, ${ChatColor.AQUA}2 Diamonds",
-                    "${(haste.zeroNonNull() >= 2).getGreenOrGray()}Tier 2: Haste II, ${ChatColor.AQUA}4 Diamonds",
+                    "${(haste >= 1).getGreenOrGray()}Tier 1: Haste I, ${ChatColor.AQUA}2 Diamonds",
+                    "${(haste >= 2).getGreenOrGray()}Tier 2: Haste II, ${ChatColor.AQUA}4 Diamonds",
                     " ",
-                    (if (haste.zeroNonNull() >= 2) "${ChatColor.GREEN}UNLOCKED" else {
+                    (if (haste >= 2) "${ChatColor.GREEN}UNLOCKED" else {
                         "${ChatColor.YELLOW}Click to purchase!"
                     })
-                ).addAllFlags()
+                ).amount((haste + 1).coerceAtMost(2))
+                .addAllFlags()
             val healPoolItem = ItemBuilder.from(Material.BEACON)
                 .setName("${healPool.getGreenOrRed()}Heal Pool")
                 .setLore(
@@ -342,7 +342,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
         material: Material,
         firstLore: List<String>,
         name: String,
-        type: TrapType
+        type: TrapType,
     ): GuiItem = ItemBuilder.from(material)
         .name("${ChatColor.RED}$name")
         .lore(firstLore.plus(getCostList(cost, hasEnough)))

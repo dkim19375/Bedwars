@@ -28,10 +28,6 @@ fun Int.toRomanNumeral() = when (this) {
     else -> Int.toString()
 }
 
-fun Int?.zeroNonNull(): Int {
-    return this?: 0
-}
-
 fun Long.formatTime(): String {
     val minutes = this / 60
     var seconds = (this % 60).toString()
@@ -39,11 +35,4 @@ fun Long.formatTime(): String {
         seconds = "0$seconds"
     }
     return "$minutes:$seconds"
-}
-
-fun Int.limit(limit: Int): Int {
-    if (this > limit) {
-        return limit
-    }
-    return this
 }
