@@ -183,18 +183,6 @@ fun Location.getOppositeYaw(): Location {
 
 fun Location.update(): Location = Location(Bukkit.getWorld(world?.name), x, y, z, yaw, pitch)
 
-fun Block.getBedHead(): Location {
-    val data = state.data
-    if (data !is Bed) {
-        return location
-    }
-    if (data.isHeadOfBed) {
-        return location
-    }
-    val direction = data.facing
-    return getRelative(direction).location
-}
-
 fun Location?.getSafeDistance(other: Location?): Double {
     this ?: return Double.MAX_VALUE
     other ?: return Double.MAX_VALUE
@@ -223,6 +211,18 @@ fun World.dropItemStraight(location: Location, itemStack: ItemStack): Item {
 
 fun Location.dropItem(item: ItemStack): Item = world.dropItem(this, item)
 
+fun Block.getBedHead(): Location {
+    val data = state.data
+    if (data !is Bed) {
+        return location
+    }
+    if (data.isHeadOfBed) {
+        return location
+    }
+    val direction = data.facing
+    return getRelative(direction).location
+}
+
 fun Block.getBedFeet(): Location {
     val data = state.data
     if (data !is Bed) {
@@ -244,6 +244,4 @@ fun ConfigurationSection.getIntOrNull(path: String): Int? = if (isSet(path) && i
 fun Player.kickPlayerFromWorld() =
     player.teleport(plugin.dataFileManager.getLobby() ?: Bukkit.getWorld(plugin.mainWorld).spawnLocation)
 
-fun ItemMeta.addAllFlags() = ItemFlag.values().toList()
-    .minus(listOf(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_POTION_EFFECTS))
-    .forEach { addItemFlags(it) }
+fun ItemMeta.addAllFlags() = ItemFlag.values().toList().forEach { addItemFlags(it) }

@@ -17,3 +17,9 @@ holograms:
   spawner-tier-text: '&eTier &c%tier%'
 parties:
   teleport-automatically: true # Make sure that teleports is enabled in the parties.yml in the Parties plugin!
+generator:
+  split:
+    enabled: true
+    generators:
+      - 'IRON'
+      - 'GOLD'

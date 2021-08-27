@@ -26,7 +26,7 @@ import org.bukkit.event.Listener
 class PlayerCoordsChangeListener(private val plugin: BedwarsPlugin) : Listener {
     @EventHandler(ignoreCancelled = true)
     private fun PlayerCoordsChangeEvent.onMove() {
-        val game = plugin.gameManager.getGame(player)?: return
+        val game = plugin.gameManager.getGame(player) ?: return
         game.upgradesManager.triggerTrap(player)
     }
 }

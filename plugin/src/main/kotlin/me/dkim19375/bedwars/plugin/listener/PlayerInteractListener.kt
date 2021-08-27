@@ -19,6 +19,7 @@
 package me.dkim19375.bedwars.plugin.listener
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
+import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.gui.CompassGUI
 import me.dkim19375.bedwars.plugin.gui.MainShopGUI
 import me.dkim19375.bedwars.plugin.gui.TeleporterGUI
@@ -39,17 +40,25 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 
 class PlayerInteractListener(private val plugin: BedwarsPlugin) : Listener {
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST)
     private fun PlayerInteractEvent.onInteract() {
         val game = plugin.gameManager.getGame(player) ?: return
-        if (item?.type == Material.COMPASS) {
-            CompassGUI(player, game).showPlayer()
-            return
-        }
+        checkTracker(game)
         checkSpectator(game)
         gameOverItems(game)
         bedPrevention()
         setupFireballs()
+    }
+
+    private fun PlayerInteractEvent.checkTracker(game: BedwarsGame) {
+        if (game.state != GameState.STARTED) {
+            return
+        }
+        if (item?.type != Material.COMPASS) {
+            return
+        }
+        CompassGUI(player, game).showPlayer()
+        isCancelled = true
     }
 
     private fun PlayerInteractEvent.checkSpectator(game: BedwarsGame) {
@@ -60,10 +69,12 @@ class PlayerInteractListener(private val plugin: BedwarsPlugin) : Listener {
     }
 
     private fun PlayerInteractEvent.gameOverItems(game: BedwarsGame) {
+        // Bukkit.broadcastMessage("1, item: ${item?.type?.name}")
         item ?: return
-        if (!game.eliminated.contains(player.uniqueId)) {
+        if (!game.eliminated.contains(player.uniqueId) && game.state != GameState.GAME_END) {
             return
         }
+        // Bukkit.broadcastMessage("2, item: ${item?.type?.name}")
         when (material) {
             Material.COMPASS -> TeleporterGUI(player, game).showPlayer()
             Material.PAPER -> {
@@ -73,6 +84,7 @@ class PlayerInteractListener(private val plugin: BedwarsPlugin) : Listener {
             Material.BED -> game.leavePlayer(player)
             else -> return
         }
+        // Bukkit.broadcastMessage("3, item: ${item?.type?.name}")
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

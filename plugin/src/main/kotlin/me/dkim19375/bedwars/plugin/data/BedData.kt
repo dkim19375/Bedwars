@@ -36,6 +36,11 @@ data class BedData private constructor(val team: Team, val location: Location, v
         "face" to face.name
     )
 
+    override fun toString(): String {
+        return "BedData(team=${team.name}, location=$location, face=${face.name})"
+    }
+
+
     companion object {
         @Suppress("unused")
         @JvmStatic

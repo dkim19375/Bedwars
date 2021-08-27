@@ -19,7 +19,12 @@
 package me.dkim19375.bedwars.plugin.listener
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
+import me.dkim19375.bedwars.plugin.enumclass.GameState
+import me.dkim19375.bedwars.plugin.util.getPlayers
+import me.dkim19375.bedwars.plugin.util.setGray
+import org.bukkit.ChatColor
 import org.bukkit.GameMode
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -28,10 +33,28 @@ import org.bukkit.event.player.AsyncPlayerChatEvent
 class AsyncPlayerChatListener(private val plugin: BedwarsPlugin) : Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     private fun AsyncPlayerChatEvent.onChat() {
-        plugin.gameManager.getGame(player) ?: return
-        if (player.gameMode != GameMode.SPECTATOR) {
+        val game = plugin.gameManager.getGame(player) ?: return
+        if (player.gameMode != GameMode.SPECTATOR
+            && game.state != GameState.GAME_END
+            && !game.eliminated.contains(player.uniqueId)
+        ) {
             return
         }
-        isCancelled = true
+        val new = recipients.map(Player::getUniqueId)
+            .toSet()
+            .getPlayers()
+            .filter {
+                it.gameMode == GameMode.SPECTATOR
+                        || game.state == GameState.GAME_END
+                        || game.eliminated.contains(it.uniqueId)
+            }
+        try {
+            recipients.clear()
+        } catch (_: UnsupportedOperationException) {
+            isCancelled = true
+            return
+        }
+        format = "[SPECTATOR] ${ChatColor.RESET}$format".setGray()
+        recipients.addAll(new)
     }
 }

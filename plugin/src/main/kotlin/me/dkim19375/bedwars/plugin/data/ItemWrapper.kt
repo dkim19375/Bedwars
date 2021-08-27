@@ -32,6 +32,7 @@ import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.LeatherArmorMeta
 import org.bukkit.material.Colorable
+import org.bukkit.material.Wool
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.potion.Potion
 import org.bukkit.potion.PotionType
@@ -52,43 +53,41 @@ data class ItemWrapper(
                     item.addEnchantment(e, 1)
                 }
             }
-            item.itemMeta?.let { meta ->
-                meta.addAllFlags()
-                item.itemMeta = meta
+            item.itemMeta = item.itemMeta?.apply {
+                addAllFlags()
             }
             return item
         }
-        val item: ItemStack
         val type = configManager.getItemFromName(configItem)
-        when (ItemStack(material, amount).itemMeta) {
-            is LeatherArmorMeta -> item = ItemStack(material, amount)
-            is Colorable -> item = ItemStack(material, amount)
-            else -> {
-                @Suppress("DEPRECATION", "LiftReturnOrAssignment") // fix warning = error?!
-                if (color == null) {
-                    item = ItemStack(material, amount)
-                } else {
-                    if (type != null && type.itemCategory == MainShopGUI.ItemType.BLOCKS) {
-                        item = ItemStack(material, amount, color.data.toShort())
+        val item: ItemStack = if (material == Material.WOOL && color != null) {
+            Wool(color).toItemStack(amount)
+        } else {
+            when (ItemStack(material, amount).itemMeta) {
+                is LeatherArmorMeta -> ItemStack(material, amount)
+                is Colorable -> ItemStack(material, amount)
+                else -> {
+                    @Suppress("LiftReturnOrAssignment") // fix warning = error?!
+                    if (color == null) {
+                        ItemStack(material, amount)
                     } else {
-                        item = ItemStack(material, amount)
+                        if (type != null && type.itemCategory == MainShopGUI.ItemType.BLOCKS) {
+                            @Suppress("DEPRECATION")
+                            ItemStack(material, amount, color.data.toShort())
+                        } else {
+                            ItemStack(material, amount)
+                        }
                     }
                 }
             }
-        }
-        item.setConfigItem(configItem).setUnbreakable(true)
+        }.setConfigItem(configItem).setUnbreakable(true)
         enchants.forEach { e ->
             item.addUnsafeEnchantment(e, 1)
         }
-        item.itemMeta = item.itemMeta?.let {
-            if (it is Colorable) {
-                it.color = color
+        item.itemMeta = item.itemMeta?.apply {
+            if (this is LeatherArmorMeta && color != null) {
+                this.color = color.color
             }
-            if (it is LeatherArmorMeta && color != null) {
-                it.color = color.color
-            }
-            it.addAllFlags()
-            it
+            addAllFlags()
         }
         return item
     }

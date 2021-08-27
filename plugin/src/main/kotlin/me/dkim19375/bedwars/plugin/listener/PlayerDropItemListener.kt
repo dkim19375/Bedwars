@@ -19,9 +19,11 @@
 package me.dkim19375.bedwars.plugin.listener
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
+import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.util.isArmor
 import me.dkim19375.bedwars.plugin.util.isTool
 import me.dkim19375.bedwars.plugin.util.isWeapon
+import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -35,7 +37,10 @@ class PlayerDropItemListener(private val plugin: BedwarsPlugin) : Listener {
         if (type.isArmor() || type.isTool() || type.isWeapon()) {
             isCancelled = true
         }
-        if (game.eliminated.contains(player.uniqueId)) {
+        if (type == Material.COMPASS) {
+            isCancelled = true
+        }
+        if (game.eliminated.contains(player.uniqueId) || game.state == GameState.GAME_END) {
             isCancelled = true
         }
     }

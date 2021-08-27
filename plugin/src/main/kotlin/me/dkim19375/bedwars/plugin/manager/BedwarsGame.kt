@@ -36,6 +36,8 @@ import org.apache.commons.io.FileUtils
 import org.bukkit.*
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.scheduler.BukkitTask
 import java.lang.reflect.Field
@@ -47,6 +49,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     var state = GameState.LOBBY
     var countdown = 10
     var time: Long = 0
+    val tempPlayers = mutableSetOf<UUID>()
     val players = mutableMapOf<Team, MutableSet<UUID>>()
     val eliminated = mutableSetOf<UUID>()
     val playersInLobby = mutableSetOf<UUID>()
@@ -61,6 +64,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     val hologramManager = SpawnerHologramManager(plugin, this)
     val kills = mutableMapOf<UUID, Int>()
     val trackers = mutableMapOf<UUID, Team>()
+    val spectators = mutableSetOf<UUID>()
 
     var data = data
         private set
@@ -80,17 +84,35 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             get() = teleportField.getBoolean(null)
     }
 
+    private fun reset(modifyPlayers: Boolean = true) {
+        countdown = 10
+        time = 0
+        tempPlayers.clear()
+        players.clear()
+        eliminated.clear()
+        if (modifyPlayers) {
+            playersInLobby.clear()
+            beforeData.clear()
+        }
+        task?.cancel()
+        task = null
+        beds.clear()
+        upgradesManager.stop()
+        spawnerManager.reset()
+        placedBlocks.clear()
+        hologramManager.stop()
+        kills.clear()
+        trackers.clear()
+        spectators.clear()
+    }
+
     fun start(force: Boolean): Result {
         val result = canStart(force)
         if (result != Result.SUCCESS) {
             return result
         }
-        eliminated.clear()
-        hologramManager.start()
         state = GameState.STARTING
-        countdown = 10
-        kills.clear()
-        trackers.clear()
+        reset(false)
         logInfo("Game ${data.world.name} is starting!")
         task?.cancel()
         task = object : BukkitRunnable() {
@@ -137,6 +159,20 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             players[team] = set
             i++
         }
+        for (bed in data.beds) {
+            if (players.keys.contains(bed.team)) {
+                continue
+            }
+            val applyToBlock = { loc: Location ->
+                loc.block.state.apply {
+                    type = Material.AIR
+                    update(true, false)
+                }
+            }
+            val block = bed.location.block
+            applyToBlock(block.getBedHead())
+            applyToBlock(block.getBedFeet())
+        }
         for (teamData in teams) {
             beds[teamData.team] = true
         }
@@ -167,13 +203,13 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             .sortedBy { (_, value) -> value }
             .map { Bukkit.getPlayer(it.first) to it.second }
             .filter { it.first != null }
+            .reversed()
             .toMutableList()
         val firstKiller: Pair<Player, Int>? = sorted.firstOrNull()
         sorted.removeFirstOrNull()
         val secondKiller: Pair<Player, Int>? = sorted.firstOrNull()
         sorted.removeFirstOrNull()
         val thirdKiller: Pair<Player, Int>? = sorted.firstOrNull()
-        Bukkit.broadcastMessage("Players: ${getPlayersInGame().getPlayers().joinToString(transform = Player::getName)}")
         for (player in getPlayersInGame().getPlayers()) {
             val isEliminated = eliminated.contains(player.uniqueId)
             if (!isEliminated) {
@@ -225,20 +261,10 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     fun forceStop(whenDone: () -> Unit = {}) {
-        getPlayersInGame().plus(eliminated).toSet().getPlayers().forEach(this::revertPlayer)
+        getPlayersInGame().plus(tempPlayers).plus(eliminated).toSet().getPlayers().forEach(this::revertPlayer)
         state = GameState.REGENERATING_WORLD
-        players.clear()
-        playersInLobby.clear()
-        task?.cancel()
-        task = null
-        beds.clear()
-        time = 0
-        spawnerManager.reset()
-        upgradesManager.stop()
-        hologramManager.stop()
-        placedBlocks.clear()
+        reset()
         revertBack()
-        beforeData.clear()
         regenerateMap {
             state = GameState.LOBBY
             whenDone()
@@ -367,7 +393,6 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         val team = getTeamOfPlayer(player) ?: return
         if (!beds.getOrDefault(team, false)) {
             player.playerListName = player.displayName
-            players.getOrDefault(team, mutableSetOf()).remove(player.uniqueId)
             player.inventory.clearAll()
             player.gameMode = GameMode.ADVENTURE
             player.allowFlight = true
@@ -375,7 +400,11 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             player.teleport(data.spec)
             player.sendTitle("${ChatColor.RED}${ChatColor.BOLD}GAME OVER!", stay = 80)
             giveGameOverItems(player)
+            player.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, 1000000, 255, false, false), true)
+            players.getOrDefault(team, mutableSetOf()).remove(player.uniqueId)
+            tempPlayers.add(player.uniqueId)
             update()
+            tempPlayers.remove(player.uniqueId)
             eliminated.add(player.uniqueId)
             return
         }
@@ -383,10 +412,12 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         player.inventory.clearAll()
         player.gameMode = GameMode.SPECTATOR
         player.teleportUpdated(data.spec)
+        spectators.add(player.uniqueId)
         object : BukkitRunnable() {
             var countDown = 5
             override fun run() {
                 if (!getPlayersInGame().contains(player.uniqueId)) {
+                    spectators.remove(player.uniqueId)
                     return
                 }
                 if (countDown <= 0) {
@@ -394,6 +425,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
                     player.gameMode = GameMode.SURVIVAL
                     player.sendOtherTitle("${ChatColor.GREEN}Respawned!")
                     giveItems(player, inventory, team)
+                    spectators.remove(player.uniqueId)
                     cancel()
                     return
                 }
@@ -535,7 +567,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     fun getPlayersInGame(): Set<UUID> = when (state) {
         GameState.LOBBY, GameState.STARTING -> playersInLobby.toSet()
         GameState.STARTED -> players.values.getCombinedValues().toSet()
-        GameState.GAME_END -> players.values.getCombinedValues().plus(eliminated).toSet()
+        GameState.GAME_END -> players.values.getCombinedValues().plus(tempPlayers).plus(eliminated).toSet()
         else -> setOf()
     }
 

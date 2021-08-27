@@ -24,7 +24,6 @@ import me.dkim19375.bedwars.plugin.gui.MainShopGUI
 import me.dkim19375.bedwars.plugin.gui.toCostType
 import me.dkim19375.bedwars.plugin.util.dropItem
 import me.dkim19375.bedwars.plugin.util.isWeapon
-import me.dkim19375.dkimbukkitcore.function.logInfo
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -34,7 +33,7 @@ class PlayerDeathListener(private val plugin: BedwarsPlugin) : Listener {
     @EventHandler
     private fun PlayerDeathEvent.onDeath() {
         val game = plugin.gameManager.getGame(entity) ?: return
-        if (game.state != GameState.STARTED) {
+        if (game.state !in listOf(GameState.STARTED, GameState.GAME_END)) {
             return
         }
         val killer = entity.killer
@@ -54,11 +53,7 @@ class PlayerDeathListener(private val plugin: BedwarsPlugin) : Listener {
         newDrops.removeIf { item ->
             item.type.isWeapon()
         }
-        logInfo("drops: $newDrops")
-        killer?.inventory?.let {
-            it.addItem(*newDrops.toTypedArray())
-            logInfo("added $newDrops to player inventory!")
-        }
+        killer?.inventory?.addItem(*newDrops.toTypedArray())
         val materials = mutableMapOf<MainShopGUI.CostType, Int>()
         for (drop in newDrops) {
             val cost = drop.type.toCostType() ?: continue

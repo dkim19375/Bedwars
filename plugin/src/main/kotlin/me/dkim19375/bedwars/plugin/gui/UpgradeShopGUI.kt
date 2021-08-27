@@ -187,8 +187,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
                             4
                         ).toRomanNumeral()
                     }"
-                )
-                .setLore(
+                ).setLore(
                     "Your team permanently gains".setGray(),
                     "Protection on all armor pieces!".setGray(),
                     " ",
@@ -319,6 +318,11 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
     private fun onTrapClick(trap: TrapType) {
         val game = plugin.gameManager.getGame(player) ?: return
         val upgrades = game.upgradesManager
+        if (upgrades.thirdTrap.containsKey(team)) {
+            player.sendMessage("${ChatColor.RED}You already have the maximum amount of traps!")
+            player.playErrorSound()
+            return
+        }
         val diamonds = player.getItemAmount(Material.DIAMOND)
         val level = upgrades.getLevel(team)
         val cost = level + 1

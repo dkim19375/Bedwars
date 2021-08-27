@@ -24,6 +24,7 @@ import dev.triumphteam.gui.guis.GuiItem
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.MainShopConfigItem
 import me.dkim19375.bedwars.plugin.enumclass.ArmorType
+import me.dkim19375.bedwars.plugin.enumclass.getToolTier
 import me.dkim19375.bedwars.plugin.util.*
 import org.bukkit.ChatColor
 import org.bukkit.DyeColor
@@ -87,7 +88,9 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
             }
 
     private fun checkIfSettingQuickBuy() {
-        if (!isSettingQuickBuy) return
+        if (!isSettingQuickBuy) {
+            return
+        }
         player.sendMessage("${ChatColor.RED}Cancelled Quick Buy selection!")
         isSettingQuickBuy = false
     }
@@ -154,6 +157,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
                 }
                 plugin.dataFileManager.setQuickBuySlot(slot, player.uniqueId, null)
                 menu.setItem(slot, ItemBuilder.from(getNoneInQuickBuyItem()).asGuiItem())
+                menu.update()
                 player.sendMessage("${ChatColor.GREEN}Successfully removed ${item.displayname} from Quick Buy!")
             }
     }
@@ -179,6 +183,26 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
             player.sendMessage("${ChatColor.RED}You already have this!")
             player.playErrorSound()
             return
+        }
+        val pair = item.item.material.getToolTier()
+        val tier = pair?.first
+        val inventoryTier = player.inventory.getToolTier().let { (pickaxe, axe) ->
+            pair ?: return@let null
+            if (pair.second) {
+                pickaxe
+            } else {
+                axe
+            }
+        }
+        if (tier != null && inventoryTier != null) {
+            if (tier.tier <= inventoryTier.tier) {
+                player.sendMessage("${ChatColor.RED}You already have a higher tier!")
+                player.playErrorSound()
+                return
+            }
+            player.inventory.removeItem(*player.inventory.getAllContents().filterNotNull().filter {
+                it.type.getToolTier()?.second == pair.second
+            }.toTypedArray())
         }
         player.inventory.removeItem(ItemStack(item.costItem.material, item.cost))
         val team = plugin.gameManager.getTeamOfPlayer(player)

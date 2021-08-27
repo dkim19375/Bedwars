@@ -28,7 +28,6 @@ import me.dkim19375.bedwars.plugin.util.getPlayers
 import me.dkim19375.bedwars.plugin.util.sendActionBar
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
-import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.entity.Player
 import org.bukkit.entity.Villager
@@ -39,7 +38,6 @@ import java.util.*
 class GameManager(private val plugin: BedwarsPlugin) {
     private val games = mutableMapOf<String, BedwarsGame>()
     val builders = mutableMapOf<String, GameBuilder>()
-    val builderLocations = mutableMapOf<UUID, Location>()
     val invisPlayers = mutableSetOf<UUID>()
     private val explosives = mutableMapOf<UUID, UUID>()
 

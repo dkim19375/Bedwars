@@ -20,12 +20,16 @@ package me.dkim19375.bedwars.plugin.listener
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.util.isHologram
+import org.bukkit.ChatColor
 import org.bukkit.entity.ArmorStand
+import org.bukkit.entity.Arrow
 import org.bukkit.entity.EntityType
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
+import kotlin.math.roundToInt
 
 class EntityDamageByEntityListener(private val plugin: BedwarsPlugin) : Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -34,12 +38,34 @@ class EntityDamageByEntityListener(private val plugin: BedwarsPlugin) : Listener
         checkHolo()
     }
 
-    private fun EntityDamageByEntityEvent.checkExplosive() {
-        val entity = entity
-        val damager = damager
-        if (entity.type != EntityType.PLAYER) {
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    private fun EntityDamageByEntityEvent.checkArrow() {
+        plugin.gameManager.getGame(entity.uniqueId) ?: return
+        val player = entity as? Player ?: return
+        val damager = damager as? Arrow ?: return
+        val shooter = damager.shooter as? Player ?: return
+        if (player.uniqueId == shooter.uniqueId) {
             return
         }
+        if (player.health - finalDamage <= 0.0) {
+            return
+        }
+        val newHp = (((player.health - finalDamage) * 10.0).roundToInt() / 10.0).let {
+            if (it.toInt().toDouble() == it) {
+                it.toInt().toString()
+            } else {
+                it.toString()
+            }
+        }
+        shooter.sendMessage("${player.displayName} ${ChatColor.GRAY}is on ${ChatColor.RED}$newHp ${ChatColor.GRAY}HP!")
+    }
+
+    private fun EntityDamageByEntityEvent.checkExplosive() {
+        plugin.gameManager.getGame(entity.uniqueId) ?: return
+        if (entity !is Player) {
+            return
+        }
+        val damager = damager
         if (damager.type != EntityType.PRIMED_TNT && damager.type != EntityType.FIREBALL) {
             return
         }

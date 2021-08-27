@@ -57,8 +57,17 @@ end-stone:
   display-name: 'Endstone'
   item-category: 'BLOCKS'
 
-wood:
+ladder:
   slot: 23
+  material: 'LADDER'
+  amount: 16
+  cost: 12
+  cost-item: 'IRON'
+  display-name: 'Ladder'
+  item-category: 'BLOCKS'
+
+wood:
+  slot: 24
   material: 'WOOD'
   amount: 16
   cost: 4
@@ -67,7 +76,7 @@ wood:
   item-category: 'BLOCKS'
 
 obsidian:
-  slot: 24
+  slot: 25
   material: 'OBSIDIAN'
   amount: 4
   cost: 4
@@ -104,13 +113,22 @@ iron-sword:
   display-name: 'Iron Sword'
   item-category: 'MELEE'
 
-knockback-stick:
+diamond-sword:
   slot: 21
+  material: 'DIAMOND_SWORD'
+  amount: 1
+  cost: 4
+  cost-item: 'DIAMOND'
+  display-name: 'Diamond Sword'
+  item-category: 'MELEE'
+
+knockback-stick:
+  slot: 22
   material: 'STICK'
   amount: 1
   enchants:
     - 'KNOCKBACK'
-  cost: 10
+  cost: 5
   cost-item: 'GOLD'
   display-name: 'Stick (Knockback I)'
   item-category: 'MELEE'
@@ -156,7 +174,7 @@ diamond-armor:
   permanent: true
   item-category: 'ARMOR'
 
-SHEARS:
+shears:
   slot: 19
   material: 'SHEARS'
   amount: 1
@@ -230,7 +248,6 @@ iron-axe:
   cost-item: 'GOLD'
   display-name: 'Iron Axe'
   item-category: 'TOOLS'
-
 
 diamond-axe:
   slot: 29
@@ -307,28 +324,19 @@ jump:
   item-category: 'POTIONS'
 
 invisibility:
-    slot: 21
-    material: 'POTION'
-    amount: 1
-    potion-type: 'INVISIBILITY'
-    potion-amplifier: 1
-    potion-duration: 600
-    cost: 2
-    cost-item: 'EMERALD'
-    display-name: 'Invisibility Potion'
-    item-category: 'POTIONS'
-
-pearl:
-  slot: 19
-  material: 'ENDER_PEARL'
+  slot: 21
+  material: 'POTION'
   amount: 1
-  cost: 4
+  potion-type: 'INVISIBILITY'
+  potion-amplifier: 1
+  potion-duration: 600
+  cost: 2
   cost-item: 'EMERALD'
-  display-name: 'Ender Pearl'
-  item-category: 'UTILITY'
+  display-name: 'Invisibility Potion'
+  item-category: 'POTIONS'
 
 golden-apple:
-  slot: 20
+  slot: 19
   material: 'GOLDEN_APPLE'
   amount: 1
   cost: 3
@@ -337,7 +345,7 @@ golden-apple:
   item-category: 'UTILITY'
 
 fireball:
-  slot: 21
+  slot: 20
   material: 'FIREBALL'
   amount: 1
   cost: 40
@@ -346,12 +354,21 @@ fireball:
   item-category: 'UTILITY'
 
 TNT:
-  slot: 22
+  slot: 21
   material: 'TNT'
   amount: 1
   cost: 4
   cost-item: 'GOLD'
   display-name: 'TNT'
+  item-category: 'UTILITY'
+
+pearl:
+  slot: 22
+  material: 'ENDER_PEARL'
+  amount: 1
+  cost: 4
+  cost-item: 'EMERALD'
+  display-name: 'Ender Pearl'
   item-category: 'UTILITY'
 
 water-bucket:

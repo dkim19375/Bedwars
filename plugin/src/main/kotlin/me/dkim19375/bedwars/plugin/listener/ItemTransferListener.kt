@@ -23,6 +23,7 @@ import me.dkim19375.bedwars.plugin.util.isArmor
 import me.dkim19375.bedwars.plugin.util.isTool
 import me.dkim19375.bedwars.plugin.util.isWeapon
 import me.dkim19375.itemmovedetectionlib.event.InventoryItemTransferEvent
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -40,6 +41,11 @@ class ItemTransferListener(private val plugin: BedwarsPlugin) : Listener {
         if (!type.isToCrafting) {
             return
         }
+        Bukkit.broadcastMessage(
+            "Cancelled for crafting: ${
+                items.map(ItemStack::getType).joinToString(transform = Material::name)
+            }"
+        )
         isCancelled = true
     }
 
@@ -50,18 +56,38 @@ class ItemTransferListener(private val plugin: BedwarsPlugin) : Listener {
         val materials = items.map(ItemStack::getType)
         if (materials.contains(Material.COMPASS)) {
             isCancelled = true
+            Bukkit.broadcastMessage(
+                "Cancelled for compass: ${
+                    items.map(ItemStack::getType).joinToString(transform = Material::name)
+                }"
+            )
             return
         }
         if (materials.any(Material::isTool)) {
             isCancelled = true
+            Bukkit.broadcastMessage(
+                "Cancelled for tool: ${
+                    items.map(ItemStack::getType).joinToString(transform = Material::name)
+                }"
+            )
             return
         }
         if (materials.any(Material::isWeapon)) {
             isCancelled = true
+            Bukkit.broadcastMessage(
+                "Cancelled for weapon: ${
+                    items.map(ItemStack::getType).joinToString(transform = Material::name)
+                }"
+            )
             return
         }
         if (materials.any(Material::isArmor)) {
             isCancelled = true
+            Bukkit.broadcastMessage(
+                "Cancelled for armor: ${
+                    items.map(ItemStack::getType).joinToString(transform = Material::name)
+                }"
+            )
             return
         }
     }

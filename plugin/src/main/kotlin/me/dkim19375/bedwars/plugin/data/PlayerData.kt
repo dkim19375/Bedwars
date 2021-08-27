@@ -20,7 +20,6 @@ package me.dkim19375.bedwars.plugin.data
 
 import me.dkim19375.bedwars.plugin.util.*
 import me.dkim19375.dkimbukkitcore.function.logInfo
-import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.entity.Player
@@ -38,7 +37,6 @@ data class PlayerData(
     fun apply(player: Player) {
         player.compassTarget = player.world.spawnLocation.clone()
         player.gameMode = gamemode
-        Bukkit.broadcastMessage("Set contents to ${player.name}")
         player.inventory.setAllContents(inventory)
         player.inventory.armorContents = armor
         player.enderChest.contents = enderChest

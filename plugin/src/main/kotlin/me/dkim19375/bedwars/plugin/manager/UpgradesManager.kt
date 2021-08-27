@@ -130,7 +130,7 @@ class UpgradesManager(plugin: BedwarsPlugin, val game: BedwarsGame) {
     }
 
     fun triggerTrap(player: Player) {
-        if (!game.upgradesManager.canAlertTrap(player)) {
+        if (!canAlertTrap(player)) {
             return
         }
         val teamOfPlayer = game.getTeamOfPlayer(player) ?: return
@@ -145,12 +145,15 @@ class UpgradesManager(plugin: BedwarsPlugin, val game: BedwarsGame) {
         val thirdTrap = thirdTrap[team]
         if (secondTrap != null) {
             firstTrap[team] = secondTrap
+            this.secondTrap.remove(team)
         }
         if (thirdTrap != null) {
             this.secondTrap[team] = thirdTrap
+            this.thirdTrap.remove(team)
         }
 
         // on trigger
+        times[player.uniqueId] = System.currentTimeMillis()
         applyToPlayer(player, trap)
         for (uuid in game.getPlayersInTeam(team)) {
             val p = Bukkit.getPlayer(uuid) ?: continue
@@ -174,6 +177,7 @@ class UpgradesManager(plugin: BedwarsPlugin, val game: BedwarsGame) {
         val time = times[player.uniqueId] ?: return true
         if (System.currentTimeMillis() - time > 30000) {
             times.remove(player.uniqueId)
+            Bukkit.broadcastMessage("Contains: ${times.containsKey(player.uniqueId)}")
             return true
         }
         return false

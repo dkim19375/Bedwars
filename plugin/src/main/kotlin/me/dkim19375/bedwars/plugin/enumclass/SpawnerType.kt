@@ -64,5 +64,10 @@ enum class SpawnerType(
             str ?: return null
             return runCatchingOrNull { valueOf(str.uppercase()) }
         }
+
+        fun fromMaterial(mat: Material?): SpawnerType? {
+            mat ?: return null
+            return values().firstOrNull { it.material == mat }
+        }
     }
 }

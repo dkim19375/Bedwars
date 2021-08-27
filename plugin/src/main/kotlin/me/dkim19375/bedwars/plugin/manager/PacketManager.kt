@@ -25,7 +25,7 @@ import com.comphenix.protocol.events.PacketContainer
 import com.comphenix.protocol.events.PacketEvent
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import org.bukkit.Material
-import org.bukkit.entity.Entity
+import org.bukkit.entity.Item
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.lang.reflect.InvocationTargetException
@@ -33,63 +33,72 @@ import java.lang.reflect.InvocationTargetException
 class PacketManager(private val plugin: BedwarsPlugin) {
     fun addListeners() {
         val plugin = plugin
-        if (!plugin.protocolLibSupport) {
-            return
-        }
         ProtocolLibrary.getProtocolManager().addPacketListener(object :
             PacketAdapter(plugin, PacketType.Play.Server.REMOVE_ENTITY_EFFECT) {
             override fun onPacketSending(event: PacketEvent) {
-                val entity: Entity = event.packet.getEntityModifier(event.player.world).read(0) as Entity
-                if ((event.packet.integers.read(1) as Int).toInt() == 14 && entity is Player) {
-                    if (plugin.gameManager.invisPlayers.contains(entity.uniqueId)) restoreArmor(entity)
+                val player = event.packet.getEntityModifier(event.player.world).read(0) as? Player ?: return
+                if (event.packet.integers.read(0) != 14) {
+                    return
+                }
+                if (plugin.gameManager.invisPlayers.contains(event.player.uniqueId)) {
+                    restoreArmor(player)
                 }
             }
         })
         ProtocolLibrary.getProtocolManager().addPacketListener(object :
             PacketAdapter(plugin, PacketType.Play.Server.ENTITY_EQUIPMENT) {
             override fun onPacketSending(event: PacketEvent) {
-                val entity = event.packet.getEntityModifier(event.player.world).read(0) as Entity
-                if (entity is Player) {
-                    if (entity != event.player && plugin.gameManager.invisPlayers.contains(entity.uniqueId) && (event.packet.integers.read(
-                            1
-                        ) as Int).toInt() != 0
-                    ) event.isCancelled = true
+                val player = event.packet.getEntityModifier(event.player.world).read(0) as? Player ?: return
+                if (player.uniqueId == event.player.uniqueId) {
+                    return
                 }
+                if (!plugin.gameManager.invisPlayers.contains(player.uniqueId)) {
+                    return
+                }
+                if (event.packet.integers.read(1) == 0) {
+                    return
+                }
+                val game = plugin.gameManager.getGame(player) ?: return
+                if (game.getTeamOfPlayer(player) == game.getTeamOfPlayer(event.player)) {
+                    return
+                }
+                event.packet.itemModifier.write(0, ItemStack(Material.AIR))
             }
         })
     }
 
-    fun hideArmor(player: Player) {
-        if (!plugin.protocolLibSupport) {
-            return
+    fun collectItem(item: Item, player: Player) {
+        val packet = PacketContainer(PacketType.Play.Server.COLLECT)
+        packet.integers.write(0, item.entityId)
+        packet.integers.write(1, player.entityId)
+        try {
+            ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet)
+        } catch (e: InvocationTargetException) {
+            e.printStackTrace()
         }
-        broadcastNearby(player, setAir(player, 1))
-        broadcastNearby(player, setAir(player, 2))
-        broadcastNearby(player, setAir(player, 3))
+    }
+
+    fun hideArmor(player: Player) {
         broadcastNearby(player, setAir(player, 4))
+        broadcastNearby(player, setAir(player, 3))
+        broadcastNearby(player, setAir(player, 2))
+        broadcastNearby(player, setAir(player, 1))
         plugin.gameManager.invisPlayers.add(player.uniqueId)
     }
 
     fun restoreArmor(player: Player) {
-        if (!plugin.protocolLibSupport) {
-            return
-        }
         plugin.gameManager.invisPlayers.remove(player.uniqueId)
-        broadcastNearby(player, setItem(player, player.inventory.boots, 1))
-        broadcastNearby(player, setItem(player, player.inventory.leggings, 2))
-        broadcastNearby(player, setItem(player, player.inventory.chestplate, 3))
         broadcastNearby(player, setItem(player, player.inventory.helmet, 4))
+        broadcastNearby(player, setItem(player, player.inventory.chestplate, 3))
+        broadcastNearby(player, setItem(player, player.inventory.leggings, 2))
+        broadcastNearby(player, setItem(player, player.inventory.boots, 1))
     }
 
     private fun broadcastNearby(player: Player, packet: PacketContainer) {
-        if (!plugin.protocolLibSupport) {
-            return
-        }
+        val game = plugin.gameManager.getGame(player) ?: return
+        val team = game.getTeamOfPlayer(player) ?: return
         val manager = ProtocolLibrary.getProtocolManager()
         for (observer in manager.getEntityTrackers(player)) {
-            val gameName = plugin.gameManager.getPlayerInGame(observer)?: continue
-            val game = plugin.gameManager.getGame(gameName)?: continue
-            val team = game.getTeamOfPlayer(player)?: continue
             if (game.getPlayersInTeam(team).contains(observer.uniqueId)) {
                 continue
             }
@@ -101,19 +110,13 @@ class PacketManager(private val plugin: BedwarsPlugin) {
         }
     }
 
-    private fun setAir(player: Player, slot: Int): PacketContainer {
-        val packet = PacketContainer(PacketType.Play.Server.ENTITY_EQUIPMENT)
-        packet.getEntityModifier(player.world).write(0, player)
-        packet.integers.write(1, Integer.valueOf(slot))
-        packet.itemModifier.write(0, ItemStack(Material.AIR))
-        return packet
-    }
+    private fun setAir(player: Player, slot: Int): PacketContainer = setItem(player, null, slot)
 
-    private fun setItem(player: Player, item: ItemStack, slot: Int): PacketContainer {
+    private fun setItem(player: Player, item: ItemStack?, slot: Int): PacketContainer {
         val packet = PacketContainer(PacketType.Play.Server.ENTITY_EQUIPMENT)
         packet.getEntityModifier(player.world).write(0, player)
-        packet.integers.write(1, Integer.valueOf(slot))
-        packet.itemModifier.write(0, item)
+        packet.integers.write(1, slot)
+        packet.itemModifier.write(0, item ?: ItemStack(Material.AIR))
         return packet
     }
 }

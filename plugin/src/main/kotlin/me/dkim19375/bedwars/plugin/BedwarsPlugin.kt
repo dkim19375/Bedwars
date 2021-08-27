@@ -69,7 +69,6 @@ class BedwarsPlugin : CoreJavaPlugin() {
         private set
 
     var partiesAPI: PartiesAPI? = null
-    var protocolLibSupport = false
 
     private val serializable = listOf(
         TeamData::class.java,
@@ -129,9 +128,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
     override fun onDisable() {
         gameManager.getGames().values.forEach(BedwarsGame::forceStop)
         gameManager.save()
-        if (protocolLibSupport) {
-            ProtocolLibrary.getProtocolManager().removePacketListeners(this)
-        }
+        ProtocolLibrary.getProtocolManager().removePacketListeners(this)
         dataFile.save()
         serializable.reversed().forEach(ConfigurationSerialization::unregisterClass)
         unregisterConfig(dataFile)
@@ -164,7 +161,6 @@ class BedwarsPlugin : CoreJavaPlugin() {
         } ?: logInfo("Could not hook into $name!")
 
     private fun initVariables() {
-        hookOntoLib("ProtocolLib", false) { _: BedwarsPlugin -> protocolLibSupport = true }
         hookOntoLib("Parties", false) { _: BedwarsPlugin -> partiesAPI = Parties.getApi() }
         hookOntoLib("Multiverse-Core") { pl: MultiverseCore -> worldManager = pl.mvWorldManager }
         dataFile = ConfigFile(this, "data.yml")
@@ -187,10 +183,10 @@ class BedwarsPlugin : CoreJavaPlugin() {
             BlockBreakListener(this), PlayerQuitListener(this), PlayerDeathListener(this),
             EntityDamageListener(this), ItemTransferListener(this), DamageByOtherListener(this),
             PotionConsumeListener(this), InventoryClickListener(this), PlayerDropItemListener(this),
-            PlayerItemDamageListener(this), CommandListeners(this), AsyncPlayerChatListener(this),
+            WorldInitListener(this), CommandListeners(this), AsyncPlayerChatListener(this),
             PlayerCoordsChangeListener(this), EntityDamageByEntityListener(this), CraftItemListener(this),
             PlayerInteractListener(this), ProjectileLaunchListener(this), PlayerPickupItemListener(this),
-            WorldInitListener(this), partiesListeners, scoreboardManager
+            partiesListeners, scoreboardManager
         )
     }
 }

@@ -30,7 +30,10 @@ import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.kyori.adventure.title.Title
 import net.kyori.adventure.util.Ticks
-import org.bukkit.*
+import org.bukkit.Bukkit
+import org.bukkit.ChatColor
+import org.bukkit.Location
+import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
@@ -117,6 +120,7 @@ fun CommandSender.showHelpMsg(label: String, page: Int = 1) = showHelpMessage(
 fun Permissible.getMaxHelpPages(): Int =
     ceil(commands.filter { msg -> hasPermission(msg.permission) }.size.toDouble() / 7.0).toInt()
 
+@Suppress("ConvertCallChainIntoSequence")
 fun PlayerInventory.containsArmor(): ArmorType? = getAllContents()
     .toList()
     .filterNotNull()
@@ -155,9 +159,6 @@ fun Player.getItemAmount(type: Material): Int {
 }
 
 fun Permissible.hasPermission(permission: Permissions) = hasPermission(permission.permission)
-
-fun Player.playSound(sound: Sound, volume: Float = 0.85f, pitch: Float = 1.0f) =
-    playSound(location, sound, volume, pitch)
 
 fun PlayerInventory.getAllContents(): List<ItemStack?> = (0..39).map(this::getItem)
 
