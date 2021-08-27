@@ -18,6 +18,7 @@
 
 package me.dkim19375.bedwars.plugin.data
 
+import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.util.*
 import me.dkim19375.dkimbukkitcore.function.logInfo
 import org.bukkit.GameMode
@@ -34,13 +35,13 @@ data class PlayerData(
     val location: Location,
     val health: Double
 ) {
-    fun apply(player: Player) {
+    fun apply(player: Player, plugin: BedwarsPlugin) {
         player.compassTarget = player.world.spawnLocation.clone()
         player.gameMode = gamemode
         player.inventory.setAllContents(inventory)
         player.inventory.armorContents = armor
         player.enderChest.contents = enderChest
-        player.teleportUpdated(location)
+        player.teleportUpdated(plugin.dataFileManager.getLobby() ?: location)
         player.compassTarget = player.world.spawnLocation.clone()
         player.activePotionEffects.forEach { e -> player.removePotionEffect(e.type) }
         player.health = health

@@ -56,9 +56,9 @@ val commands = listOf(
     HelpMessage("reload", "Reload the plugin's config files", Permissions.RELOAD.permission),
     HelpMessage("create", "Create a new bedwars game", Permissions.SETUP.permission),
     HelpMessage("delete <name>", "Delete a bedwars game", Permissions.SETUP.permission),
-    HelpMessage("save <name>", "Save a bedwars game", Permissions.SETUP.permission),
-    HelpMessage("start <name>", "Start a bedwars game", Permissions.START.permission),
-    HelpMessage("stop <name>", "Stop a bedwars game", Permissions.STOP.permission),
+    HelpMessage("save [name]", "Save a bedwars game", Permissions.SETUP.permission),
+    HelpMessage("start [name]", "Start a bedwars game", Permissions.START.permission),
+    HelpMessage("stop [name]", "Stop a bedwars game", Permissions.STOP.permission),
     HelpMessage("lobby [disable]", "Set or disable the main lobby", Permissions.SETUP.permission),
     HelpMessage(
         "edit <name>",
@@ -70,47 +70,47 @@ val commands = listOf(
         "See information about a bedwars game",
         Permissions.INFO.permission
     ),
-    HelpMessage("setup <name> ready", "Detects if the game can be saved", Permissions.SETUP.permission),
-    HelpMessage("setup <name> lobby", "Set the lobby location", Permissions.SETUP.permission),
-    HelpMessage("setup <name> spec", "Set the spectator spot", Permissions.SETUP.permission),
-    HelpMessage("setup <name> minplayers [min]", "Set the minimum players", Permissions.SETUP.permission),
-    HelpMessage("setup <name> maxplayers [max]", "Set the maximum players", Permissions.SETUP.permission),
+    HelpMessage("setup [name] ready", "Detects if the game can be saved", Permissions.SETUP.permission),
+    HelpMessage("setup [name] lobby", "Set the lobby location", Permissions.SETUP.permission),
+    HelpMessage("setup [name] spec", "Set the spectator spot", Permissions.SETUP.permission),
+    HelpMessage("setup [name] minplayers [min]", "Set the minimum players", Permissions.SETUP.permission),
+    HelpMessage("setup [name] maxplayers [max]", "Set the maximum players", Permissions.SETUP.permission),
     HelpMessage(
-        "setup <name> shop add [tp/teleport]", "Set the villager being looked at as a shop, " +
+        "setup [name] shop add [tp/teleport]", "Set the villager being looked at as a shop, " +
                 "if teleport/tp arg is set, then the villager will teleport to you", Permissions.SETUP.permission
     ),
     HelpMessage(
-        "setup <name> shop remove",
+        "setup [name] shop remove",
         "Removes the villager being looked at as a shop",
         Permissions.SETUP.permission
     ),
     HelpMessage(
-        "setup <name> upgrades add [tp/teleport]",
+        "setup [name] upgrades add [tp/teleport]",
         "Set the villager being looked at as an upgrade shop, if teleport/tp arg is set, then the villager will teleport to you",
         Permissions.SETUP.permission
     ),
     HelpMessage(
-        "setup <name> upgrades remove",
+        "setup [name] upgrades remove",
         "Removes the villager being looked at as an upgrade shop",
         Permissions.SETUP
             .permission
     ),
-    HelpMessage("setup <name> spawner add <iron/gold/diamond/emerald>", "Add a spawner", Permissions.SETUP.permission),
-    HelpMessage("setup <name> spawner remove", "Removes a spawner within 5 blocks", Permissions.SETUP.permission),
-    HelpMessage("setup <name> team", "Get the current teams", Permissions.SETUP.permission),
+    HelpMessage("setup [name] spawner add <iron/gold/diamond/emerald>", "Add a spawner", Permissions.SETUP.permission),
+    HelpMessage("setup [name] spawner remove", "Removes a spawner within 5 blocks", Permissions.SETUP.permission),
+    HelpMessage("setup [name] team", "Get the current teams", Permissions.SETUP.permission),
     HelpMessage(
-        "setup <name> team add <color>",
+        "setup [name] team add <color>",
         "Create a team, with the spawn at your location",
         Permissions.SETUP.permission
     ),
-    HelpMessage("setup <name> team remove <color>", "Remove a team", Permissions.SETUP.permission),
+    HelpMessage("setup [name] team remove <color>", "Remove a team", Permissions.SETUP.permission),
     HelpMessage(
-        "setup <name> bed add <color>",
+        "setup [name] bed add <color>",
         "Set the bed of the team color of the bed you are standing on",
         Permissions.SETUP
             .permission
     ),
-    HelpMessage("setup <name> bed remove <color>", "Unsets the bed of the team color", Permissions.SETUP.permission),
+    HelpMessage("setup [name] bed remove <color>", "Unsets the bed of the team color", Permissions.SETUP.permission),
 )
 
 fun CommandSender.showHelpMsg(label: String, page: Int = 1) = showHelpMessage(

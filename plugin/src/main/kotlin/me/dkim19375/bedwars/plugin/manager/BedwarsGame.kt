@@ -504,7 +504,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         if (!setOf(GameMode.SPECTATOR, GameMode.CREATIVE).contains(data.gamemode)) {
             player.isFlying = false
         }
-        data.apply(player)
+        data.apply(player, plugin)
     }
 
     private fun giveGameOverItems(player: Player) {

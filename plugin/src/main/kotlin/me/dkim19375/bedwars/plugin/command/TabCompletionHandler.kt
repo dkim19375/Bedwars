@@ -127,12 +127,16 @@ class TabCompletionHandler(private val plugin: BedwarsPlugin) : TabCompleter {
         return list
     }
 
-    private fun getSecondArg(sender: CommandSender, args: Array<String>): List<String> = if (getBedwarsGames().none {
+    private fun getSecondArg(sender: CommandSender, args: Array<String>): List<String> = if (getAllGames().none {
             it.startsWith(args[1], true)
         } && sender is Player) {
         completesListMap["setup"].toList()
     } else {
-        getBedwarsGames().plus(if (sender is Player) completesListMap["setup"].toList() else emptyList())
+        getBedwarsGames().plus(if (sender is Player && getAllGames().any { it.equals(sender.world.name, true) }) {
+            completesListMap["setup"].toList()
+        } else {
+            emptyList()
+        })
     }
 
     private fun getRestArgs(sender: CommandSender, args: Array<String>): Pair<String, List<String>> {

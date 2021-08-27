@@ -271,7 +271,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 return true
             }
             "stop" -> {
-                if (!check(sender, args, 2, Permissions.STOP, false)) {
+                if (!check(sender, args, 1, Permissions.STOP, false)) {
                     return true
                 }
                 if (args[1].equals("all", ignoreCase = true)) {
@@ -298,7 +298,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                     }
                     return true
                 }
-                val game = plugin.gameManager.getGame(args[1])
+                val game = (args.getOrNull(1) ?: (sender as? Player)?.world?.name)?.let(plugin.gameManager::getGame)
                 if (game == null) {
                     sender.sendMessage(ErrorMessages.INVALID_GAME)
                     return true
