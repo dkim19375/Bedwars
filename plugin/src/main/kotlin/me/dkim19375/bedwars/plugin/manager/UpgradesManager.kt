@@ -29,7 +29,6 @@ import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
-import org.bukkit.scheduler.BukkitTask
 import java.util.*
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -42,11 +41,8 @@ class UpgradesManager(plugin: BedwarsPlugin, val game: BedwarsGame) {
     val secondTrap = mutableMapOf<Team, TrapType>()
     val thirdTrap = mutableMapOf<Team, TrapType>()
     private val times = mutableMapOf<UUID, Long>()
-    var task: BukkitTask? = null
 
-    fun stop() {
-        task?.cancel()
-        task = null
+    fun reset() {
         sharpness.clear()
         protection.clear()
         haste.clear()
@@ -174,10 +170,9 @@ class UpgradesManager(plugin: BedwarsPlugin, val game: BedwarsGame) {
                     (d.location.getSafeDistance(player.location) < 7) &&
                     (firstTrap.containsKey(d.team))
         } ?: return false
-        val time = times[player.uniqueId] ?: return true
-        if (System.currentTimeMillis() - time > 30000) {
+        val time = times[player.uniqueId]
+        if (time == null || System.currentTimeMillis() - time > 20000) {
             times.remove(player.uniqueId)
-            Bukkit.broadcastMessage("Contains: ${times.containsKey(player.uniqueId)}")
             return true
         }
         return false

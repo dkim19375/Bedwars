@@ -27,11 +27,9 @@ import me.dkim19375.bedwars.plugin.enumclass.*
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
 import me.dkim19375.bedwars.plugin.util.*
 import me.dkim19375.dkimbukkitcore.data.toWrapper
-import me.dkim19375.dkimbukkitcore.function.playSound
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
-import org.bukkit.Sound
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -68,26 +66,6 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                     return true
                 }
                 sender.showHelpMsg(label)
-                return true
-            }
-            "sound" -> {
-                if (!check(sender, args, 3, Permissions.SETUP, true)) {
-                    return true
-                }
-                val player = sender as Player
-                val sound: Sound = try {
-                    Sound.valueOf(args[1].lowercase())
-                } catch (_: IllegalArgumentException) {
-                    player.sendMessage(ErrorMessages.INVALID_ARG)
-                    return true
-                }
-                val pitch: Float? = args[2].toFloatOrNull()
-                if (pitch == null) {
-                    player.sendMessage(ErrorMessages.INVALID_ARG)
-                    return true
-                }
-                player.playSound(sound, pitch = pitch)
-                player.sendMessage("${ChatColor.GREEN}Played sound: ${sound.name} at pitch $pitch!")
                 return true
             }
             "list" -> {

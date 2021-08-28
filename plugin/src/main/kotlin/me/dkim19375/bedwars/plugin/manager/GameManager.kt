@@ -55,6 +55,7 @@ class GameManager(private val plugin: BedwarsPlugin) {
             for (game in getGames().values) {
                 for (player in game.getPlayersInGame().getPlayers()) {
                     player.foodLevel = 20
+                    player.saturation = 5f
                 }
                 if (game.state != GameState.STARTED) {
                     continue

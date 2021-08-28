@@ -22,7 +22,6 @@ import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.enumclass.SpawnerType
 import me.dkim19375.bedwars.plugin.util.Delay
-import me.dkim19375.bedwars.plugin.util.dropItemStraight
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Item
@@ -72,7 +71,7 @@ class SpawnerManager(private val plugin: BedwarsPlugin, private val game: Bedwar
                         spawner.location.x,
                         spawner.location.y,
                         spawner.location.z)
-                    val item = loc.world.dropItemStraight(loc, ItemStack(spawner.type.material))
+                    val item = loc.world.dropItem(loc, ItemStack(spawner.type.material))
                     val entities = item.getNearbyEntities(4.0, 4.0, 4.0)
                     var amount = 1
                     for (entity in entities) {

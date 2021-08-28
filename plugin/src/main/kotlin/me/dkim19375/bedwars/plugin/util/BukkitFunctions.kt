@@ -202,13 +202,6 @@ fun Location?.getSafeDistance(other: Location?): Double {
     }
 }
 
-fun World.dropItemStraight(location: Location, itemStack: ItemStack): Item {
-    val item = dropItem(location, itemStack)
-    item.velocity.x = 0.0
-    item.velocity.z = 0.0
-    return item
-}
-
 fun Location.dropItem(item: ItemStack): Item = world.dropItem(this, item)
 
 fun Block.getBedHead(): Location {

@@ -29,6 +29,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.util.Vector
 import kotlin.math.roundToInt
 
 class EntityDamageByEntityListener(private val plugin: BedwarsPlugin) : Listener {
@@ -74,7 +75,11 @@ class EntityDamageByEntityListener(private val plugin: BedwarsPlugin) : Listener
             return
         }
         damage = finalDamage * 0.1
+        val newVelocity = entity.velocity.clone().multiply(1.7)
+        entity.velocity = Vector(newVelocity.x.coerce(), newVelocity.y.coerce(), newVelocity.z.coerce())
     }
+
+    private fun Double.coerce(): Double = coerceIn(-3.9999999999999999, 3.9999999999999999)
 
     private fun EntityDamageByEntityEvent.checkHolo() {
         val clicked = entity as? ArmorStand ?: return

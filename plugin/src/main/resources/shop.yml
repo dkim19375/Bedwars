@@ -41,7 +41,7 @@ hardened-clay:
 
 blast-proof-glass:
   slot: 21
-  material: 'GLASS'
+  material: 'STAINED_GLASS'
   amount: 4
   cost: 12
   cost-item: 'IRON'
@@ -118,7 +118,7 @@ diamond-sword:
   material: 'DIAMOND_SWORD'
   amount: 1
   cost: 4
-  cost-item: 'DIAMOND'
+  cost-item: 'EMERALD'
   display-name: 'Diamond Sword'
   item-category: 'MELEE'
 

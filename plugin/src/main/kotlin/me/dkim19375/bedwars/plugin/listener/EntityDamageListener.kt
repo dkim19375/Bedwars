@@ -20,6 +20,7 @@ package me.dkim19375.bedwars.plugin.listener
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.enumclass.GameState
+import me.dkim19375.bedwars.plugin.manager.BedwarsGame
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -32,22 +33,28 @@ class EntityDamageListener(private val plugin: BedwarsPlugin) : Listener {
         if (plugin.gameManager.getVillagersUUID().contains(entity.uniqueId)) {
             isCancelled = true
         }
-        playerAutoRespawn()
-        lobbyDamage()
-        spectatorDamage()
-    }
-
-    private fun EntityDamageEvent.spectatorDamage() {
         val player = entity as? Player ?: return
         val game = plugin.gameManager.getGame(player) ?: return
+        playerAutoRespawn(player, game)
+        lobbyDamage(game)
+        spectatorDamage(player, game)
+        fallDamage()
+    }
+
+    private fun EntityDamageEvent.fallDamage() {
+        if (cause != EntityDamageEvent.DamageCause.FALL) {
+            return
+        }
+        damage = finalDamage * 0.5
+    }
+
+    private fun EntityDamageEvent.spectatorDamage(player: Player, game: BedwarsGame) {
         if (game.eliminated.contains(player.uniqueId)) {
             isCancelled = true
         }
     }
 
-    private fun EntityDamageEvent.playerAutoRespawn() {
-        val player = entity as? Player ?: return
-        val game = plugin.gameManager.getGame(player) ?: return
+    private fun playerAutoRespawn(player: Player, game: BedwarsGame) {
         if (player.location.y > 1.0) {
             return
         }
@@ -57,9 +64,7 @@ class EntityDamageListener(private val plugin: BedwarsPlugin) : Listener {
         }
     }
 
-    private fun EntityDamageEvent.lobbyDamage() {
-        val player = entity as? Player ?: return
-        val game = plugin.gameManager.getGame(player) ?: return
+    private fun EntityDamageEvent.lobbyDamage(game: BedwarsGame) {
         if (game.state != GameState.LOBBY && game.state != GameState.STARTING) {
             return
         }

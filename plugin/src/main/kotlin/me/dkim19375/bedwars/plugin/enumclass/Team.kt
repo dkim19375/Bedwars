@@ -26,9 +26,13 @@ import org.bukkit.inventory.ItemStack
 
 enum class Team(val color: DyeColor, val chatColor: ChatColor, val displayName: String) {
     RED(DyeColor.RED, ChatColor.RED, "Red"),
-    YELLOW(DyeColor.YELLOW, ChatColor.YELLOW, "Yellow"),
+    BLUE(DyeColor.LIGHT_BLUE, ChatColor.BLUE, "Blue"),
     GREEN(DyeColor.LIME, ChatColor.GREEN, "Green"),
-    BLUE(DyeColor.LIGHT_BLUE, ChatColor.BLUE, "Blue");
+    YELLOW(DyeColor.YELLOW, ChatColor.YELLOW, "Yellow"),
+    AQUA(DyeColor.CYAN, ChatColor.AQUA, "Aqua"),
+    WHITE(DyeColor.WHITE, ChatColor.WHITE, "White"),
+    PINK(DyeColor.PINK, ChatColor.LIGHT_PURPLE, "Pink"),
+    GRAY(DyeColor.GRAY, ChatColor.GRAY, "Gray");
 
     companion object {
         fun fromString(str: String?): Team? {

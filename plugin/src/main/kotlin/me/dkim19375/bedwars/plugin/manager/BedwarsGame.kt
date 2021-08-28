@@ -84,26 +84,32 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             get() = teleportField.getBoolean(null)
     }
 
-    private fun reset(modifyPlayers: Boolean = true) {
+    private fun reset(start: Boolean = false) {
         countdown = 10
         time = 0
         tempPlayers.clear()
         players.clear()
         eliminated.clear()
-        if (modifyPlayers) {
-            playersInLobby.clear()
-            beforeData.clear()
-        }
         task?.cancel()
         task = null
         beds.clear()
-        upgradesManager.stop()
+        upgradesManager.reset()
         spawnerManager.reset()
         placedBlocks.clear()
         hologramManager.stop()
         kills.clear()
         trackers.clear()
         spectators.clear()
+
+
+        if (!start) {
+            playersInLobby.clear()
+            beforeData.clear()
+        }
+        if (start) {
+            spawnerManager.start()
+            hologramManager.start()
+        }
     }
 
     fun start(force: Boolean): Result {
@@ -112,7 +118,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             return result
         }
         state = GameState.STARTING
-        reset(false)
+        reset(true)
         logInfo("Game ${data.world.name} is starting!")
         task?.cancel()
         task = object : BukkitRunnable() {
@@ -170,8 +176,12 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
                 }
             }
             val block = bed.location.block
-            applyToBlock(block.getBedHead())
-            applyToBlock(block.getBedFeet())
+            val head = block.getBedHead()
+            val feet = block.getBedFeet()
+            applyToBlock(head)
+            applyToBlock(feet)
+            Bukkit.broadcastMessage("Head of ${bed.team.displayName}: ${head.format()}")
+            Bukkit.broadcastMessage("Feet of ${bed.team.displayName}: ${feet.format()}")
         }
         for (teamData in teams) {
             beds[teamData.team] = true

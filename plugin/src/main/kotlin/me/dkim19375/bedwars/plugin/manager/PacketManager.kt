@@ -33,8 +33,8 @@ import java.lang.reflect.InvocationTargetException
 class PacketManager(private val plugin: BedwarsPlugin) {
     fun addListeners() {
         val plugin = plugin
-        ProtocolLibrary.getProtocolManager().addPacketListener(object :
-            PacketAdapter(plugin, PacketType.Play.Server.REMOVE_ENTITY_EFFECT) {
+        val manager = ProtocolLibrary.getProtocolManager()
+        manager.addPacketListener(object : PacketAdapter(plugin, PacketType.Play.Server.REMOVE_ENTITY_EFFECT) {
             override fun onPacketSending(event: PacketEvent) {
                 val player = event.packet.getEntityModifier(event.player.world).read(0) as? Player ?: return
                 if (event.packet.integers.read(0) != 14) {
@@ -45,8 +45,7 @@ class PacketManager(private val plugin: BedwarsPlugin) {
                 }
             }
         })
-        ProtocolLibrary.getProtocolManager().addPacketListener(object :
-            PacketAdapter(plugin, PacketType.Play.Server.ENTITY_EQUIPMENT) {
+        manager.addPacketListener(object : PacketAdapter(plugin, PacketType.Play.Server.ENTITY_EQUIPMENT) {
             override fun onPacketSending(event: PacketEvent) {
                 val player = event.packet.getEntityModifier(event.player.world).read(0) as? Player ?: return
                 if (player.uniqueId == event.player.uniqueId) {

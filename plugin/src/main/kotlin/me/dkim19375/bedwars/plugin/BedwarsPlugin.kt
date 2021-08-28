@@ -179,7 +179,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
 
     private fun registerListeners() {
         registerListener(
-            PlayerMoveListener(), ExplodeListeners(this), BlockPlaceListener(this),
+            PlayerMoveListener(), EntityExplodeListener(this), BlockPlaceListener(this),
             BlockBreakListener(this), PlayerQuitListener(this), PlayerDeathListener(this),
             EntityDamageListener(this), ItemTransferListener(this), DamageByOtherListener(this),
             PotionConsumeListener(this), InventoryClickListener(this), PlayerDropItemListener(this),
