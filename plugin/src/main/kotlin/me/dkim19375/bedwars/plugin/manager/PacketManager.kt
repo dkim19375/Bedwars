@@ -23,12 +23,17 @@ import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.events.PacketAdapter
 import com.comphenix.protocol.events.PacketContainer
 import com.comphenix.protocol.events.PacketEvent
+import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import org.bukkit.Material
 import org.bukkit.entity.Item
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.lang.reflect.InvocationTargetException
+
+private const val INVISIBILITY_ID: Int = 14
+private const val MAIN_HAND_SLOT: Int = 0
+private val NEW_EQUIPMENT: Boolean = MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_16_R1)
 
 class PacketManager(private val plugin: BedwarsPlugin) {
     fun addListeners() {
@@ -37,7 +42,7 @@ class PacketManager(private val plugin: BedwarsPlugin) {
         manager.addPacketListener(object : PacketAdapter(plugin, PacketType.Play.Server.REMOVE_ENTITY_EFFECT) {
             override fun onPacketSending(event: PacketEvent) {
                 val player = event.packet.getEntityModifier(event.player.world).read(0) as? Player ?: return
-                if (event.packet.integers.read(0) != 14) {
+                if (event.packet.integers.read(0) != INVISIBILITY_ID) {
                     return
                 }
                 if (plugin.gameManager.invisPlayers.contains(event.player.uniqueId)) {
@@ -54,7 +59,7 @@ class PacketManager(private val plugin: BedwarsPlugin) {
                 if (!plugin.gameManager.invisPlayers.contains(player.uniqueId)) {
                     return
                 }
-                if (event.packet.integers.read(1) == 0) {
+                if (event.packet.integers.read(1) == MAIN_HAND_SLOT) {
                     return
                 }
                 val game = plugin.gameManager.getGame(player) ?: return

@@ -274,14 +274,11 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         getPlayersInGame().plus(tempPlayers).plus(eliminated).toSet().getPlayers().forEach(this::revertPlayer)
         state = GameState.REGENERATING_WORLD
         reset()
-        revertBack()
         regenerateMap {
             state = GameState.LOBBY
             whenDone()
         }
     }
-
-    private fun revertBack() = getPlayersInGame().toSet().forEach { Bukkit.getPlayer(it)?.let(::revertPlayer) }
 
     fun isEditing() = plugin.dataFileManager.isEditing(data)
 
@@ -510,6 +507,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
 
     fun revertPlayer(player: Player) {
         plugin.scoreboardManager.getScoreboard(player, false).deactivate()
+        player.scoreboard = Bukkit.getScoreboardManager().mainScoreboard
         val data = beforeData[player.uniqueId] ?: return
         if (!setOf(GameMode.SPECTATOR, GameMode.CREATIVE).contains(data.gamemode)) {
             player.isFlying = false
