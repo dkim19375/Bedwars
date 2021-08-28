@@ -23,6 +23,7 @@ import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.events.PacketAdapter
 import com.comphenix.protocol.events.PacketContainer
 import com.comphenix.protocol.events.PacketEvent
+import com.comphenix.protocol.wrappers.EnumWrappers
 import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import org.bukkit.Material
@@ -32,8 +33,17 @@ import org.bukkit.inventory.ItemStack
 import java.lang.reflect.InvocationTargetException
 
 private const val INVISIBILITY_ID: Int = 14
-private const val MAIN_HAND_SLOT: Int = 0
+private val OFFHAND: Boolean = MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_9_R1)
 private val NEW_EQUIPMENT: Boolean = MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_16_R1)
+private val ARMOR_SLOTS: List<Pair<Int, EnumWrappers.ItemSlot>> = getArmorSlots(if (OFFHAND) 2 else 1)
+
+private fun getArmorSlots(offset: Int): List<Pair<Int, EnumWrappers.ItemSlot>> {
+    return listOf(
+        EnumWrappers.ItemSlot.FEET,
+        EnumWrappers.ItemSlot.LEGS,
+        EnumWrappers.ItemSlot.CHEST,
+        EnumWrappers.ItemSlot.HEAD).mapIndexed { index, itemSlot -> index + offset to itemSlot }
+}
 
 class PacketManager(private val plugin: BedwarsPlugin) {
     fun addListeners() {
@@ -52,21 +62,33 @@ class PacketManager(private val plugin: BedwarsPlugin) {
         })
         manager.addPacketListener(object : PacketAdapter(plugin, PacketType.Play.Server.ENTITY_EQUIPMENT) {
             override fun onPacketSending(event: PacketEvent) {
-                val player = event.packet.getEntityModifier(event.player.world).read(0) as? Player ?: return
+                val packet = event.packet
+                val player = packet.getEntityModifier(event.player.world).read(0) as? Player ?: return
                 if (player.uniqueId == event.player.uniqueId) {
                     return
                 }
                 if (!plugin.gameManager.invisPlayers.contains(player.uniqueId)) {
                     return
                 }
-                if (event.packet.integers.read(1) == MAIN_HAND_SLOT) {
+                if (NEW_EQUIPMENT) {
+                    if (packet.itemSlots.read(0) !in ARMOR_SLOTS.toMap().values) {
+                        return
+                    }
+                    val game = plugin.gameManager.getGame(player) ?: return
+                    if (game.getTeamOfPlayer(player) == game.getTeamOfPlayer(event.player)) {
+                        return
+                    }
+                    packet.itemModifier.write(0, ItemStack(Material.AIR))
+                    return
+                }
+                if (packet.integers.read(1) !in ARMOR_SLOTS.toMap().keys) {
                     return
                 }
                 val game = plugin.gameManager.getGame(player) ?: return
                 if (game.getTeamOfPlayer(player) == game.getTeamOfPlayer(event.player)) {
                     return
                 }
-                event.packet.itemModifier.write(0, ItemStack(Material.AIR))
+                packet.itemModifier.write(0, ItemStack(Material.AIR))
             }
         })
     }
@@ -83,19 +105,18 @@ class PacketManager(private val plugin: BedwarsPlugin) {
     }
 
     fun hideArmor(player: Player) {
-        broadcastNearby(player, setAir(player, 4))
-        broadcastNearby(player, setAir(player, 3))
-        broadcastNearby(player, setAir(player, 2))
-        broadcastNearby(player, setAir(player, 1))
+        ARMOR_SLOTS.toMap().keys.forEach {
+            broadcastNearby(player, setAir(player, it))
+        }
         plugin.gameManager.invisPlayers.add(player.uniqueId)
     }
 
     fun restoreArmor(player: Player) {
         plugin.gameManager.invisPlayers.remove(player.uniqueId)
-        broadcastNearby(player, setItem(player, player.inventory.helmet, 4))
-        broadcastNearby(player, setItem(player, player.inventory.chestplate, 3))
-        broadcastNearby(player, setItem(player, player.inventory.leggings, 2))
-        broadcastNearby(player, setItem(player, player.inventory.boots, 1))
+        broadcastNearby(player, setItem(player, player.inventory.helmet, 3))
+        broadcastNearby(player, setItem(player, player.inventory.chestplate, 2))
+        broadcastNearby(player, setItem(player, player.inventory.leggings, 1))
+        broadcastNearby(player, setItem(player, player.inventory.boots, 0))
     }
 
     private fun broadcastNearby(player: Player, packet: PacketContainer) {
@@ -119,7 +140,11 @@ class PacketManager(private val plugin: BedwarsPlugin) {
     private fun setItem(player: Player, item: ItemStack?, slot: Int): PacketContainer {
         val packet = PacketContainer(PacketType.Play.Server.ENTITY_EQUIPMENT)
         packet.getEntityModifier(player.world).write(0, player)
-        packet.integers.write(1, slot)
+        if (NEW_EQUIPMENT) {
+            packet.itemSlots.write(1, ARMOR_SLOTS[slot].second)
+        } else {
+            packet.integers.write(1, ARMOR_SLOTS[slot].first)
+        }
         packet.itemModifier.write(0, item ?: ItemStack(Material.AIR))
         return packet
     }

@@ -252,7 +252,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 if (!check(sender, args, 1, Permissions.STOP, false)) {
                     return true
                 }
-                if (args[1].equals("all", ignoreCase = true)) {
+                if (args.getOrNull(1)?.equals("all", ignoreCase = true) == true) {
                     val games = plugin.gameManager.getRunningGames().values
                     val amount = games.size
                     if (amount <= 0) {
