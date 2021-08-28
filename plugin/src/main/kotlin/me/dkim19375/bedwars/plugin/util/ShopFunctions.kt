@@ -18,10 +18,15 @@
 
 package me.dkim19375.bedwars.plugin.util
 
+import me.dkim19375.bedwars.plugin.NEW_SOUND
 import me.dkim19375.dkimbukkitcore.function.playSound
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 
-fun Player.playBoughtSound() = playSound(Sound.NOTE_PLING, pitch = 7.0f, volume = 0.95f)
+private val BOUGHT_SOUND = if (NEW_SOUND) Sound.valueOf("BLOCK_NOTE_PLING") else Sound.NOTE_PLING
 
-fun Player.playErrorSound() = playSound(Sound.ANVIL_LAND, pitch = 0.8f, volume = 0.3f)
+private val ERROR_SOUND = if (NEW_SOUND) Sound.valueOf("BLOCK_ANVIL_LAND") else Sound.ANVIL_LAND
+
+fun Player.playBoughtSound() = playSound(BOUGHT_SOUND, pitch = 7.0f, volume = 0.95f)
+
+fun Player.playErrorSound() = playSound(ERROR_SOUND, pitch = 0.8f, volume = 0.3f)

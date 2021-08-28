@@ -23,6 +23,7 @@ import com.alessiodp.parties.api.interfaces.PartiesAPI
 import com.comphenix.protocol.ProtocolLibrary
 import com.onarandombox.MultiverseCore.MultiverseCore
 import com.onarandombox.MultiverseCore.api.MVWorldManager
+import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion
 import de.tr7zw.nbtinjector.NBTInjector
 import io.github.slimjar.app.builder.ApplicationBuilder
 import me.dkim19375.bedwars.plugin.command.MainCommand
@@ -46,6 +47,8 @@ import java.io.FileInputStream
 import java.io.IOException
 import java.util.*
 import kotlin.system.measureTimeMillis
+
+val NEW_SOUND: Boolean = MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_9_R1)
 
 @Suppress("MemberVisibilityCanBePrivate")
 class BedwarsPlugin : CoreJavaPlugin() {

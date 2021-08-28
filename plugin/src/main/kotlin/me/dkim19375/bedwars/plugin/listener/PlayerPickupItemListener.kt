@@ -19,6 +19,7 @@
 package me.dkim19375.bedwars.plugin.listener
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
+import me.dkim19375.bedwars.plugin.NEW_SOUND
 import me.dkim19375.bedwars.plugin.enumclass.SpawnerType
 import me.dkim19375.bedwars.plugin.util.giveItem
 import me.dkim19375.dkimbukkitcore.function.playSound
@@ -62,9 +63,10 @@ class PlayerPickupItemListener(private val plugin: BedwarsPlugin) : Listener {
         } else {
             emptyList()
         }).plus(player).toSet()
+        val sound = if (NEW_SOUND) Sound.valueOf("ENTITY_ITEM_PICKUP") else Sound.ITEM_PICKUP
         for (loopPlayer in players) {
             loopPlayer.giveItem(itemStack.clone())
-            loopPlayer.playSound(Sound.ITEM_PICKUP, 0.2f, Random.nextDouble(1.0, 2.5).coerceAtMost(2.0).toFloat())
+            loopPlayer.playSound(sound, 0.2f, Random.nextDouble(1.0, 2.5).coerceAtMost(2.0).toFloat())
             plugin.packetManager.collectItem(item, loopPlayer)
         }
     }

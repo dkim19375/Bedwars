@@ -19,6 +19,7 @@
 package me.dkim19375.bedwars.plugin.listener
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
+import me.dkim19375.bedwars.plugin.NEW_SOUND
 import me.dkim19375.bedwars.plugin.util.getPlayers
 import me.dkim19375.dkimbukkitcore.function.playSound
 import org.bukkit.Sound
@@ -38,7 +39,8 @@ class ProjectileLaunchListener(private val plugin: BedwarsPlugin) : Listener {
         val shooter = entity.shooter as? Player ?: return
         val game = plugin.gameManager.getGame(shooter) ?: return
         game.getPlayersInGame().getPlayers().forEach {
-            it.playSound(Sound.ENDERMAN_TELEPORT)
+            val sound = if (NEW_SOUND) Sound.valueOf("ENTITY_ENDERMEN_TELEPORT") else Sound.ENDERMAN_TELEPORT
+            it.playSound(sound)
         }
     }
 }
