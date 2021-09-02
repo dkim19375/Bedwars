@@ -24,6 +24,7 @@ import me.dkim19375.bedwars.compat.abstract.NBTUtilitiesAbstract
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.MainShopConfigItem
 import org.bukkit.entity.ArmorStand
+import org.bukkit.entity.Item
 import org.bukkit.entity.LivingEntity
 import org.bukkit.inventory.ItemStack
 
@@ -53,3 +54,7 @@ fun ArmorStand.isHologram(): Boolean = nbtUtils.isHologram(this)
 fun ArmorStand.setHologramNBT(holo: Boolean): ArmorStand = nbtUtils.setHologramNBT(this, holo)
 
 fun ItemStack.setUnbreakable(unbreakable: Boolean): ItemStack = nbtUtils.setUnbreakable(this, unbreakable)
+
+fun Item.setDrop(drop: Boolean): Item = nbtUtils.setDrop(this, drop)
+
+fun Item.isDrop(): Boolean = nbtUtils.isDrop(this)

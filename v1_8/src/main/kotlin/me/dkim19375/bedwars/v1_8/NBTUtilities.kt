@@ -25,6 +25,7 @@ import de.tr7zw.nbtinjector.NBTInjector
 import me.dkim19375.bedwars.compat.abstract.NBTUtilitiesAbstract
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Entity
+import org.bukkit.entity.Item
 import org.bukkit.entity.LivingEntity
 import org.bukkit.inventory.ItemStack
 
@@ -32,7 +33,7 @@ private const val NO_AI_KEY = "NoAI"
 
 @Suppress("unused", "UNCHECKED_CAST")
 class NBTUtilities : NBTUtilitiesAbstract() {
-    private fun <T : LivingEntity> T.getNBT(): Pair<T, NBTCompound> {
+    private fun <T : Entity> T.getNBT(): Pair<T, NBTCompound> {
         val patched = NBTInjector.patchEntity(this) as T
         return patched to NBTInjector.getNbtData(patched)
     }
@@ -70,4 +71,18 @@ class NBTUtilities : NBTUtilitiesAbstract() {
 
     override fun setUnbreakable(item: ItemStack, unbreakable: Boolean): ItemStack =
         item.getNBT().apply { setInteger("Unbreakable", if (unbreakable) 1 else 0) }.item
+
+    override fun setDrop(item: Item, drop: Boolean): Item = if (drop) {
+        item.getNBT().let {
+            it.second.setByte(DROP_KEY, 0)
+            it.first
+        }
+    } else {
+        item.getNBT().let {
+            it.second.removeKey(DROP_KEY)
+            it.first
+        }
+    }
+
+    override fun isDrop(item: Item): Boolean = item.getNBT().second.keys.contains(DROP_KEY)
 }

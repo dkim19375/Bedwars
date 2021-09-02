@@ -20,6 +20,7 @@ package me.dkim19375.bedwars.compat.abstract
 
 import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion
 import org.bukkit.entity.ArmorStand
+import org.bukkit.entity.Item
 import org.bukkit.entity.LivingEntity
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
@@ -39,9 +40,10 @@ abstract class NBTUtilitiesAbstract {
         }
     }
 
-    protected val HOLOGRAM_KEY = "BedwarsArmorStand"
     protected val CONFIG_ITEM_KEY = "BedwarsConfigItem"
+    protected val HOLOGRAM_KEY = "BedwarsArmorStand"
     protected val TRACKER_KEY = "BedwarsPlayerTracker"
+    protected val DROP_KEY = "BedwarsGenDrop"
 
     abstract fun <T : LivingEntity> addAI(entity: T)
 
@@ -58,4 +60,8 @@ abstract class NBTUtilitiesAbstract {
     abstract fun setHologramNBT(armorStand: ArmorStand, holo: Boolean): ArmorStand
 
     abstract fun setUnbreakable(item: ItemStack, unbreakable: Boolean): ItemStack
+
+    abstract fun setDrop(item: Item, drop: Boolean): Item
+
+    abstract fun isDrop(item: Item): Boolean
 }

@@ -22,6 +22,7 @@ import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.NEW_SOUND
 import me.dkim19375.bedwars.plugin.enumclass.SpawnerType
 import me.dkim19375.bedwars.plugin.util.giveItem
+import me.dkim19375.bedwars.plugin.util.isDrop
 import me.dkim19375.dkimbukkitcore.function.playSound
 import org.bukkit.Bukkit
 import org.bukkit.Sound
@@ -44,6 +45,7 @@ class PlayerPickupItemListener(private val plugin: BedwarsPlugin) : Listener {
             return
         }
         val itemStack = item.itemStack.clone()
+        val isDrop = item.isDrop()
         isCancelled = true
         collected.add(item.uniqueId)
         Bukkit.getScheduler().runTask(plugin) {
@@ -58,7 +60,7 @@ class PlayerPickupItemListener(private val plugin: BedwarsPlugin) : Listener {
         val generator = SpawnerType.fromMaterial(itemStack.type)
         val enabled = (section?.getBoolean("enabled", true) != false)
                 && generator != null && generators.contains(generator)
-        val players = (if (enabled) {
+        val players = (if (enabled && isDrop) {
             item.getNearbyEntities(1.7, 2.0, 1.7).mapNotNull { it as? Player }
         } else {
             emptyList()
