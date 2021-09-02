@@ -35,6 +35,7 @@ import me.dkim19375.dkimbukkitcore.function.logInfo
 import me.dkim19375.dkimcore.extension.runCatchingOrNull
 import org.apache.commons.io.FileUtils
 import org.bukkit.*
+import org.bukkit.entity.Item
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
@@ -160,7 +161,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             val player = Bukkit.getPlayer(uuid) ?: continue
             val teamData = teams[i % teams.size]
             val team = teamData.team
-            val format = plugin.config.getString("tab.name") ?: "%team_color%%team_first_letter% %player_name%"
+            val format = plugin.config.getString("tab.name") ?: "%team_color%&l%team_first_letter% %team_color%%player_name%"
             val replaceMap = mapOf<String, Any>(
                 "team_color" to team.chatColor,
                 "team_name" to team.displayName,
@@ -183,23 +184,13 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             if (players.keys.contains(bed.team)) {
                 continue
             }
-            val applyToBlock = { loc: Location ->
-                loc.block.state.apply {
-                    type = Material.AIR
-                    update(true, false)
-                }
-            }
             val block = bed.location.block
-            val head = block.getBedHead()
-            val feet = block.getBedFeet()
-            if (!head.block.type.isBed()) {
-                Bukkit.broadcastMessage("Head of ${bed.team.displayName}: ${head.format()}")
-            }
-            if (!feet.block.type.isBed()) {
-                Bukkit.broadcastMessage("Feet of ${bed.team.displayName}: ${feet.format()}")
-            }
-            applyToBlock(head)
-            applyToBlock(feet)
+            block.type = Material.AIR
+            block.state.update()
+            block.world.getNearbyEntities(block.location, 6.0, 6.0, 6.0)
+                .mapNotNull { it as? Item }
+                .filter { it.itemStack.type.isBed() }
+                .forEach(Item::remove)
         }
         for (teamData in teams) {
             beds[teamData.team] = true

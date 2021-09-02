@@ -25,7 +25,6 @@ import me.dkim19375.bedwars.plugin.util.isBed
 import me.dkim19375.bedwars.plugin.util.setConfigItem
 import me.dkim19375.dkimbukkitcore.data.LocationWrapper
 import me.dkim19375.dkimbukkitcore.data.toWrapper
-import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Item
@@ -64,14 +63,12 @@ class BlockBreakListener(private val plugin: BedwarsPlugin) : Listener {
             return
         }
         isCancelled = true
-        Bukkit.getScheduler().runTask(plugin) {
-            player.getNearbyEntities(6.0, 6.0, 6.0)
-                .mapNotNull { i -> i as? Item }
-                .filter { i -> i.itemStack.type.isBed() }
-                .forEach(Item::remove)
-        }
         block.type = Material.AIR
         block.state.update()
+        player.getNearbyEntities(6.0, 6.0, 6.0)
+            .mapNotNull { it as? Item }
+            .filter { it.itemStack.type.isBed() }
+            .forEach(Item::remove)
         game.bedBreak(bed.team, player)
     }
 }
