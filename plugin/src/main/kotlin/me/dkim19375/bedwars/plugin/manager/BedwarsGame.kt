@@ -192,6 +192,12 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             val block = bed.location.block
             val head = block.getBedHead()
             val feet = block.getBedFeet()
+            if (!head.block.type.isBed()) {
+                Bukkit.broadcastMessage("Head of ${bed.team.displayName}: ${head.format()}")
+            }
+            if (!feet.block.type.isBed()) {
+                Bukkit.broadcastMessage("Feet of ${bed.team.displayName}: ${feet.format()}")
+            }
             applyToBlock(head)
             applyToBlock(feet)
         }

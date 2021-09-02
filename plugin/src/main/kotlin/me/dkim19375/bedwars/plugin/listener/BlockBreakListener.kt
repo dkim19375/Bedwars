@@ -21,6 +21,7 @@ package me.dkim19375.bedwars.plugin.listener
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.util.getBedHead
+import me.dkim19375.bedwars.plugin.util.isBed
 import me.dkim19375.bedwars.plugin.util.setConfigItem
 import me.dkim19375.dkimbukkitcore.data.LocationWrapper
 import me.dkim19375.dkimbukkitcore.data.toWrapper
@@ -41,7 +42,7 @@ class BlockBreakListener(private val plugin: BedwarsPlugin) : Listener {
             isCancelled = true
             return
         }
-        if (block.type != Material.BED_BLOCK && block.type != Material.BED) {
+        if (!block.type.isBed()) {
             val loc = LocationWrapper(block.location)
             if (loc in game.placedBlocks) {
                 val configItem = game.placedBlocks[loc]
@@ -66,7 +67,7 @@ class BlockBreakListener(private val plugin: BedwarsPlugin) : Listener {
         Bukkit.getScheduler().runTask(plugin) {
             player.getNearbyEntities(6.0, 6.0, 6.0)
                 .mapNotNull { i -> i as? Item }
-                .filter { i -> i.itemStack.type == Material.BED }
+                .filter { i -> i.itemStack.type.isBed() }
                 .forEach(Item::remove)
         }
         block.type = Material.AIR

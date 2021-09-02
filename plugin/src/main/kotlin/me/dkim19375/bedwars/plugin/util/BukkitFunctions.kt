@@ -228,6 +228,10 @@ fun Block.getBedFeet(): Location {
     return getRelative(direction.oppositeFace).location
 }
 
+private val bedMaterials = setOf(Material.BED, Material.BED_BLOCK)
+
+fun Material.isBed(): Boolean = this in bedMaterials
+
 fun Location.format(): String = "${if (world != null) "world: ${world.name}, " else ""}($x, $y, $z)"
 
 fun LocationWrapper.format(): String = "${"world: ${world.name}, "}($x, $y, $z)"

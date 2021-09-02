@@ -26,6 +26,7 @@ import me.dkim19375.bedwars.plugin.gui.TeleporterGUI
 import me.dkim19375.bedwars.plugin.gui.UpgradeShopGUI
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
 import me.dkim19375.bedwars.plugin.util.default
+import me.dkim19375.bedwars.plugin.util.isBed
 import me.dkim19375.bedwars.plugin.util.isHologram
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -124,7 +125,7 @@ class PlayerInteractListener(private val plugin: BedwarsPlugin) : Listener {
     private fun PlayerInteractEvent.bedPrevention() {
         plugin.gameManager.getGame(player) ?: return
         clickedBlock ?: return
-        if (!listOf(Material.BED, Material.BED_BLOCK).contains(clickedBlock.type)) {
+        if (!clickedBlock.type.isBed()) {
             return
         }
         if (!action.name.startsWith("RIGHT")) {

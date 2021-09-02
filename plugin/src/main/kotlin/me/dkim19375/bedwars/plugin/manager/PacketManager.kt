@@ -34,7 +34,6 @@ import java.lang.reflect.InvocationTargetException
 
 private const val INVISIBILITY_ID: Int = 14
 private val OFFHAND: Boolean = MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_9_R1)
-// private val COLORED_BEDS: Boolean = MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_12_R1)
 private val NEW_EQUIPMENT: Boolean = MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_16_R1)
 private val ARMOR_SLOTS: List<Pair<Int, EnumWrappers.ItemSlot>> = getArmorSlots(if (OFFHAND) 2 else 1)
 

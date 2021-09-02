@@ -29,7 +29,6 @@ import me.dkim19375.bedwars.plugin.util.*
 import me.dkim19375.dkimbukkitcore.data.toWrapper
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
-import org.bukkit.Material
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -638,7 +637,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                                 return true
                             }
                             val block = sender.location.block
-                            if (!(block.type == Material.BED_BLOCK || block.type == Material.BED)) {
+                            if (!block.type.isBed()) {
                                 sender.sendMessage("${ChatColor.RED}You are not standing on a bed!")
                                 return true
                             }
