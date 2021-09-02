@@ -23,3 +23,11 @@ generator:
     generators:
       - 'IRON'
       - 'GOLD'
+tab:
+  name: '%team_color%%team_first_letter% %player_name%' # Can also use %team_name% for "Red" or %team_uppercase% for "RED"
+
+  # Players in-game won't see players not in the game and players not in the game won't see players in-game
+  # unless in the same world (and same-world is true)
+  hide-players:
+    same-world: true # Allows you to see players in the same world even if they're not in the same game
+    enabled: true

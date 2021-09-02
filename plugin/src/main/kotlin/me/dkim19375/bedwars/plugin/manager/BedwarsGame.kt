@@ -30,6 +30,7 @@ import me.dkim19375.bedwars.plugin.enumclass.Team
 import me.dkim19375.bedwars.plugin.enumclass.getColored
 import me.dkim19375.bedwars.plugin.util.*
 import me.dkim19375.dkimbukkitcore.data.LocationWrapper
+import me.dkim19375.dkimbukkitcore.function.formatAll
 import me.dkim19375.dkimbukkitcore.function.logInfo
 import me.dkim19375.dkimcore.extension.runCatchingOrNull
 import org.apache.commons.io.FileUtils
@@ -159,7 +160,20 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             val player = Bukkit.getPlayer(uuid) ?: continue
             val teamData = teams[i % teams.size]
             val team = teamData.team
-            player.playerListName = "${team.chatColor}${player.name}"
+            val format = plugin.config.getString("tab.name") ?: "%team_color%%team_first_letter% %player_name%"
+            val replaceMap = mapOf<String, Any>(
+                "team_color" to team.chatColor,
+                "team_name" to team.displayName,
+                "team_uppercase" to team.displayName.uppercase(),
+                "team_first_letter" to team.displayName.uppercase().first(),
+            )
+            player.playerListName = format.formatAll(player).let {
+                var new = it
+                for ((key, value) in replaceMap) {
+                    new = new.replace("%$key%", value.toString())
+                }
+                new
+            }
             val set = players.getOrDefault(team, mutableSetOf())
             set.add(player.uniqueId)
             players[team] = set
@@ -180,8 +194,6 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             val feet = block.getBedFeet()
             applyToBlock(head)
             applyToBlock(feet)
-            Bukkit.broadcastMessage("Head of ${bed.team.displayName}: ${head.format()}")
-            Bukkit.broadcastMessage("Feet of ${bed.team.displayName}: ${feet.format()}")
         }
         for (teamData in teams) {
             beds[teamData.team] = true
@@ -508,6 +520,12 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     fun revertPlayer(player: Player) {
         plugin.scoreboardManager.getScoreboard(player, false).deactivate()
         player.scoreboard = Bukkit.getScoreboardManager().mainScoreboard
+        plugin.gameManager.hiddenPlayers[player.uniqueId]?.let { set ->
+            for (hiddenPlayer in set.getPlayers()) {
+                player.showPlayer(hiddenPlayer)
+            }
+        }
+        plugin.gameManager.hiddenPlayers.remove(player.uniqueId)
         val data = beforeData[player.uniqueId] ?: return
         if (!setOf(GameMode.SPECTATOR, GameMode.CREATIVE).contains(data.gamemode)) {
             player.isFlying = false

@@ -40,55 +40,96 @@ class GameManager(private val plugin: BedwarsPlugin) {
     val builders = mutableMapOf<String, GameBuilder>()
     val invisPlayers = mutableSetOf<UUID>()
     private val explosives = mutableMapOf<UUID, UUID>()
+    val hiddenPlayers = mutableMapOf<UUID, MutableSet<UUID>>()
 
     init {
         Bukkit.getScheduler().runTaskTimer(plugin, {
-            for (uuid in getAllPlayers().toSet()) {
-                val player = Bukkit.getPlayer(uuid) ?: continue
-                if (player.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
-                    invisPlayers.add(player.uniqueId)
-                    continue
-                }
-                invisPlayers.remove(player.uniqueId)
-            }
-
+            updateInvisPlayers()
             for (game in getGames().values) {
-                for (player in game.getPlayersInGame().getPlayers()) {
-                    player.foodLevel = 20
-                    player.saturation = 5f
-                }
-                if (game.state != GameState.STARTED) {
-                    continue
-                }
-                for ((uuid, team) in game.trackers) {
-                    val player = Bukkit.getPlayer(uuid) ?: continue
-                    if (game.beds[team] != true) {
-                        continue
-                    }
-                    var nearestPlayer: Pair<Player, Double>? = null
-                    for (otherPlayer in game.getPlayersInTeam(team).getPlayers()) {
-                        val distance = player.location.distance(otherPlayer.location)
-                        if (nearestPlayer == null) {
-                            nearestPlayer = otherPlayer to distance
-                            continue
-                        }
-                        if (nearestPlayer.second > distance) {
-                            nearestPlayer = otherPlayer to distance
-                        }
-                    }
-                    player.compassTarget = (nearestPlayer?.first?.location ?: player.world.spawnLocation).clone()
-                    player.sendActionBar(
-                        if (nearestPlayer == null) {
-                            null
-                        } else {
-                            "Tracking: ${team.chatColor}${nearestPlayer.first.name} ${ChatColor.WHITE}- " +
-                                    "Distance: ${ChatColor.GREEN}${ChatColor.BOLD}${nearestPlayer.second.toInt()}m"
-                        }
-                    )
-                }
+                updateSaturation(game)
+                updateTrackers(game)
+                updateTab(game)
             }
         }, 20L, 20L)
         Bukkit.getScheduler().runTask(plugin, this::reloadData)
+    }
+
+    private fun updateSaturation(game: BedwarsGame) {
+        for (player in game.getPlayersInGame().getPlayers()) {
+            player.foodLevel = 20
+            player.saturation = 1f
+        }
+    }
+
+    private fun updateTrackers(game: BedwarsGame) {
+        if (game.state != GameState.STARTED) {
+            return
+        }
+        for ((uuid, team) in game.trackers) {
+            val player = Bukkit.getPlayer(uuid) ?: continue
+            if (game.beds[team] != true) {
+                continue
+            }
+            var nearestPlayer: Pair<Player, Double>? = null
+            for (otherPlayer in game.getPlayersInTeam(team).getPlayers()) {
+                val distance = player.location.distance(otherPlayer.location)
+                if (nearestPlayer == null) {
+                    nearestPlayer = otherPlayer to distance
+                    continue
+                }
+                if (nearestPlayer.second > distance) {
+                    nearestPlayer = otherPlayer to distance
+                }
+            }
+            player.compassTarget = (nearestPlayer?.first?.location ?: player.world.spawnLocation).clone()
+            player.sendActionBar(
+                if (nearestPlayer == null) {
+                    null
+                } else {
+                    "Tracking: ${team.chatColor}${nearestPlayer.first.name} ${ChatColor.WHITE}- " +
+                            "Distance: ${ChatColor.GREEN}${ChatColor.BOLD}${nearestPlayer.second.toInt()}m"
+                }
+            )
+        }
+    }
+
+    private fun updateTab(game: BedwarsGame) {
+        if (game.state !in setOf(GameState.STARTED, GameState.STARTING, GameState.LOBBY, GameState.GAME_END)) {
+            return
+        }
+        val section = plugin.config.getConfigurationSection("tab.hide-players")
+        val sameWorld = section?.getBoolean("same-world", true) ?: true
+        if (section?.getBoolean("enabled", true) == false) {
+            return
+        }
+        for (player in game.getPlayersInGame().getPlayers()) {
+            for (onlinePlayer in Bukkit.getOnlinePlayers()) {
+                if (game.getPlayersInGame().contains(onlinePlayer.uniqueId)
+                    || (player.world.name == onlinePlayer.world.name && sameWorld)
+                ) {
+                    if (hiddenPlayers[player.uniqueId]?.contains(onlinePlayer.uniqueId) == true) {
+                        player.showPlayer(onlinePlayer)
+                        onlinePlayer.showPlayer(player)
+                        hiddenPlayers[player.uniqueId]?.remove(onlinePlayer.uniqueId)
+                    }
+                    continue
+                }
+                player.hidePlayer(onlinePlayer)
+                onlinePlayer.hidePlayer(player)
+                hiddenPlayers.getOrPut(player.uniqueId) { mutableSetOf() }.add(onlinePlayer.uniqueId)
+            }
+        }
+    }
+
+    private fun updateInvisPlayers() {
+        for (uuid in getAllPlayers().toSet()) {
+            val player = Bukkit.getPlayer(uuid) ?: continue
+            if (player.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
+                invisPlayers.add(player.uniqueId)
+                continue
+            }
+            invisPlayers.remove(player.uniqueId)
+        }
     }
 
     fun save() {
