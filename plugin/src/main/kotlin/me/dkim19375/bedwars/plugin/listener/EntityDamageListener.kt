@@ -54,13 +54,17 @@ class EntityDamageListener(private val plugin: BedwarsPlugin) : Listener {
         }
     }
 
-    private fun playerAutoRespawn(player: Player, game: BedwarsGame) {
+    private fun EntityDamageEvent.playerAutoRespawn(player: Player, game: BedwarsGame) {
         if (player.location.y > 1.0) {
             return
         }
         if (game.state == GameState.STARTED) {
             player.health = 0.01
             return
+        }
+        if (game.state == GameState.GAME_END) {
+            isCancelled = true
+            player.teleport(game.data.spec)
         }
     }
 
