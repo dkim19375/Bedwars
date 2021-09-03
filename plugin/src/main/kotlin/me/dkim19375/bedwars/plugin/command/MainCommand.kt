@@ -18,8 +18,10 @@
 
 package me.dkim19375.bedwars.plugin.command
 
+import com.google.gson.Gson
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.builder.DataEditor
+import me.dkim19375.bedwars.plugin.builder.GameBuilder
 import me.dkim19375.bedwars.plugin.data.BedData
 import me.dkim19375.bedwars.plugin.data.SpawnerData
 import me.dkim19375.bedwars.plugin.data.TeamData
@@ -56,6 +58,22 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
         }
         @Suppress("LiftReturnOrAssignment")
         when (args[0].lowercase()) {
+            "test" -> {
+                if (sender !is Player) {
+                    return true
+                }
+                val gameData = GameBuilder(sender.world).build(true) ?: return true
+                sender.sendMessage("${ChatColor.GREEN}Saving the data...")
+                gameData.save(plugin)
+                val newGame = BedwarsGame(plugin, gameData)
+                newGame.saveMap()
+                newGame.state = GameState.LOBBY
+                plugin.dataFileManager.setEditing(gameData, false)
+                plugin.gameManager.builders.remove(gameData.world.name)
+                plugin.gameManager.addGame(newGame)
+                sender.sendMessage("${ChatColor.GREEN}Successfully saved! (Map: ${newGame.data.world.name})")
+                return true
+            }
             "help" -> {
                 if (args.size > 1) {
                     sender.showHelpMsg(
@@ -199,7 +217,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 return true
             }
             "delete" -> {
-                val game = hasPermissionAndValidGame(sender, args) ?: return true
+                val game = hasPermissionAndValidGame(sender, args, mustBePlayer = false) ?: return true
                 game.broadcast("${ChatColor.RED}Game force stopping!")
                 game.forceStop()
                 plugin.gameManager.deleteGame(game)
@@ -214,7 +232,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                         sender.sendMessage(ErrorMessages.MUST_BE_PLAYER)
                         return true
                     }
-                    val editor = getEditorFromWorld(args[1], player) ?: return true
+                    val editor = getEditorFromWorld(args.getOrNull(1) ?: player.world.name, player) ?: return true
                     val gameData = editor.data.build()
                     if (gameData == null) {
                         player.sendMessage(
@@ -758,9 +776,17 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
         args: Array<out String>,
         showMsgForGame: Boolean = true,
         editing: Boolean = false,
+        mustBePlayer: Boolean = false,
     ): BedwarsGame? {
         val player = sender as? Player
-        if (!check(sender, args, if (player == null) 2 else 1, Permissions.SETUP, !editing)) {
+        if (!check(
+                sender = sender,
+                args = args,
+                minArgs = if (player == null) 2 else 1,
+                permission = Permissions.SETUP,
+                bePlayer = mustBePlayer
+            )
+        ) {
             return null
         }
         val game = plugin.gameManager.getGame(args.getOrNull(1), player)

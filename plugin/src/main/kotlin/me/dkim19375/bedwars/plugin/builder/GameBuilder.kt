@@ -80,13 +80,13 @@ data class GameBuilder(
                 if (!force) {
                     return null
                 }
-                Location(null, 0.0, 0.0, 0.0)
+                Location(world, 0.0, 0.0, 0.0)
             },
             gameLobby = lobby ?: run {
                 if (!force) {
                     return null
                 }
-                Location(null, 0.0, 0.0, 0.0)
+                Location(world, 0.0, 0.0, 0.0)
             }
         )
     }

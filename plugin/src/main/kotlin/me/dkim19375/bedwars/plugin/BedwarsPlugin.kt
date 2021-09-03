@@ -26,26 +26,33 @@ import com.onarandombox.MultiverseCore.api.MVWorldManager
 import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion
 import de.tr7zw.nbtinjector.NBTInjector
 import io.github.slimjar.app.builder.ApplicationBuilder
+import me.dkim19375.bedwars.plugin.builder.GameBuilder
 import me.dkim19375.bedwars.plugin.command.MainCommand
 import me.dkim19375.bedwars.plugin.command.TabCompletionHandler
 import me.dkim19375.bedwars.plugin.config.ConfigManager
-import me.dkim19375.bedwars.plugin.data.BedData
-import me.dkim19375.bedwars.plugin.data.GameData
-import me.dkim19375.bedwars.plugin.data.SpawnerData
-import me.dkim19375.bedwars.plugin.data.TeamData
+import me.dkim19375.bedwars.plugin.data.*
 import me.dkim19375.bedwars.plugin.listener.*
 import me.dkim19375.bedwars.plugin.manager.*
+import me.dkim19375.bedwars.plugin.serializer.LocationSerializer
+import me.dkim19375.bedwars.plugin.serializer.ShopConfigItemSerializer
+import me.dkim19375.bedwars.plugin.serializer.WorldSerializer
 import me.dkim19375.bedwars.plugin.util.initNBTVariables
 import me.dkim19375.dkimbukkitcore.config.ConfigFile
 import me.dkim19375.dkimbukkitcore.function.logInfo
 import me.dkim19375.dkimbukkitcore.javaplugin.CoreJavaPlugin
+import me.dkim19375.dkimcore.file.JsonFile
 import me.dkim19375.itemmovedetectionlib.ItemMoveDetectionLib
 import me.tigerhix.lib.scoreboard.ScoreboardLib
+import org.bukkit.Bukkit
+import org.bukkit.Location
+import org.bukkit.World
 import org.bukkit.configuration.serialization.ConfigurationSerialization
 import org.bukkit.plugin.Plugin
+import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
 import java.util.*
+import kotlin.io.path.nameWithoutExtension
 import kotlin.system.measureTimeMillis
 
 val NEW_SOUND: Boolean = MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_9_R1)
@@ -54,9 +61,10 @@ val NEW_SOUND: Boolean = MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_
 class BedwarsPlugin : CoreJavaPlugin() {
     val configManager = ConfigManager(this)
     val shopFile = ConfigFile(this, "shop.yml")
+    val gameDataFiles = mutableMapOf<String, JsonFile<GameData>>()
     lateinit var gameManager: GameManager
         private set
-    lateinit var dataFile: ConfigFile
+    lateinit var mainDataFile: JsonFile<MainDataFile>
         private set
     lateinit var dataFileManager: DataFileManager
         private set
@@ -79,6 +87,13 @@ class BedwarsPlugin : CoreJavaPlugin() {
         SpawnerData::class.java,
         GameData::class.java
     )
+    val jsonSerializers by lazy {
+        mapOf<Class<*>, Any>(
+            Location::class.java to LocationSerializer(),
+            MainShopConfigItem::class.java to ShopConfigItemSerializer(this),
+            World::class.java to WorldSerializer()
+        )
+    }
 
     override fun onLoad() {
         val time = measureTimeMillis {
@@ -132,9 +147,8 @@ class BedwarsPlugin : CoreJavaPlugin() {
         gameManager.getGames().values.forEach(BedwarsGame::forceStop)
         gameManager.save()
         ProtocolLibrary.getProtocolManager().removePacketListeners(this)
-        dataFile.save()
         serializable.reversed().forEach(ConfigurationSerialization::unregisterClass)
-        unregisterConfig(dataFile)
+        unregisterConfig(mainDataFile)
         unregisterConfig(shopFile)
     }
 
@@ -142,6 +156,19 @@ class BedwarsPlugin : CoreJavaPlugin() {
         super.reloadConfig()
         gameManager.reloadData()
         configManager.update()
+        for (file in File(dataFolder, "games").listFiles() ?: emptyArray()) {
+            val name = file.toPath().nameWithoutExtension
+            val world = Bukkit.getWorld(name) ?: continue
+            val data = GameBuilder(world).build(true) ?: continue
+            val newData = JsonFile(
+                type = GameData::class,
+                fileName = file.path,
+                prettyPrinting = true,
+                typeAdapters = jsonSerializers,
+                default = { data }
+            )
+            gameDataFiles[name] = newData
+        }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -166,8 +193,14 @@ class BedwarsPlugin : CoreJavaPlugin() {
     private fun initVariables() {
         hookOntoLib("Parties", false) { _: BedwarsPlugin -> partiesAPI = Parties.getApi() }
         hookOntoLib("Multiverse-Core") { pl: MultiverseCore -> worldManager = pl.mvWorldManager }
-        dataFile = ConfigFile(this, "data.yml")
-        registerConfig(dataFile)
+        mainDataFile = JsonFile(
+            type = MainDataFile::class,
+            fileName = File(dataFolder, "data/data.json").path,
+            prettyPrinting = true,
+            typeAdapters = jsonSerializers,
+            default = { MainDataFile() }
+        )
+        registerConfig(mainDataFile)
         registerConfig(shopFile)
         dataFileManager = DataFileManager(this)
         gameManager = GameManager(this)

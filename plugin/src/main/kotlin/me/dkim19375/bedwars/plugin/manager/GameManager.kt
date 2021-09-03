@@ -186,6 +186,7 @@ class GameManager(private val plugin: BedwarsPlugin) {
 
     fun deleteGame(game: GameData) {
         games.remove(game.world.name)
+        plugin.dataFileManager.setEditing(game, false)
         plugin.dataFileManager.removeGameData(game)
     }
 

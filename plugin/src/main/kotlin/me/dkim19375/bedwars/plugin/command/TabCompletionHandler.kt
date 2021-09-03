@@ -187,8 +187,7 @@ class TabCompletionHandler(private val plugin: BedwarsPlugin) : TabCompleter {
                     } ?: listOf("<min>")
                     "maxplayers" -> listOf("<max>")
                     "shop", "upgrades", "spawner",
-                    "team", "bed",
-                    -> getPartial(newArgs[1], completesListMap["addRemove"])
+                    "team", "bed" -> getPartial(newArgs[1], completesListMap["addRemove"])
                     else -> emptyList()
                 }
             }

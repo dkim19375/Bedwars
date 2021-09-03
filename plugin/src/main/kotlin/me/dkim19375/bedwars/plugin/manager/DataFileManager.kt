@@ -20,91 +20,89 @@ package me.dkim19375.bedwars.plugin.manager
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.GameData
+import me.dkim19375.bedwars.plugin.data.MainDataFile
 import me.dkim19375.bedwars.plugin.data.MainShopConfigItem
+import me.dkim19375.dkimcore.file.JsonFile
 import org.bukkit.Bukkit
 import org.bukkit.Location
-import org.bukkit.plugin.java.JavaPlugin
+import java.io.File
 import java.util.*
 
 class DataFileManager(private val plugin: BedwarsPlugin) {
     private var save = false
+    private val data: MainDataFile
+        get() = plugin.mainDataFile.get()
 
     init {
         Bukkit.getScheduler().runTask(plugin) {
             Bukkit.getScheduler().runTaskTimer(plugin, {
                 if (save) {
-                    plugin.dataFile.save()
+                    data.save()
+                    for (data in plugin.gameDataFiles.values) {
+                        data.save()
+                    }
                     save = false
                 }
             }, 100L, 100L)
         }
     }
 
-    fun getQuickBuySlot(slot: Int, player: UUID): MainShopConfigItem? {
-        return JavaPlugin.getPlugin(BedwarsPlugin::class.java).configManager.getItemFromName(
-            plugin.dataFile.config.getString(
-                "$player.shop.quick-buy.$slot"
-            )
-        )
-    }
+    fun getQuickBuySlot(slot: Int, player: UUID): MainShopConfigItem? = data.quickBuySlots[player]?.get(slot)
 
     fun setQuickBuySlot(slot: Int, player: UUID, item: MainShopConfigItem?) {
         if (item == null) {
-            plugin.dataFile.config.set("$player.shop.quick-buy.$slot", null)
+            data.quickBuySlots.getOrPut(player) { mutableMapOf() }.remove(slot)
             save = true
             return
         }
-        plugin.dataFile.config.set("$player.shop.quick-buy.$slot", item.name)
+        data.quickBuySlots.getOrPut(player) { mutableMapOf() }[slot] = item
         save = true
     }
 
     fun setGameData(data: GameData) {
-        plugin.dataFile.config.set("game-data.${data.world.name}", data)
+        removeGameData(data)
+        val newData = JsonFile(
+            type = GameData::class,
+            fileName = File(plugin.dataFolder, "data/games/${data.world.name}.json").path,
+            prettyPrinting = true,
+            typeAdapters = plugin.jsonSerializers,
+            default = { data }
+        )
+        plugin.gameDataFiles[data.world.name] = newData
         save = true
     }
 
     fun removeGameData(data: GameData) {
-        plugin.dataFile.config.set("game-data.${data.world.name}", null)
+        plugin.gameDataFiles[data.world.name]?.file?.delete()
+        plugin.gameDataFiles.remove(data.world.name)
         save = true
     }
 
-    fun getGameData(world: String): GameData? {
-        return plugin.dataFile.config.get("game-data.$world") as? GameData
-    }
+    fun getGameData(world: String): GameData? = plugin.gameDataFiles[world]?.get()
 
-    fun getGameDatas(): Set<GameData> {
-        val section = plugin.dataFile.config.getConfigurationSection("game-data") ?: return emptySet()
-        val dataSet = mutableSetOf<GameData>()
-        for (key in section.getKeys(false)) {
-            if (Bukkit.getWorld(key) == null) {
-                continue
-            }
-            val data = section.get(key) ?: continue
-            if (data !is GameData) {
-                continue
-            }
-            dataSet.add(data)
-        }
-        return dataSet.toSet()
-    }
+    fun getGameDatas(): Set<GameData> = plugin.gameDataFiles
+        .filter { Bukkit.getWorld(it.key) != null }
+        .map(Map.Entry<String, JsonFile<GameData>>::value)
+        .map(JsonFile<GameData>::get)
+        .toSet()
 
     @Suppress("unused")
     fun setLobby(location: Location?) {
-        plugin.dataFile.config.set("lobby", location)
+        data.lobby = location
         save = true
     }
 
-    fun getLobby(): Location? = plugin.dataFile.config.get("lobby") as? Location
+    fun getLobby(): Location? = data.lobby
 
-    fun isEditing(data: GameData) = plugin.dataFile.config.getBoolean("editing.${data.world.name}")
+    fun isEditing(data: GameData) = this.data.editing.contains(data.world.name)
 
     fun setEditing(data: GameData, editing: Boolean) {
         if (!editing) {
-            plugin.dataFile.config.set("editing.${data.world.name}", null)
+            this.data.editing.remove(data.world.name)
             save = true
             return
         }
-        plugin.dataFile.config.set("editing.${data.world.name}", editing)
+        this.data.editing.add(data.world.name)
         save = true
         return
     }
