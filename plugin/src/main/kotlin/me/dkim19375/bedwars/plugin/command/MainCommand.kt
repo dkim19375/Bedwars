@@ -18,10 +18,8 @@
 
 package me.dkim19375.bedwars.plugin.command
 
-import com.google.gson.Gson
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.builder.DataEditor
-import me.dkim19375.bedwars.plugin.builder.GameBuilder
 import me.dkim19375.bedwars.plugin.data.BedData
 import me.dkim19375.bedwars.plugin.data.SpawnerData
 import me.dkim19375.bedwars.plugin.data.TeamData
@@ -56,24 +54,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
             sender.showHelpMsg(label)
             return true
         }
-        @Suppress("LiftReturnOrAssignment")
         when (args[0].lowercase()) {
-            "test" -> {
-                if (sender !is Player) {
-                    return true
-                }
-                val gameData = GameBuilder(sender.world).build(true) ?: return true
-                sender.sendMessage("${ChatColor.GREEN}Saving the data...")
-                gameData.save(plugin)
-                val newGame = BedwarsGame(plugin, gameData)
-                newGame.saveMap()
-                newGame.state = GameState.LOBBY
-                plugin.dataFileManager.setEditing(gameData, false)
-                plugin.gameManager.builders.remove(gameData.world.name)
-                plugin.gameManager.addGame(newGame)
-                sender.sendMessage("${ChatColor.GREEN}Successfully saved! (Map: ${newGame.data.world.name})")
-                return true
-            }
             "help" -> {
                 if (args.size > 1) {
                     sender.showHelpMsg(
