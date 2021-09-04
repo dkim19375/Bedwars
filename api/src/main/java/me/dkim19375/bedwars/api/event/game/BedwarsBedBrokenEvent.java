@@ -20,11 +20,8 @@ package me.dkim19375.bedwars.api.event.game;
 
 import me.dkim19375.bedwars.api.BedwarsGameAPI;
 import me.dkim19375.bedwars.api.data.BedwarsBedData;
-import me.dkim19375.bedwars.api.enumclass.Team;
 import me.dkim19375.bedwars.api.event.BedwarsEvent;
-import me.dkim19375.bedwars.api.event.player.BedwarsPlayerEvent;
 import me.dkim19375.dkimcore.annotation.API;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
