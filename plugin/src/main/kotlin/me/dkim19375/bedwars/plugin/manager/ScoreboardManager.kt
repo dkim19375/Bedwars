@@ -20,9 +20,9 @@
 
 package me.dkim19375.bedwars.plugin.manager
 
+import me.dkim19375.bedwars.api.enumclass.GameState
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.SpawnerData
-import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.enumclass.SpawnerType
 import me.dkim19375.bedwars.plugin.util.Delay
 import me.dkim19375.bedwars.plugin.util.formatTime

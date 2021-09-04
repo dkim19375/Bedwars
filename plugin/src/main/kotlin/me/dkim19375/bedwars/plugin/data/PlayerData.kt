@@ -18,6 +18,7 @@
 
 package me.dkim19375.bedwars.plugin.data
 
+import me.dkim19375.bedwars.api.data.BedwarsPlayerData
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.util.*
 import me.dkim19375.dkimbukkitcore.function.logInfo
@@ -34,14 +35,14 @@ data class PlayerData(
     val enderChest: Array<ItemStack>,
     val location: Location,
     val health: Double
-) {
-    fun apply(player: Player, plugin: BedwarsPlugin) {
+) : BedwarsPlayerData {
+    fun apply(player: Player, plugin: BedwarsPlugin?) {
         player.compassTarget = player.world.spawnLocation.clone()
         player.gameMode = gamemode
         player.inventory.setAllContents(inventory)
         player.inventory.armorContents = armor
         player.enderChest.contents = enderChest
-        player.teleportUpdated(plugin.dataFileManager.getLobby() ?: location)
+        player.teleportUpdated(plugin?.dataFileManager?.getLobby() ?: location)
         player.compassTarget = player.world.spawnLocation.clone()
         player.activePotionEffects.forEach { e -> player.removePotionEffect(e.type) }
         player.health = health
@@ -66,6 +67,37 @@ data class PlayerData(
                 "location=$location, " +
                 "health=$health)"
     }
+
+    override fun apply(player: Player) = apply(player, null)
+
+    override fun getPlayerGamemode(): GameMode = gamemode
+
+    override fun getPlayerArmor(): Array<ItemStack> = armor
+
+    override fun getPlayerInventory(): List<ItemStack?> = inventory
+
+    override fun getPlayerEnderChest(): Array<ItemStack> = enderChest
+
+    override fun getPlayerLocation(): Location = location
+
+    override fun getPlayerHealth(): Double = health
+
+    @Suppress("USELESS_ELVIS") // kotlin bug? https://youtrack.jetbrains.com/issue/KT-24392
+    override fun clone(
+        gamemode: GameMode?,
+        armor: Array<ItemStack>,
+        inventory: List<ItemStack?>?,
+        enderChest: Array<ItemStack>,
+        location: Location?,
+        health: Double?
+    ): BedwarsPlayerData = copy(
+        gamemode = gamemode ?: this.gamemode,
+        armor = armor ?: this.armor,
+        inventory = inventory ?: this.inventory,
+        enderChest = enderChest ?: this.enderChest,
+        location = location ?: this.location,
+        health = health ?: this.health
+    )
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -20,14 +20,22 @@ package me.dkim19375.bedwars.plugin.manager
 
 import com.alessiodp.parties.api.interfaces.PartyPlayer
 import dev.triumphteam.gui.builder.item.ItemBuilder
+import me.dkim19375.bedwars.api.enumclass.GameState
+import me.dkim19375.bedwars.api.enumclass.Result
+import me.dkim19375.bedwars.api.enumclass.Team
+import me.dkim19375.bedwars.api.event.game.BedwarsBedBrokenEvent
+import me.dkim19375.bedwars.api.event.game.BedwarsGameStartCountDownEvent
+import me.dkim19375.bedwars.api.event.game.BedwarsGameStartEvent
+import me.dkim19375.bedwars.api.event.player.BedwarsPlayerEliminatedEvent
+import me.dkim19375.bedwars.api.event.player.BedwarsPlayerJoinEvent
+import me.dkim19375.bedwars.api.event.player.BedwarsPlayerQuitEvent
+import me.dkim19375.bedwars.api.event.player.BedwarsTeamEliminatedEvent
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
+import me.dkim19375.bedwars.plugin.api.getAPI
 import me.dkim19375.bedwars.plugin.data.GameData
 import me.dkim19375.bedwars.plugin.data.MainShopConfigItem
 import me.dkim19375.bedwars.plugin.data.PlayerData
 import me.dkim19375.bedwars.plugin.enumclass.ArmorType
-import me.dkim19375.bedwars.plugin.enumclass.GameState
-import me.dkim19375.bedwars.plugin.enumclass.Team
-import me.dkim19375.bedwars.plugin.enumclass.getColored
 import me.dkim19375.bedwars.plugin.util.*
 import me.dkim19375.dkimbukkitcore.data.LocationWrapper
 import me.dkim19375.dkimbukkitcore.function.formatAll
@@ -119,6 +127,11 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         if (result != Result.SUCCESS) {
             return result
         }
+        val event = BedwarsGameStartCountDownEvent(getAPI())
+        Bukkit.getPluginManager().callEvent(event)
+        if (event.isCancelled) {
+            return Result.CANCELLED
+        }
         state = GameState.STARTING
         reset(true)
         logInfo("Game ${data.world.name} is starting!")
@@ -155,6 +168,11 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
 
     private fun setupAfterStart() {
         update()
+        val event = BedwarsGameStartEvent(getAPI())
+        Bukkit.getPluginManager().callEvent(event)
+        if (event.isCancelled) {
+            return
+        }
         var i = 1
         val teams = data.teams.toList()
         for (uuid in playersInLobby.shuffled()) {
@@ -351,6 +369,11 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         if (playersInLobby.size >= data.maxPlayers) {
             return Result.TOO_MANY_PLAYERS
         }
+        val event = BedwarsPlayerJoinEvent(player, getAPI())
+        Bukkit.getPluginManager().callEvent(event)
+        if (event.isCancelled) {
+            return Result.CANCELLED
+        }
         playersInLobby.add(player.uniqueId)
         broadcast("${player.displayName}${ChatColor.GREEN} has joined the game! ${playersInLobby.size}/${data.maxPlayers}")
         val lobby = plugin.dataFileManager.getLobby()
@@ -422,6 +445,12 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             update()
             tempPlayers.remove(player.uniqueId)
             eliminated.add(player.uniqueId)
+            val event = BedwarsPlayerEliminatedEvent(player, getAPI())
+            Bukkit.getPluginManager().callEvent(event)
+            if (players.getOrDefault(team, mutableSetOf()).isEmpty()) {
+                val eliminatedEvent = BedwarsTeamEliminatedEvent(event, team)
+                Bukkit.getPluginManager().callEvent(eliminatedEvent)
+            }
             return
         }
         val teamData = data.teams.getTeam(team) ?: return
@@ -557,6 +586,8 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     fun leavePlayer(player: Player, update: Boolean = true) {
         revertPlayer(player)
         player.playerListName = player.displayName
+        val event = BedwarsPlayerQuitEvent(player, getAPI())
+        Bukkit.getPluginManager().callEvent(event)
         if (state == GameState.LOBBY || state == GameState.STARTING) {
             if (!playersInLobby.contains(player.uniqueId)) {
                 return
@@ -665,7 +696,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
                         throw IllegalStateException("Could not load world ${data.world.name}!")
                     }
                     val world = result.second ?: throw IllegalStateException("Could not load world ${data.world.name}!")
-                    data.copy(gameWorld = world).save(plugin)
+                    data.copy(tempWorld = world).save(plugin)
                     logInfo("${world.name} has finished regenerating!")
                     whenDone()
                 }
@@ -673,10 +704,13 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         }, 2L)
     }
 
-    // DURING GAME EVENTS
-
     fun bedBreak(team: Team, player: Player?) {
         if (beds[team] == false) {
+            return
+        }
+        val event = BedwarsBedBrokenEvent(getAPI(), player, data.beds.first { it.team == team })
+        Bukkit.getPluginManager().callEvent(event)
+        if (event.isCancelled) {
             return
         }
         beds[team] = false
@@ -697,14 +731,5 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
                     "${teamOfPlayer.chatColor}${player.displayName}${ChatColor.GRAY}!"
         )
         update()
-    }
-
-    enum class Result(val message: String) {
-        SUCCESS("Successful!"),
-        GAME_RUNNING("The game is currently running!"),
-        GAME_STOPPED("The game is not running!"),
-        NOT_ENOUGH_PLAYERS("Not enough players!"),
-        REGENERATING_WORLD("The game world is regenerating!"),
-        TOO_MANY_PLAYERS("Too many players!")
     }
 }

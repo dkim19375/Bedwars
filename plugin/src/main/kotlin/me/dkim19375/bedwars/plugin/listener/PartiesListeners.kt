@@ -20,8 +20,8 @@ package me.dkim19375.bedwars.plugin.listener
 
 import com.alessiodp.parties.api.events.bukkit.player.BukkitPartiesPlayerPreTeleportEvent
 import com.alessiodp.parties.api.interfaces.PartyPlayer
+import me.dkim19375.bedwars.api.enumclass.GameState
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
-import me.dkim19375.bedwars.plugin.enumclass.GameState
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority

@@ -18,8 +18,8 @@
 
 package me.dkim19375.bedwars.plugin.builder
 
+import me.dkim19375.bedwars.api.enumclass.GameState
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
-import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
 import me.dkim19375.bedwars.plugin.util.getIgnoreCase
 import org.bukkit.World

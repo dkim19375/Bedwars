@@ -18,26 +18,19 @@
 
 package me.dkim19375.bedwars.plugin.data
 
-import me.dkim19375.bedwars.plugin.enumclass.Team
+import me.dkim19375.bedwars.api.data.BedwarsTeamData
+import me.dkim19375.bedwars.api.enumclass.Team
 import org.bukkit.Location
-import org.bukkit.configuration.serialization.ConfigurationSerializable
 
-data class TeamData(val team: Team, val spawn: Location) : ConfigurationSerializable {
-    override fun serialize(): Map<String, Any> = mapOf(
-        "team" to team.name,
-        "spawn" to spawn
+data class TeamData(val team: Team, val location: Location) : BedwarsTeamData {
+    override fun toString(): String = "TeamData(team=${team.name}, spawn=$location)"
+
+    override fun getTeamType(): Team = team
+
+    override fun getSpawn(): Location = location
+
+    override fun clone(team: Team?, location: Location?): BedwarsTeamData = copy(
+        team = team ?: this.team,
+        location = location ?: this.location
     )
-
-    override fun toString(): String = "TeamData(team=${team.name}, spawn=$spawn)"
-
-
-    companion object {
-        @Suppress("unused")
-        @JvmStatic
-        fun deserialize(map: Map<String, Any>): TeamData? {
-            val team = Team.fromString(map["team"] as String) ?: return null
-            val spawn = map["spawn"] as? Location ?: return null
-            return TeamData(team, spawn)
-        }
-    }
 }

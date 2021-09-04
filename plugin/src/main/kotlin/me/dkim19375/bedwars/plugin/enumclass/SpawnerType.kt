@@ -18,12 +18,14 @@
 
 package me.dkim19375.bedwars.plugin.enumclass
 
+import me.dkim19375.bedwars.api.enumclass.SpawnerTypes
 import me.dkim19375.bedwars.plugin.util.Delay
 import me.dkim19375.dkimcore.extension.runCatchingOrNull
 import org.bukkit.Material
 
 @Suppress("MemberVisibilityCanBePrivate")
 enum class SpawnerType(
+    val type: SpawnerTypes,
     val material: Material,
     val maxAmount: Int,
     val delayFirst: Delay,
@@ -32,9 +34,10 @@ enum class SpawnerType(
     val secondTime: Delay? = null,
     val thirdTime: Delay? = null
 ) {
-    IRON(Material.IRON_INGOT, 48, Delay.fromMillis(1800)),
-    GOLD(Material.GOLD_INGOT, 12, Delay.fromMillis(7500)),
+    IRON(SpawnerTypes.IRON, Material.IRON_INGOT, 48, Delay.fromMillis(1800)),
+    GOLD(SpawnerTypes.GOLD, Material.GOLD_INGOT, 12, Delay.fromMillis(7500)),
     DIAMOND(
+        type = SpawnerTypes.DIAMOND,
         material = Material.DIAMOND,
         maxAmount = 4,
         delayFirst = Delay.fromSeconds(30),
@@ -44,6 +47,7 @@ enum class SpawnerType(
         thirdTime = Delay.fromMinutes(17),
     ),
     EMERALD(
+        type = SpawnerTypes.EMERALD,
         material = Material.EMERALD,
         maxAmount = 2,
         delayFirst = Delay.fromMinutes(1),
@@ -60,6 +64,11 @@ enum class SpawnerType(
     }
 
     companion object {
+        fun fromAPIType(type: SpawnerTypes?): SpawnerType? {
+            type ?: return null
+            return values().firstOrNull { it.type == type }
+        }
+
         fun fromString(str: String?): SpawnerType? {
             str ?: return null
             return runCatchingOrNull { valueOf(str.uppercase()) }

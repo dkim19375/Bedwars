@@ -19,10 +19,10 @@
 package me.dkim19375.bedwars.plugin.command
 
 import com.google.common.collect.HashMultimap
+import me.dkim19375.bedwars.api.enumclass.Team
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.builder.DataEditor
 import me.dkim19375.bedwars.plugin.enumclass.Permissions
-import me.dkim19375.bedwars.plugin.enumclass.Team
 import me.dkim19375.bedwars.plugin.util.getMaxHelpPages
 import me.dkim19375.bedwars.plugin.util.hasPermission
 import org.bukkit.Bukkit
@@ -39,7 +39,7 @@ class TabCompletionHandler(private val plugin: BedwarsPlugin) : TabCompleter {
 
     init {
         add("spawners", "iron", "gold", "diamond", "emerald")
-        add("colors", Team.values().map(Team::displayName))
+        add("colors", Team.values().map(Team::getDisplayName))
         add(
             "setup", "ready", "lobby", "spec", "minplayers", "maxplayers", "shop", "upgrades", "spawner",
             "team", "bed"

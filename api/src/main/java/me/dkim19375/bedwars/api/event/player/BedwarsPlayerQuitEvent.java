@@ -16,11 +16,31 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.dkim19375.bedwars.plugin.enumclass
+package me.dkim19375.bedwars.api.event.player;
 
-enum class UpgradeType {
-    SHARPNESS,
-    PROTECTION,
-    HASTE,
-    HEAL_POOL
+import me.dkim19375.bedwars.api.BedwarsGameAPI;
+import me.dkim19375.dkimcore.annotation.API;
+import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
+
+public class BedwarsPlayerQuitEvent extends BedwarsPlayerEvent {
+    @NotNull
+    private static final HandlerList HANDLERS = new HandlerList();
+
+    public BedwarsPlayerQuitEvent(@NotNull Player player, @NotNull BedwarsGameAPI game) {
+        super(player, game);
+    }
+
+    @Override
+    @NotNull
+    public HandlerList getHandlers() {
+        return HANDLERS;
+    }
+
+    @NotNull
+    @API
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
+    }
 }

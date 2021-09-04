@@ -1,4 +1,5 @@
 //file:noinspection SpellCheckingInspection
+//file:noinspection GroovyAssignabilityCheck
 plugins {
     id 'com.github.johnrengelman.shadow' version '6.1.0'
     id 'org.jetbrains.kotlin.jvm' version '1.5.30'
@@ -100,7 +101,6 @@ subprojects {
 
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 
-    //noinspection GroovyAssignabilityCheck
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
     }
@@ -113,6 +113,7 @@ subprojects {
     license {
         header = rootProject.file 'HEADER'
         include '**/*.kt'
+        include '**/*.java'
         exclude '**/DefaultFontInfo.kt'
     }
 
@@ -130,7 +131,7 @@ subprojects {
         implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.30'
 
 
-        implementation('io.github.dkim19375:dkim-bukkit-core:3.3.3') {
+        implementation('io.github.dkim19375:dkim-bukkit-core:3.3.5') {
             exclude group: 'org.jetbrains.kotlin'
             exclude group: 'org.jetbrains.kotlinx'
         }

@@ -68,21 +68,21 @@ data class GameBuilder(
             return null
         }
         return GameData(
-            gameWorld = world,
+            tempWorld = world,
             minPlayers = minPlayers,
             maxPlayers = maxPlayers,
-            gameTeams = teams,
+            tempTeams = teams,
             shopVillagers = shopVillagers,
             upgradeVillagers = upgradeVillagers,
-            gameSpawners = spawners,
-            gameBeds = beds,
-            gameSpec = spec ?: run {
+            tempSpawners = spawners,
+            tempBeds = beds,
+            tempSpec = spec ?: run {
                 if (!force) {
                     return null
                 }
                 Location(world, 0.0, 0.0, 0.0)
             },
-            gameLobby = lobby ?: run {
+            tempLobby = lobby ?: run {
                 if (!force) {
                     return null
                 }

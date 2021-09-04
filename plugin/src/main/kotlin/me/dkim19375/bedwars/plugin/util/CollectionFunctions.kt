@@ -18,8 +18,8 @@
 
 package me.dkim19375.bedwars.plugin.util
 
+import me.dkim19375.bedwars.api.enumclass.Team
 import me.dkim19375.bedwars.plugin.data.TeamData
-import me.dkim19375.bedwars.plugin.enumclass.Team
 
 
 fun <V> Map<String, V>.getKeyFromStr(key: String): String? {

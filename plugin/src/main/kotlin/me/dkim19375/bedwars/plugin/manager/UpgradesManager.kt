@@ -18,9 +18,9 @@
 
 package me.dkim19375.bedwars.plugin.manager
 
+import me.dkim19375.bedwars.api.enumclass.GameState
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
-import me.dkim19375.bedwars.plugin.enumclass.GameState
-import me.dkim19375.bedwars.plugin.enumclass.Team
+import  me.dkim19375.bedwars.api.enumclass.Team
 import me.dkim19375.bedwars.plugin.enumclass.TrapType
 import me.dkim19375.bedwars.plugin.util.*
 import org.bukkit.Bukkit

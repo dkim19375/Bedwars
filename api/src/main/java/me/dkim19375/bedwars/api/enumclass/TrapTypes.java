@@ -16,13 +16,11 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.dkim19375.bedwars.plugin.enumclass
+package me.dkim19375.bedwars.api.enumclass;
 
-enum class GameState {
-    STOPPED,
-    LOBBY,
-    STARTING,
-    STARTED,
-    REGENERATING_WORLD,
-    GAME_END;
+public enum TrapTypes {
+    ITS_A_TRAP,
+    COUNTER_OFFENSIVE,
+    ALARM,
+    MINER_FATIGUE
 }

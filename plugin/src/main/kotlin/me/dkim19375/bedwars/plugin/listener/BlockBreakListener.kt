@@ -18,8 +18,8 @@
 
 package me.dkim19375.bedwars.plugin.listener
 
+import me.dkim19375.bedwars.api.enumclass.GameState
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
-import me.dkim19375.bedwars.plugin.enumclass.GameState
 import me.dkim19375.bedwars.plugin.util.getBedHead
 import me.dkim19375.bedwars.plugin.util.isBed
 import me.dkim19375.bedwars.plugin.util.setConfigItem

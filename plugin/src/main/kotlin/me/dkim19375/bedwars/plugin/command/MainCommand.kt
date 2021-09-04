@@ -18,12 +18,17 @@
 
 package me.dkim19375.bedwars.plugin.command
 
+import me.dkim19375.bedwars.api.enumclass.GameState
+import me.dkim19375.bedwars.api.enumclass.Result
+import me.dkim19375.bedwars.api.enumclass.Team
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.builder.DataEditor
 import me.dkim19375.bedwars.plugin.data.BedData
 import me.dkim19375.bedwars.plugin.data.SpawnerData
 import me.dkim19375.bedwars.plugin.data.TeamData
-import me.dkim19375.bedwars.plugin.enumclass.*
+import me.dkim19375.bedwars.plugin.enumclass.ErrorMessages
+import me.dkim19375.bedwars.plugin.enumclass.Permissions
+import me.dkim19375.bedwars.plugin.enumclass.SpawnerType
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
 import me.dkim19375.bedwars.plugin.util.*
 import me.dkim19375.dkimbukkitcore.data.toWrapper
@@ -101,19 +106,19 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                     return true
                 }
                 when (val result = game.addPlayer(player)) {
-                    BedwarsGame.Result.SUCCESS -> {
+                    Result.SUCCESS -> {
                         player.sendMessage("${ChatColor.GREEN}Successfully joined the bedwars game!")
                         return true
                     }
-                    BedwarsGame.Result.GAME_RUNNING -> {
+                    Result.GAME_RUNNING -> {
                         player.sendMessage("${ChatColor.RED}The game is already running!")
                         return true
                     }
-                    BedwarsGame.Result.GAME_STOPPED -> {
+                    Result.GAME_STOPPED -> {
                         player.sendMessage("${ChatColor.RED}The game is not running!")
                         return true
                     }
-                    BedwarsGame.Result.TOO_MANY_PLAYERS -> {
+                    Result.TOO_MANY_PLAYERS -> {
                         player.sendMessage("${ChatColor.RED}The game is full!")
                         return true
                     }
@@ -315,7 +320,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                     return true
                 }
                 val result = game.start(true)
-                if (result == BedwarsGame.Result.SUCCESS) {
+                if (result == Result.SUCCESS) {
                     sender.sendMessage("${ChatColor.GREEN}Successfully started the game!")
                     return true
                 }

@@ -18,6 +18,7 @@
 
 package me.dkim19375.bedwars.plugin.enumclass
 
+import me.dkim19375.bedwars.api.enumclass.TrapTypes
 import org.bukkit.Material
 import org.bukkit.potion.PotionEffectType
 
@@ -25,30 +26,35 @@ enum class TrapType(
     val displayName: String,
     val duration: Int = 0,
     val material: Material,
+    val type: TrapTypes,
     val removeEffects: Set<PotionEffectType> = setOf(),
     val effects: Map<PotionEffectType, Int> = emptyMap()
 ) {
     ITS_A_TRAP(
-        "Its a trap!",
-        8 * 20,
-        Material.TRIPWIRE_HOOK,
+        displayName = "Its a trap!",
+        duration = 8 * 20,
+        material = Material.TRIPWIRE_HOOK,
+        type = TrapTypes.ITS_A_TRAP,
         effects = mapOf(Pair(PotionEffectType.BLINDNESS, 1), Pair(PotionEffectType.SLOW, 1))
     ),
     COUNTER_OFFENSIVE(
-        "Counter Offensive",
-        10 * 20,
-        Material.FEATHER,
+        displayName = "Counter Offensive",
+        duration = 10 * 20,
+        material = Material.FEATHER,
+        type = TrapTypes.COUNTER_OFFENSIVE,
         effects = mapOf(Pair(PotionEffectType.SPEED, 1), Pair(PotionEffectType.JUMP, 2))
     ),
     ALARM(
-        "Alarm",
+        displayName = "Alarm",
         material = Material.REDSTONE_TORCH_ON,
+        type = TrapTypes.ALARM,
         removeEffects = setOf(PotionEffectType.INVISIBILITY)
     ),
     MINER_FATIGUE(
-        "Mining Fatigue",
-        10 * 20,
-        Material.IRON_PICKAXE,
+        displayName = "Mining Fatigue",
+        duration = 10 * 20,
+        material = Material.IRON_PICKAXE,
+        type = TrapTypes.MINER_FATIGUE,
         effects = mapOf(Pair(PotionEffectType.SLOW_DIGGING, 1))
     )
 }

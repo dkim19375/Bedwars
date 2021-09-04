@@ -18,11 +18,11 @@
 
 package me.dkim19375.bedwars.plugin.manager
 
+import me.dkim19375.bedwars.api.enumclass.GameState
+import me.dkim19375.bedwars.api.enumclass.Team
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.builder.GameBuilder
 import me.dkim19375.bedwars.plugin.data.GameData
-import me.dkim19375.bedwars.plugin.enumclass.GameState
-import me.dkim19375.bedwars.plugin.enumclass.Team
 import me.dkim19375.bedwars.plugin.util.getIgnoreCase
 import me.dkim19375.bedwars.plugin.util.getPlayers
 import me.dkim19375.bedwars.plugin.util.sendActionBar

@@ -22,9 +22,9 @@ import dev.triumphteam.gui.builder.item.ItemBuilder
 import dev.triumphteam.gui.guis.Gui
 import dev.triumphteam.gui.guis.GuiItem
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
-import me.dkim19375.bedwars.plugin.enumclass.Team
+import  me.dkim19375.bedwars.api.enumclass.Team
 import me.dkim19375.bedwars.plugin.enumclass.TrapType
-import me.dkim19375.bedwars.plugin.enumclass.UpgradeType
+import me.dkim19375.bedwars.api.enumclass.UpgradeType
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
 import me.dkim19375.bedwars.plugin.util.*
 import org.bukkit.Bukkit

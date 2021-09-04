@@ -20,6 +20,7 @@
 
 package me.dkim19375.bedwars.plugin.util
 
+import me.dkim19375.bedwars.api.enumclass.Team
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.ItemWrapper
 import me.dkim19375.bedwars.plugin.enumclass.ArmorType
@@ -242,3 +243,7 @@ fun Player.kickPlayerFromWorld() =
     player.teleport(plugin.dataFileManager.getLobby() ?: Bukkit.getWorld(plugin.mainWorld).spawnLocation)
 
 fun ItemMeta.addAllFlags() = ItemFlag.values().toList().forEach { addItemFlags(it) }
+
+fun Team.getColored(material: Material): ItemStack = getColored(ItemStack(material))
+
+fun Team.getColored(item: ItemStack): ItemStack = item.getWrapper().toItemStack(color)

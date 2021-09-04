@@ -18,72 +18,80 @@
 
 package me.dkim19375.bedwars.plugin.data
 
+import me.dkim19375.bedwars.api.data.BedwarsBedData
+import me.dkim19375.bedwars.api.data.BedwarsGameData
+import me.dkim19375.bedwars.api.data.BedwarsSpawnerData
+import me.dkim19375.bedwars.api.data.BedwarsTeamData
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
 import me.dkim19375.bedwars.plugin.util.update
-import me.dkim19375.dkimcore.extension.toUUID
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.World
-import org.bukkit.configuration.serialization.ConfigurationSerializable
 import java.util.*
 
 data class GameData(
-    private val gameWorld: World,
+    @Transient
+    private val tempWorld: World,
     val minPlayers: Int = 2,
     val maxPlayers: Int = 8,
-    private val gameTeams: Set<TeamData>,
+    @Transient
+    private val tempTeams: Set<TeamData>,
     val shopVillagers: Set<UUID>,
     val upgradeVillagers: Set<UUID>,
-    private val gameSpawners: Set<SpawnerData>,
-    private val gameBeds: Set<BedData>,
-    private val gameSpec: Location,
-    private val gameLobby: Location
-) : ConfigurationSerializable {
+    @Transient
+    private val tempSpawners: Set<SpawnerData>,
+    @Transient
+    private val tempBeds: Set<BedData>,
+    @Transient
+    private val tempSpec: Location,
+    @Transient
+    private val tempLobby: Location
+) : BedwarsGameData {
     val world: World
-        get() =  Bukkit.getWorld(gameWorld.name) ?: gameWorld
+        get() =  Bukkit.getWorld(tempWorld.name) ?: tempWorld
     val spec: Location
         get() {
-            if (gameSpec.world.name == world.name) {
-                return gameSpec.update()
+            if (tempSpec.world.name == world.name) {
+                return tempSpec.update()
             }
-            return gameSpec.setWorld(world.name, false)
+            return tempSpec.setWorld(world.name, false)
         }
     val lobby: Location
         get() {
-            if (gameLobby.world.name == world.name) {
-                return gameLobby.update()
+            if (tempLobby.world.name == world.name) {
+                return tempLobby.update()
             }
-            return gameLobby.setWorld(world.name, false)
+            return tempLobby.setWorld(world.name, false)
         }
     val teams: Set<TeamData>
         get() {
-            if (gameTeams
-                    .map(TeamData::spawn)
+            if (tempTeams
+                    .map(TeamData::location)
                     .map(Location::getWorld)
                     .map(World::getName)
                     .none { s -> s != world.name }
             ) {
-                return gameTeams
+                return tempTeams
             }
-            return gameTeams.map { data ->
+            return tempTeams.map { data ->
                 data.copy(
                     team = data.team,
-                    spawn = data.spawn.setWorld(world.name, false)
+                    location = data.location.setWorld(world.name, false)
                 )
             }.toSet()
         }
     val spawners: Set<SpawnerData>
         get() {
-            if (gameSpawners
+            if (tempSpawners
                     .map(SpawnerData::location)
                     .map(Location::getWorld)
                     .map(World::getName)
                     .none { s -> s != world.name }
             ) {
-                return gameSpawners
+                return tempSpawners
             }
-            return gameSpawners.map { data ->
+            return tempSpawners.map { data ->
                 data.copy(
                     type = data.type,
                     location = data.location.setWorld(world.name, false)
@@ -92,15 +100,15 @@ data class GameData(
         }
     val beds: Set<BedData>
         get() {
-            if (gameBeds
+            if (tempBeds
                     .map(BedData::location)
                     .map(Location::getWorld)
                     .map(World::getName)
                     .none { s -> s != world.name }
             ) {
-                return gameBeds
+                return tempBeds
             }
-            return gameBeds.map { data ->
+            return tempBeds.map { data ->
                 data.copy(
                     team = data.team,
                     location = data.location.setWorld(world.name, false),
@@ -111,16 +119,16 @@ data class GameData(
 
     fun save(plugin: BedwarsPlugin) {
         val copy = copy(
-            gameWorld = world,
+            tempWorld = world,
             minPlayers = minPlayers,
             maxPlayers = maxPlayers,
-            gameTeams = teams,
+            tempTeams = teams,
             shopVillagers = shopVillagers,
             upgradeVillagers = upgradeVillagers,
-            gameSpawners = spawners,
-            gameBeds = beds,
-            gameSpec = spec,
-            gameLobby = lobby
+            tempSpawners = spawners,
+            tempBeds = beds,
+            tempSpec = spec,
+            tempLobby = lobby
         )
         plugin.dataFileManager.setGameData(copy)
         if (plugin.gameManager.getGame(world) != null) {
@@ -129,55 +137,49 @@ data class GameData(
         plugin.gameManager.addGame(BedwarsGame(plugin, copy))
     }
 
-    override fun serialize(): Map<String, Any> = mapOf(
-        "world" to world.name,
-        "min-players" to minPlayers,
-        "max-players" to maxPlayers,
-        "teams" to teams.toList(),
-        "shop-villagers" to shopVillagers.map(UUID::toString),
-        "upgrade-villagers" to upgradeVillagers.map(UUID::toString),
-        "spawners" to spawners.toList(),
-        "beds" to beds.toList(),
-        "spec" to spec.setWorld(world.name),
-        "lobby" to lobby.setWorld(world.name)
-    )
+    override fun getGameWorld(): World = world
 
-    companion object {
-        @Suppress("unused", "unchecked_cast")
-        @JvmStatic
-        fun deserialize(map: Map<String, Any>): GameData {
-            val worldName = map["world"] as String
-            val world = Bukkit.getWorld(worldName)!!
-            return GameData(
-                world, // makes sure the world exists
-                map["min-players"] as Int,
-                map["max-players"] as Int,
-                (map["teams"] as List<TeamData>).map { data ->
-                    data.copy(
-                        team = data.team,
-                        spawn = data.spawn.setWorld(worldName)
-                    )
-                }.toSet(),
-                (map["shop-villagers"] as List<String>).mapNotNull(String::toUUID).toSet(),
-                (map["upgrade-villagers"] as List<String>).mapNotNull(String::toUUID).toSet(),
-                (map["spawners"] as List<SpawnerData>).map { data ->
-                    data.copy(
-                        type = data.type,
-                        location = data.location.setWorld(worldName)
-                    )
-                }.toSet(),
-                (map["beds"] as List<BedData>).map { data ->
-                    data.copy(
-                        team = data.team,
-                        location = data.location.setWorld(worldName),
-                        face = data.face
-                    )
-                }.toSet(),
-                (map["spec"] as Location).setWorld(worldName),
-                (map["lobby"] as Location).setWorld(worldName)
-            )
-        }
-    }
+    override fun getMinimumPlayers(): Int = minPlayers
+
+    override fun getMaximumPlayers(): Int = maxPlayers
+
+    override fun getGameTeams(): Set<BedwarsTeamData> = teams
+
+    override fun getShopNPCs(): Set<UUID> = shopVillagers
+
+    override fun getUpgradeNPCs(): Set<UUID> = upgradeVillagers
+
+    override fun getGameSpawners(): Set<BedwarsSpawnerData> = spawners
+
+    override fun getGameBeds(): Set<BedwarsBedData> = beds
+
+    override fun getSpectator(): Location = spec
+
+    override fun getGameLobby(): Location = lobby
+
+    override fun clone(
+        world: World?,
+        minPlayers: Int?,
+        maxPlayers: Int?,
+        teams: Set<BedwarsTeamData>?,
+        shopVillagers: Set<UUID>?,
+        upgradeVillagers: Set<UUID>?,
+        spawners: Set<BedwarsSpawnerData>?,
+        beds: Set<BedwarsBedData>?,
+        spec: Location?,
+        lobby: Location?
+    ): BedwarsGameData = copy(
+        tempWorld = world ?: this.world,
+        minPlayers = minPlayers ?: this.minPlayers,
+        maxPlayers = maxPlayers ?: this.maxPlayers,
+        tempTeams = teams?.map { it as TeamData }?.toSet() ?: this.teams,
+        shopVillagers = shopVillagers ?: this.shopVillagers,
+        upgradeVillagers = upgradeVillagers ?: this.upgradeVillagers,
+        tempSpawners = spawners?.map { it as SpawnerData }?.toSet() ?: this.spawners,
+        tempBeds = beds?.map { it as BedData }?.toSet() ?: this.beds,
+        tempSpec = spec ?: this.spec,
+        tempLobby = lobby ?: this.lobby
+    )
 }
 
 private fun Location.setWorld(world: String, shouldClone: Boolean = true): Location {

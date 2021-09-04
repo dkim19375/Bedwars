@@ -18,28 +18,23 @@
 
 package me.dkim19375.bedwars.plugin.data
 
+import me.dkim19375.bedwars.api.data.BedwarsSpawnerData
+import me.dkim19375.bedwars.api.enumclass.SpawnerTypes
 import me.dkim19375.bedwars.plugin.enumclass.SpawnerType
-import me.dkim19375.dkimcore.extension.runCatchingOrNull
 import org.bukkit.Location
-import org.bukkit.configuration.serialization.ConfigurationSerializable
 
-data class SpawnerData(val type: SpawnerType, val location: Location) : ConfigurationSerializable {
-    override fun serialize(): Map<String, Any> = mapOf(
-        "type" to type.name,
-        "location" to location
-    )
+data class SpawnerData(val type: SpawnerType, val location: Location) : BedwarsSpawnerData {
 
     override fun toString(): String {
         return "SpawnerData(type=${type.name}, location=$location)"
     }
 
-    companion object {
-        @Suppress("unused")
-        @JvmStatic
-        fun deserialize(map: Map<String, Any>): SpawnerData? {
-            val type = runCatchingOrNull { SpawnerType.valueOf(map["type"] as String) } ?: return null
-            val location = map["location"] as? Location ?: return null
-            return SpawnerData(type, location)
-        }
-    }
+    override fun getType(): SpawnerTypes = type.type
+
+    override fun getSpawnerLocation(): Location = location
+
+    override fun clone(type: SpawnerTypes?, location: Location?): BedwarsSpawnerData = copy(
+        type = SpawnerType.fromAPIType(type) ?: this.type,
+        location = location ?: this.location
+    )
 }

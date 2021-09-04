@@ -21,13 +21,11 @@ package me.dkim19375.bedwars.plugin.gui
 import dev.triumphteam.gui.builder.item.ItemBuilder
 import dev.triumphteam.gui.guis.Gui
 import dev.triumphteam.gui.guis.GuiItem
-import me.dkim19375.bedwars.plugin.enumclass.getColored
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
 import me.dkim19375.bedwars.plugin.util.*
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 
 class TrackerGUI(private val player: Player, private val game: BedwarsGame) {

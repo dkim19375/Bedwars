@@ -26,11 +26,15 @@ import com.onarandombox.MultiverseCore.api.MVWorldManager
 import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion
 import de.tr7zw.nbtinjector.NBTInjector
 import io.github.slimjar.app.builder.ApplicationBuilder
+import me.dkim19375.bedwars.api.BedwarsAPIProvider
+import me.dkim19375.bedwars.plugin.api.BedwarsAPIImpl
 import me.dkim19375.bedwars.plugin.builder.GameBuilder
 import me.dkim19375.bedwars.plugin.command.MainCommand
 import me.dkim19375.bedwars.plugin.command.TabCompletionHandler
 import me.dkim19375.bedwars.plugin.config.ConfigManager
-import me.dkim19375.bedwars.plugin.data.*
+import me.dkim19375.bedwars.plugin.data.GameData
+import me.dkim19375.bedwars.plugin.data.MainDataFile
+import me.dkim19375.bedwars.plugin.data.MainShopConfigItem
 import me.dkim19375.bedwars.plugin.listener.*
 import me.dkim19375.bedwars.plugin.manager.*
 import me.dkim19375.bedwars.plugin.serializer.LocationSerializer
@@ -46,7 +50,6 @@ import me.tigerhix.lib.scoreboard.ScoreboardLib
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.World
-import org.bukkit.configuration.serialization.ConfigurationSerialization
 import org.bukkit.plugin.Plugin
 import java.io.File
 import java.io.FileInputStream
@@ -81,12 +84,6 @@ class BedwarsPlugin : CoreJavaPlugin() {
 
     var partiesAPI: PartiesAPI? = null
 
-    private val serializable = listOf(
-        TeamData::class.java,
-        BedData::class.java,
-        SpawnerData::class.java,
-        GameData::class.java
-    )
     val jsonSerializers by lazy {
         mapOf<Class<*>, Any>(
             Location::class.java to LocationSerializer(),
@@ -105,6 +102,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
                     }
                 }ms!"
             )
+            BedwarsAPIProvider.register(BedwarsAPIImpl(this))
             val properties = Properties()
             val catch = { e: Throwable ->
                 e.printStackTrace()
@@ -123,7 +121,6 @@ class BedwarsPlugin : CoreJavaPlugin() {
                 catch(e)
             }
             initNBTVariables(this)
-            serializable.forEach(ConfigurationSerialization::registerClass)
             NBTInjector.inject()
             ScoreboardLib.setPluginInstance(this)
             BedwarsGame // initialize companion object variables
@@ -147,7 +144,6 @@ class BedwarsPlugin : CoreJavaPlugin() {
         gameManager.getGames().values.forEach(BedwarsGame::forceStop)
         gameManager.save()
         ProtocolLibrary.getProtocolManager().removePacketListeners(this)
-        serializable.reversed().forEach(ConfigurationSerialization::unregisterClass)
         unregisterConfig(mainDataFile)
         unregisterConfig(shopFile)
     }
