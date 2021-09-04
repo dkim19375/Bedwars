@@ -28,7 +28,8 @@ private val plugin: BedwarsPlugin = JavaPlugin.getPlugin(BedwarsPlugin::class.ja
 data class MainDataFile(
     var quickBuySlots: MutableMap<UUID, MutableMap<Int, MainShopConfigItem>> = mutableMapOf(),
     var lobby: Location? = null,
-    var editing: MutableSet<String> = mutableSetOf()
+    var editing: MutableSet<String> = mutableSetOf(),
+    var statistics: MutableMap<UUID, StatisticsData> = mutableMapOf()
 ) {
     fun save() {
         plugin.mainDataFile.set(this)

@@ -16,43 +16,59 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.dkim19375.bedwars.api;
+package me.dkim19375.bedwars.api.data;
 
-import me.dkim19375.bedwars.api.data.BedwarsGameData;
-import me.dkim19375.bedwars.api.data.BedwarsStatisticsData;
-import me.dkim19375.bedwars.api.enumclass.Team;
 import me.dkim19375.dkimcore.annotation.API;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
-import java.util.UUID;
-
-public interface BedwarsAPI {
+public interface BedwarsStatisticsData {
     @API
-    @NotNull
-    Map<String, BedwarsGameAPI> getGames();
+    int getKillCount();
 
     @API
-    @Nullable
-    BedwarsGameAPI getGame(@NotNull String name);
+    void setKillCount(int amount);
 
     @API
-    void deleteGame(@NotNull BedwarsGameAPI game);
+    int getFinalKillCount();
 
     @API
-    void saveGameData(@NotNull BedwarsGameData data);
+    void setFinalKillCount(int amount);
 
     @API
-    ItemStack getColored(@NotNull Team team, @NotNull ItemStack item);
+    int getDeathCount();
 
     @API
-    @NotNull
-    BedwarsStatisticsData getStatistics(@NotNull Player player);
+    void setDeathCount(int amount);
 
     @API
-    @NotNull
-    BedwarsStatisticsData getStatistics(@NotNull UUID player);
+    int getFinalDeathCount();
+
+    @API
+    void setFinalDeathCount(int amount);
+
+    @API
+    int getWinCount();
+
+    @API
+    void setWinCount(int amount);
+
+    @API
+    int getLossCount();
+
+    @API
+    void setLossCount(int amount);
+
+    @API
+    int getBedsBrokenCount();
+
+    @API
+    void setBedsBrokenCount(int amount);
+
+    @API
+    double getKillDeathRatio();
+
+    @API
+    double getFinalKillDeathRatio();
+
+    @API
+    double getWinLossRatio();
 }

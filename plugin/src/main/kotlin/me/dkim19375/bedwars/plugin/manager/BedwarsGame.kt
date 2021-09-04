@@ -35,6 +35,7 @@ import me.dkim19375.bedwars.plugin.api.getAPI
 import me.dkim19375.bedwars.plugin.data.GameData
 import me.dkim19375.bedwars.plugin.data.MainShopConfigItem
 import me.dkim19375.bedwars.plugin.data.PlayerData
+import me.dkim19375.bedwars.plugin.data.StatisticsData
 import me.dkim19375.bedwars.plugin.enumclass.ArmorType
 import me.dkim19375.bedwars.plugin.util.*
 import me.dkim19375.dkimbukkitcore.data.LocationWrapper
@@ -179,7 +180,8 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             val player = Bukkit.getPlayer(uuid) ?: continue
             val teamData = teams[i % teams.size]
             val team = teamData.team
-            val format = plugin.config.getString("tab.name") ?: "%team_color%&l%team_first_letter% %team_color%%player_name%"
+            val format =
+                plugin.config.getString("tab.name") ?: "%team_color%&l%team_first_letter% %team_color%%player_name%"
             val replaceMap = mapOf<String, Any>(
                 "team_color" to team.chatColor,
                 "team_name" to team.displayName,
@@ -235,6 +237,17 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
 
     fun stop(winner: Player?, team: Team) {
         state = GameState.GAME_END
+        for (player in getPlayersInGame()) {
+            val playerTeam = getTeamOfPlayer(player) ?: continue
+            plugin.mainDataFile.get().statistics.getOrPut(player) { StatisticsData(plugin) }.run {
+                if (team == playerTeam) {
+                    wins++
+                } else {
+                    losses++
+                }
+                plugin.dataFileManager.save = true
+            }
+        }
         logInfo("${team.chatColor}${winner?.displayName ?: team.displayName} has won BedWars!")
         val sorted = kills.toList()
             .sortedBy { (_, value) -> value }
@@ -430,7 +443,24 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
 
     fun playerKilled(player: Player, inventory: List<ItemStack>) {
         val team = getTeamOfPlayer(player) ?: return
-        if (!beds.getOrDefault(team, false)) {
+        val hasBed = beds.getOrDefault(team, false)
+        plugin.mainDataFile.get().statistics.getOrPut(player.uniqueId) { StatisticsData(plugin) }.run {
+            deaths++
+            if (!hasBed) {
+                finalDeaths++
+            }
+            plugin.dataFileManager.save = true
+        }
+        player.killer?.let { killer ->
+            plugin.mainDataFile.get().statistics.getOrPut(killer.uniqueId) { StatisticsData(plugin) }.run {
+                kills++
+                if (!hasBed) {
+                    finalKills++
+                }
+                plugin.dataFileManager.save = true
+            }
+        }
+        if (!hasBed) {
             player.playerListName = player.displayName
             player.inventory.clearAll()
             player.gameMode = GameMode.ADVENTURE
@@ -584,6 +614,10 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     fun leavePlayer(player: Player, update: Boolean = true) {
+        if (state != GameState.GAME_END) {
+            plugin.mainDataFile.get().statistics.getOrPut(player.uniqueId) { StatisticsData(plugin) }.losses++
+            plugin.dataFileManager.save = true
+        }
         revertPlayer(player)
         player.playerListName = player.displayName
         val event = BedwarsPlayerQuitEvent(player, getAPI())
@@ -724,6 +758,8 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             )
             return
         }
+        plugin.mainDataFile.get().statistics.getOrPut(player.uniqueId) { StatisticsData(plugin) }.bedsBroken++
+        plugin.dataFileManager.save = true
         val teamOfPlayer = getTeamOfPlayer(player) ?: return
         broadcast(
             "${ChatColor.BOLD}BED DESTRUCTION > ${team.chatColor}${team.displayName}${ChatColor.GRAY}'s " +

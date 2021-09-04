@@ -29,7 +29,7 @@ import java.io.File
 import java.util.*
 
 class DataFileManager(private val plugin: BedwarsPlugin) {
-    private var save = false
+    var save = false
     private val data: MainDataFile
         get() = plugin.mainDataFile.get()
 
