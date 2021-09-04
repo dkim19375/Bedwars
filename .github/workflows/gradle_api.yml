@@ -25,13 +25,10 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
-      run: |
-        cd api
-        ./gradlew build
-        cd ..
+      run: ./gradlew api:build
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v2.2.4
       with:
-        name: Bedwars Plugin JAR
+        name: Bedwars API JAR
         path: api/build/libs/*.jar
         if-no-files-found: error
