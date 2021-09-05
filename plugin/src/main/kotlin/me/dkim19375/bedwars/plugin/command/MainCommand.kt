@@ -82,18 +82,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 for (gameEntry in plugin.gameManager.getGames()) {
                     val name = gameEntry.key
                     val game = gameEntry.value
-                    sender.sendMessage(
-                        "${ChatColor.AQUA}- $name: ${
-                            when (game.state) {
-                                GameState.LOBBY -> "${ChatColor.GREEN}Ready"
-                                GameState.STARTING -> "${ChatColor.RED}Starting"
-                                GameState.STARTED -> "${ChatColor.YELLOW}Running"
-                                GameState.STOPPED -> "${ChatColor.RED}Stopped"
-                                GameState.REGENERATING_WORLD -> "${ChatColor.RED}Restarting"
-                                GameState.GAME_END -> "${ChatColor.RED}Game Ended"
-                            }
-                        }"
-                    )
+                    sender.sendMessage("${ChatColor.AQUA}- $name: ${game.state.color}${game.state.displayname}")
                 }
                 return true
             }

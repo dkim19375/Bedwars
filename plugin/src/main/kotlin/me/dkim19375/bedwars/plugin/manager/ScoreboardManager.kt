@@ -22,9 +22,6 @@ package me.dkim19375.bedwars.plugin.manager
 
 import me.dkim19375.bedwars.api.enumclass.GameState
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
-import me.dkim19375.bedwars.plugin.data.SpawnerData
-import me.dkim19375.bedwars.plugin.enumclass.SpawnerType
-import me.dkim19375.bedwars.plugin.util.Delay
 import me.dkim19375.bedwars.plugin.util.formatTime
 import me.dkim19375.bedwars.plugin.util.toRomanNumeral
 import me.tigerhix.lib.scoreboard.ScoreboardLib
@@ -81,33 +78,11 @@ class ScoreboardManager(private val plugin: BedwarsPlugin) : ScoreboardHandler, 
         }
         entry.next("Time: ${ChatColor.GREEN}${game.getElapsedTime().formatTime()}")
             .blank()
-        val time = System.currentTimeMillis()
-        val start = game.time
-        val tiers = game.spawnerManager.upgradeLevels
-        var closest: Pair<SpawnerType, Delay>? = null
-        for (spawner in game.data.spawners.map(SpawnerData::type)) {
-            val next = tiers.getOrDefault(spawner, 1) + 1
-            if (next > 3) {
-                continue
-            }
-            val timeUntil = Delay.fromMillis(start) + when (next) {
-                2 -> spawner.secondTime ?: continue
-                3 -> spawner.thirdTime ?: continue
-                else -> continue
-            } - Delay.fromMillis(time)
-            if (closest == null) {
-                closest = spawner to timeUntil
-                continue
-            }
-            val delay = closest.second
-            if (delay > timeUntil) {
-                closest = spawner to timeUntil
-            }
-        }
+        val closest = game.spawnerManager.getClosest()
         if (closest != null) {
             val spawner = closest.first
             val delay = closest.second
-            val tier = (tiers.getOrDefault(spawner, 1) + 1).toRomanNumeral()
+            val tier = (game.spawnerManager.upgradeLevels.getOrDefault(spawner, 1) + 1).toRomanNumeral()
             entry.next("${StringUtils.capitalize(closest.first.name.lowercase())} $tier in${ChatColor.GREEN} ${delay.formatTime()}")
                 .blank()
         }

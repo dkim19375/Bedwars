@@ -19,15 +19,32 @@
 package me.dkim19375.bedwars.api.enumclass;
 
 import me.dkim19375.bedwars.api.BedwarsGameAPI;
+import org.bukkit.ChatColor;
 
 /**
  * Represents the current {@link GameState} of the {@link BedwarsGameAPI}
  */
 public enum GameState {
-    STOPPED,
-    LOBBY,
-    STARTING,
-    STARTED,
-    REGENERATING_WORLD,
-    GAME_END
+    STOPPED("Stopped", ChatColor.RED),
+    LOBBY("Ready", ChatColor.GREEN),
+    STARTING("Starting", ChatColor.YELLOW),
+    STARTED("Running", ChatColor.YELLOW),
+    REGENERATING_WORLD("Restarting", ChatColor.RED),
+    GAME_END("Game Ended", ChatColor.RED);
+
+    private final String displayname;
+    private final ChatColor color;
+
+    GameState(String displayname, ChatColor color) {
+        this.displayname = displayname;
+        this.color = color;
+    }
+
+    public String getDisplayname() {
+        return displayname;
+    }
+
+    public ChatColor getColor() {
+        return color;
+    }
 }

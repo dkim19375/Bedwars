@@ -64,7 +64,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     val eliminated = mutableSetOf<UUID>()
     val playersInLobby = mutableSetOf<UUID>()
     var task: BukkitTask? = null
-    private val worldName: String = data.world.name
+    val worldName: String = data.world.name
     val beds = mutableMapOf<Team, Boolean>()
     val npcManager = NPCManager(plugin, data)
     val upgradesManager = UpgradesManager(plugin, this)
@@ -470,6 +470,9 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             giveGameOverItems(player)
             player.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, 1000000, 255, false, false), true)
             players.getOrDefault(team, mutableSetOf()).remove(player.uniqueId)
+            if (players[team].isNullOrEmpty()) {
+                players.remove(team)
+            }
             tempPlayers.add(player.uniqueId)
             update()
             tempPlayers.remove(player.uniqueId)
@@ -644,6 +647,9 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         val team = getTeamOfPlayer(player) ?: return
         player.playerListName = player.displayName
         players.getOrDefault(team, mutableSetOf()).remove(player.uniqueId)
+        if (players[team].isNullOrEmpty()) {
+            players.remove(team)
+        }
         broadcast("${team.chatColor}${player.displayName}${ChatColor.RED} has left the game!")
         if (update) {
             update()
@@ -695,9 +701,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         }, 2L)
     }
 
-    fun getPlayersInTeam(team: Team): Set<UUID> {
-        return players.getOrDefault(team, setOf())
-    }
+    fun getPlayersInTeam(team: Team): Set<UUID> = players.getOrDefault(team, setOf())
 
     fun regenerateMap(whenDone: () -> Unit = {}) {
         val dir = Paths.get(plugin.dataFolder.absolutePath, "worlds", data.world.name).toFile()
