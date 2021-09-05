@@ -115,6 +115,9 @@ class TabCompletionHandler(private val plugin: BedwarsPlugin) : TabCompleter {
         if (sender.hasPermission(Permissions.INFO)) {
             list.add("info")
         }
+        if (sender.hasPermission(Permissions.STATISTICS)) {
+            list.add("stats")
+        }
         if (!sender.hasPermission(Permissions.SETUP)) {
             return list
         }
@@ -165,6 +168,13 @@ class TabCompletionHandler(private val plugin: BedwarsPlugin) : TabCompleter {
                     "stop" -> getPartialPerm(args[1], getBedwarsGames(), sender, Permissions.STOP)
                     "lobby" -> getPartialPerm(args[1], listOf("disable"), sender)
                     "info" -> getPartialPerm(args[1], getBedwarsGames(), sender, Permissions.INFO)
+                    "stats" -> getPartialPerm(
+                        token = args[1],
+                        collection = Bukkit.getOnlinePlayers().map(Player::getName)
+                            .plus(plugin.mainDataFile.get().nameCache.keys),
+                        sender = sender,
+                        perm = Permissions.STATISTICS
+                    )
                     else -> emptyList()
                 }
             }
@@ -187,7 +197,8 @@ class TabCompletionHandler(private val plugin: BedwarsPlugin) : TabCompleter {
                     } ?: listOf("<min>")
                     "maxplayers" -> listOf("<max>")
                     "shop", "upgrades", "spawner",
-                    "team", "bed" -> getPartial(newArgs[1], completesListMap["addRemove"])
+                    "team", "bed",
+                    -> getPartial(newArgs[1], completesListMap["addRemove"])
                     else -> emptyList()
                 }
             }
@@ -207,6 +218,7 @@ class TabCompletionHandler(private val plugin: BedwarsPlugin) : TabCompleter {
                         }
                     }
                     "team", "bed" -> {
+                        Bukkit.broadcastMessage("Got ${newArgs[0].lowercase()}, next: ${newArgs[1].lowercase()}")
                         return when (newArgs[1].lowercase()) {
                             "add" -> getPartial(newArgs[2], getMissingTeams(sender, worldName))
                             "remove" -> getPartial(newArgs[2], getTeams(sender, worldName))
