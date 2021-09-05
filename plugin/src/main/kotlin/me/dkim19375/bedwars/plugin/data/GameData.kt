@@ -43,7 +43,7 @@ data class GameData(
     private val tempLobby: Location
 ) : BedwarsGameData {
     val world: World
-        get() =  Bukkit.getWorld(tempWorld.name) ?: tempWorld
+        get() = Bukkit.getWorld(tempWorld.name) ?: tempWorld
     val spec: Location
         get() {
             if (tempSpec.world.name == world.name) {

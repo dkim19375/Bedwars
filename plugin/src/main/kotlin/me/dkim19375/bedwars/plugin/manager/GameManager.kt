@@ -179,7 +179,7 @@ class GameManager(private val plugin: BedwarsPlugin) {
     fun getGames(): Map<String, BedwarsGame> = games.toMap()
 
     fun addGame(game: BedwarsGame) {
-        games[game.data.world.name] = game
+        games[game.worldName] = game
     }
 
     fun deleteGame(game: BedwarsGame) = deleteGame(game.data)
