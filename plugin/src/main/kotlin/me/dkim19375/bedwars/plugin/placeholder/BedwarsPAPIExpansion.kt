@@ -122,7 +122,7 @@ class BedwarsPAPIExpansion(private val plugin: BedwarsPlugin) : PlaceholderExpan
                 }
             }
             "player" -> {
-                val playerArg = PLAYER_ARGS.containsIgnoreCase(args[2])
+                val playerArg = args.getOrNull(2)?.let(PLAYER_ARGS::containsIgnoreCase) == true
                 val nullReturn = if (params.endsWith("game", true) || params.endsWith("team", true)) {
                     "None"
                 } else {

@@ -103,7 +103,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                     name = sender.name
                     uuid = sender.uniqueId
                 } else {
-                    val firstArg = args[0]
+                    val firstArg = args[1]
                     val result = Bukkit.getPlayer(firstArg)?.let { it.name to it.uniqueId }
                         ?: plugin.mainDataFile.get().nameCache.toList().firstOrNull { (name, uuid) ->
                             firstArg.equals(name, true) || firstArg.toUUID() == uuid

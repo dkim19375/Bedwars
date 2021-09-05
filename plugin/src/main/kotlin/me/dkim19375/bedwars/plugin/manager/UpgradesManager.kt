@@ -18,9 +18,10 @@
 
 package me.dkim19375.bedwars.plugin.manager
 
+import dev.triumphteam.gui.builder.item.ItemBuilder
 import me.dkim19375.bedwars.api.enumclass.GameState
+import me.dkim19375.bedwars.api.enumclass.Team
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
-import  me.dkim19375.bedwars.api.enumclass.Team
 import me.dkim19375.bedwars.plugin.enumclass.TrapType
 import me.dkim19375.bedwars.plugin.util.*
 import org.bukkit.Bukkit
@@ -101,6 +102,18 @@ class UpgradesManager(plugin: BedwarsPlugin, val game: BedwarsGame) {
             if (item.type.isWeapon() && sharpness) {
                 item.addEnchantment(Enchantment.DAMAGE_ALL, 1)
             }
+        }
+    }
+
+    fun applyToItem(item: ItemBuilder, player: Player) {
+        val team = game.getTeamOfPlayer(player) ?: return
+        val sharpness = sharpness.contains(team)
+        val protection = protection[team]
+        if (item.build().type.isArmor() && protection != null) {
+            item.enchant(Enchantment.PROTECTION_ENVIRONMENTAL, protection, true)
+        }
+        if (item.build().type.isWeapon() && sharpness) {
+            item.enchant(Enchantment.DAMAGE_ALL, 1, true)
         }
     }
 

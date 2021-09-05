@@ -98,9 +98,9 @@ class PlayerInteractListener(private val plugin: BedwarsPlugin) : Listener {
     private fun PlayerInteractAtEntityEvent.checkShops(game: BedwarsGame) {
         if (game.npcManager.getShopVillagersUUID().contains(rightClicked.uniqueId)) {
             isCancelled = true
-            MainShopGUI(player, plugin).showPlayer()
+            MainShopGUI(player, plugin, game).showPlayer()
             Bukkit.getScheduler().runTask(plugin) {
-                MainShopGUI(player, plugin).showPlayer()
+                MainShopGUI(player, plugin, game).showPlayer()
             }
             return
         }

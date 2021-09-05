@@ -25,6 +25,7 @@ import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.MainShopConfigItem
 import me.dkim19375.bedwars.plugin.enumclass.ArmorType
 import me.dkim19375.bedwars.plugin.enumclass.getToolTier
+import me.dkim19375.bedwars.plugin.manager.BedwarsGame
 import me.dkim19375.bedwars.plugin.util.*
 import org.bukkit.ChatColor
 import org.bukkit.DyeColor
@@ -34,7 +35,7 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 
 @Suppress("MemberVisibilityCanBePrivate")
-class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin) {
+class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin, private val game: BedwarsGame) {
     private val configManager = plugin.configManager
     val menu: Gui = Gui.gui()
         .rows(6)
@@ -281,6 +282,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin)
         if (getRemainingQuickSlots() < 1) {
             return builder
         }
+        game.upgradesManager.applyToItem(builder, player)
         return builder.lore("")
     }
 

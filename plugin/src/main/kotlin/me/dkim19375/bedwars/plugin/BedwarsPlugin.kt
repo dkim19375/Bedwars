@@ -154,12 +154,11 @@ class BedwarsPlugin : CoreJavaPlugin() {
 
     override fun reloadConfig() {
         super.reloadConfig()
-        gameManager.reloadData()
-        configManager.update()
-        for (file in File(dataFolder, "games").listFiles() ?: emptyArray()) {
+        for (file in File(dataFolder, "data/games").listFiles() ?: emptyArray()) {
             val name = file.toPath().nameWithoutExtension
             val world = Bukkit.getWorld(name) ?: continue
             val data = GameBuilder(world).build(true) ?: continue
+            Bukkit.broadcastMessage("Data: $data")
             val newData = JsonFile(
                 type = GameData::class,
                 fileName = file.path,
@@ -169,6 +168,8 @@ class BedwarsPlugin : CoreJavaPlugin() {
             )
             gameDataFiles[name] = newData
         }
+        gameManager.reloadData()
+        configManager.update()
     }
 
     @Suppress("UNCHECKED_CAST")
