@@ -31,21 +31,15 @@ import org.bukkit.World
 import java.util.*
 
 data class GameData(
-    @Transient
     private val tempWorld: World,
     val minPlayers: Int = 2,
     val maxPlayers: Int = 8,
-    @Transient
     private val tempTeams: Set<TeamData>,
     val shopVillagers: Set<UUID>,
     val upgradeVillagers: Set<UUID>,
-    @Transient
     private val tempSpawners: Set<SpawnerData>,
-    @Transient
     private val tempBeds: Set<BedData>,
-    @Transient
     private val tempSpec: Location,
-    @Transient
     private val tempLobby: Location
 ) : BedwarsGameData {
     val world: World
