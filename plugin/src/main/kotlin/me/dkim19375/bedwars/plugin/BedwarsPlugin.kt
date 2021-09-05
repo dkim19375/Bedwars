@@ -21,6 +21,7 @@ package me.dkim19375.bedwars.plugin
 import com.alessiodp.parties.api.Parties
 import com.alessiodp.parties.api.interfaces.PartiesAPI
 import com.comphenix.protocol.ProtocolLibrary
+import com.google.gson.Gson
 import com.onarandombox.MultiverseCore.MultiverseCore
 import com.onarandombox.MultiverseCore.api.MVWorldManager
 import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion
@@ -35,6 +36,7 @@ import me.dkim19375.bedwars.plugin.config.ConfigManager
 import me.dkim19375.bedwars.plugin.data.GameData
 import me.dkim19375.bedwars.plugin.data.MainDataFile
 import me.dkim19375.bedwars.plugin.data.MainShopConfigItem
+import me.dkim19375.bedwars.plugin.data.UserCacheJson
 import me.dkim19375.bedwars.plugin.listener.*
 import me.dkim19375.bedwars.plugin.manager.*
 import me.dkim19375.bedwars.plugin.serializer.LocationSerializer
@@ -44,6 +46,8 @@ import me.dkim19375.bedwars.plugin.util.initNBTVariables
 import me.dkim19375.dkimbukkitcore.config.ConfigFile
 import me.dkim19375.dkimbukkitcore.function.logInfo
 import me.dkim19375.dkimbukkitcore.javaplugin.CoreJavaPlugin
+import me.dkim19375.dkimcore.extension.createFileAndDirs
+import me.dkim19375.dkimcore.extension.toUUID
 import me.dkim19375.dkimcore.file.JsonFile
 import me.dkim19375.itemmovedetectionlib.ItemMoveDetectionLib
 import me.tigerhix.lib.scoreboard.ScoreboardLib
@@ -65,6 +69,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
     val configManager = ConfigManager(this)
     val shopFile = ConfigFile(this, "shop.yml")
     val gameDataFiles = mutableMapOf<String, JsonFile<GameData>>()
+    val userCache: MutableMap<String, UUID> = Collections.synchronizedMap(mutableMapOf<String, UUID>())
     lateinit var gameManager: GameManager
         private set
     lateinit var mainDataFile: JsonFile<MainDataFile>
@@ -203,6 +208,26 @@ class BedwarsPlugin : CoreJavaPlugin() {
         scoreboardManager = ScoreboardManager(this)
         packetManager = PacketManager(this)
         partiesListeners = PartiesListeners(this)
+        val file = File("usercache.json")
+        val gson = Gson()
+        file.createFileAndDirs()
+        var first = true
+        Bukkit.getScheduler().runTask(this) {
+            Bukkit.getScheduler().runTaskTimerAsynchronously(this, {
+                file.reader().use { reader ->
+                    val result = gson.fromJson(reader, Array<UserCacheJson>::class.java)
+                    if (first) {
+                        Bukkit.broadcastMessage("Result: ${result.joinToString()}")
+                        Bukkit.broadcastMessage("Name: ${Bukkit.getOfflinePlayer("069a79f4-44e9-4726-a5be-fca90e38aaf5".toUUID()).name}")
+                        first = false
+                    }
+                    userCache.clear()
+                    userCache.putAll(result.mapNotNull { json ->
+                        json.uuid.toUUID()?.let { uuid -> json.name to uuid }
+                    })
+                }
+            }, 20L, 20L)
+        }
     }
 
     private fun registerCommands() {

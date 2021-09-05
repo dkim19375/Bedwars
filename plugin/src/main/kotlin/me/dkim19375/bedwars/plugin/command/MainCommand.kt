@@ -32,6 +32,8 @@ import me.dkim19375.bedwars.plugin.enumclass.SpawnerType
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
 import me.dkim19375.bedwars.plugin.util.*
 import me.dkim19375.dkimbukkitcore.data.toWrapper
+import me.dkim19375.dkimcore.extension.setDecimalPlaces
+import me.dkim19375.dkimcore.extension.toUUID
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.command.Command
@@ -92,6 +94,57 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                             }
                         }"
                     )
+                }
+                return true
+            }
+            "stats" -> {
+                if (!sender.hasPermission(Permissions.STATISTICS)) {
+                    sender.sendMessage(ErrorMessages.NO_PERMISSION)
+                    return true
+                }
+                var self = false
+                val name: String
+                val uuid: UUID
+                if (args.size == 1) {
+                    if (sender !is Player) {
+                        sender.sendMessage(ErrorMessages.TOO_LITTLE_ARGS)
+                        return true
+                    }
+                    self = true
+                    name = sender.name
+                    uuid = sender.uniqueId
+                } else {
+                    val firstArg = args[0]
+                    val result = Bukkit.getPlayer(firstArg)?.let { it.name to it.uniqueId }
+                        ?: plugin.mainDataFile.get().nameCache.toList().firstOrNull { (name, uuid) ->
+                            firstArg.equals(name, true) || firstArg.toUUID() == uuid
+                        } ?: run {
+                            sender.sendMessage(ErrorMessages.INVALID_PLAYER)
+                            return true
+                        }
+                    name = result.first
+                    uuid = result.second
+                }
+                val stats = plugin.mainDataFile.get().getStatistics(uuid)
+                if (self) {
+                    sender.sendMessage("${ChatColor.GREEN}Your Statistics:")
+                } else {
+                    sender.sendMessage("${ChatColor.GREEN}$name's Statistics:")
+                }
+                val dataMap = mapOf<String, Any>(
+                    "Kills" to stats.kills,
+                    "Deaths" to stats.deaths,
+                    "K/D Ratio" to (stats.killDeathRatio).setDecimalPlaces(2),
+                    "Final Kills" to stats.finalKills,
+                    "Final Deaths" to stats.finalDeaths,
+                    "FK/D Ratio" to (stats.finalKillDeathRatio).setDecimalPlaces(2),
+                    "Wins" to stats.wins,
+                    "Losses" to stats.losses,
+                    "W/L Ratio" to (stats.winLossRatio).setDecimalPlaces(2),
+                    "Beds Broken" to stats.bedsBroken
+                )
+                for ((key, value) in dataMap) {
+                    sender.sendMessage("${ChatColor.AQUA}$key: ${ChatColor.GOLD}$value")
                 }
                 return true
             }

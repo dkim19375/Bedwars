@@ -50,6 +50,7 @@ private val plugin: BedwarsPlugin by lazy { JavaPlugin.getPlugin(BedwarsPlugin::
 val commands = listOf(
     HelpMessage("help [page]", "Show this help menu", Permissions.COMMAND.permission),
     HelpMessage("list", "List bedwars maps and games", Permissions.LIST.permission),
+    HelpMessage("stats [player]", "See someone's statistics", Permissions.STATISTICS.permission),
     HelpMessage("join <name>", "Join a bedwars game", Permissions.JOIN.permission),
     HelpMessage("quickjoin", "Quickly a bedwars game", Permissions.JOIN.permission),
     HelpMessage("leave", "Leave a bedwars game", Permissions.LEAVE.permission),

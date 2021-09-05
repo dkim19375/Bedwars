@@ -20,7 +20,7 @@ package me.dkim19375.bedwars.plugin.data
 
 import me.dkim19375.bedwars.api.data.BedwarsStatisticsData
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
-import kotlin.math.roundToInt
+import me.dkim19375.dkimcore.extension.setDecimalPlaces
 
 data class StatisticsData(
     @Transient
@@ -92,6 +92,6 @@ data class StatisticsData(
         if (other == 0) {
             return 0.0
         }
-        return ((toDouble() / other.toDouble()) * 15.0).roundToInt() / 15.0
+        return (toDouble() / other.toDouble()).setDecimalPlaces(15)
     }
 }

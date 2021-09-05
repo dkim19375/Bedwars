@@ -22,6 +22,7 @@ enum class Permissions(val permission: String) {
     COMMAND("bedwars.command"),
     START("bedwars.start"),
     LIST("bedwars.list"),
+    STATISTICS("bedwars.statistics"),
     RELOAD("bedwars.reload"),
     JOIN("bedwars.join"),
     LEAVE("bedwars.leave"),

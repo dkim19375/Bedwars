@@ -35,7 +35,6 @@ import me.dkim19375.bedwars.plugin.api.getAPI
 import me.dkim19375.bedwars.plugin.data.GameData
 import me.dkim19375.bedwars.plugin.data.MainShopConfigItem
 import me.dkim19375.bedwars.plugin.data.PlayerData
-import me.dkim19375.bedwars.plugin.data.StatisticsData
 import me.dkim19375.bedwars.plugin.enumclass.ArmorType
 import me.dkim19375.bedwars.plugin.util.*
 import me.dkim19375.dkimbukkitcore.data.LocationWrapper
@@ -239,7 +238,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         state = GameState.GAME_END
         for (player in getPlayersInGame()) {
             val playerTeam = getTeamOfPlayer(player) ?: continue
-            plugin.mainDataFile.get().statistics.getOrPut(player) { StatisticsData(plugin) }.run {
+            plugin.mainDataFile.get().getStatistics(player).run {
                 if (team == playerTeam) {
                     wins++
                 } else {
@@ -444,7 +443,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     fun playerKilled(player: Player, inventory: List<ItemStack>) {
         val team = getTeamOfPlayer(player) ?: return
         val hasBed = beds.getOrDefault(team, false)
-        plugin.mainDataFile.get().statistics.getOrPut(player.uniqueId) { StatisticsData(plugin) }.run {
+        plugin.mainDataFile.get().getStatistics(player).run {
             deaths++
             if (!hasBed) {
                 finalDeaths++
@@ -452,7 +451,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             plugin.dataFileManager.save = true
         }
         player.killer?.let { killer ->
-            plugin.mainDataFile.get().statistics.getOrPut(killer.uniqueId) { StatisticsData(plugin) }.run {
+            plugin.mainDataFile.get().getStatistics(killer).run {
                 kills++
                 if (!hasBed) {
                     finalKills++
@@ -615,7 +614,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
 
     fun leavePlayer(player: Player, update: Boolean = true) {
         if (state != GameState.GAME_END) {
-            plugin.mainDataFile.get().statistics.getOrPut(player.uniqueId) { StatisticsData(plugin) }.losses++
+            plugin.mainDataFile.get().getStatistics(player).losses++
             plugin.dataFileManager.save = true
         }
         revertPlayer(player)
@@ -758,7 +757,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             )
             return
         }
-        plugin.mainDataFile.get().statistics.getOrPut(player.uniqueId) { StatisticsData(plugin) }.bedsBroken++
+        plugin.mainDataFile.get().getStatistics(player).bedsBroken++
         plugin.dataFileManager.save = true
         val teamOfPlayer = getTeamOfPlayer(player) ?: return
         broadcast(

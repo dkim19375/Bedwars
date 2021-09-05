@@ -19,7 +19,9 @@
 package me.dkim19375.bedwars.plugin.data
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
+import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.*
 
@@ -29,8 +31,24 @@ data class MainDataFile(
     var quickBuySlots: MutableMap<UUID, MutableMap<Int, MainShopConfigItem>> = mutableMapOf(),
     var lobby: Location? = null,
     var editing: MutableSet<String> = mutableSetOf(),
-    var statistics: MutableMap<UUID, StatisticsData> = mutableMapOf()
+    var statistics: MutableMap<UUID, StatisticsData> = mutableMapOf(),
+    var nameCache: MutableMap<String, UUID> = mutableMapOf()
 ) {
+    fun getStatistics(uuid: UUID): StatisticsData {
+        Bukkit.getPlayer(uuid)?.let { player ->
+            return getStatistics(player)
+        }
+        Bukkit.getOfflinePlayer(uuid)?.name?.let {
+            nameCache[it] = uuid
+        }
+        return statistics.getOrPut(uuid) { StatisticsData(plugin) }
+    }
+
+    fun getStatistics(player: Player): StatisticsData {
+        nameCache[player.name] = player.uniqueId
+        return statistics.getOrPut(player.uniqueId) { StatisticsData(plugin) }
+    }
+
     fun save() {
         plugin.mainDataFile.set(this)
         plugin.mainDataFile.save()

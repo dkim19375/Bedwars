@@ -34,4 +34,5 @@ enum class ErrorMessages(val message: String) {
     INVALID_WORLD("${ChatColor.RED}The world is not valid!"),
     INVALID_TEAM("${ChatColor.RED}That is not a valid team!"),
     GAME_ALREADY_EXISTS("${ChatColor.RED}That game already exists!"),
+    INVALID_PLAYER("${ChatColor.RED}That player could not be found!")
 }

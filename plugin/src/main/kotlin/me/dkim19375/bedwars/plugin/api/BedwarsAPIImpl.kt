@@ -25,7 +25,6 @@ import me.dkim19375.bedwars.api.data.BedwarsStatisticsData
 import me.dkim19375.bedwars.api.enumclass.Team
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.GameData
-import me.dkim19375.bedwars.plugin.data.StatisticsData
 import me.dkim19375.bedwars.plugin.manager.GameManager
 import me.dkim19375.bedwars.plugin.util.getColored
 import me.dkim19375.dkimcore.extension.toImmutableMap
@@ -51,6 +50,7 @@ class BedwarsAPIImpl(private val plugin: BedwarsPlugin) : BedwarsAPI {
 
     override fun getStatistics(player: Player): BedwarsStatisticsData = getStatistics(player.uniqueId)
 
-    override fun getStatistics(player: UUID): BedwarsStatisticsData =
-        plugin.mainDataFile.get().statistics.getOrPut(player) { StatisticsData(plugin) }
+    override fun getStatistics(player: UUID): BedwarsStatisticsData {
+        return plugin.mainDataFile.get().getStatistics(player)
+    }
 }

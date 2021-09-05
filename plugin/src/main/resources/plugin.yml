@@ -25,6 +25,7 @@ permissions:
       - bedwars.list
       - bedwars.join
       - bedwars.leave
+      - bedwars.statistics
   bedwars.permpack.staff:
     description: Grant all permissions recommended for staff
     children:
@@ -45,6 +46,8 @@ permissions:
     description: Start a bedwars game
   bedwars.list:
     description: See the list of bedwars games
+  bedwars.statistics:
+    description: See statistics of a player
   bedwars.reload:
     description: Reload the plugin's configuration files
   bedwars.join:

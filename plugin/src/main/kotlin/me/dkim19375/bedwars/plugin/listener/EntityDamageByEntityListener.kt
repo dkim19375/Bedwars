@@ -20,6 +20,7 @@ package me.dkim19375.bedwars.plugin.listener
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.util.isHologram
+import me.dkim19375.dkimcore.extension.setDecimalPlaces
 import org.bukkit.ChatColor
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Arrow
@@ -30,7 +31,6 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.util.Vector
-import kotlin.math.roundToInt
 
 class EntityDamageByEntityListener(private val plugin: BedwarsPlugin) : Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -51,7 +51,7 @@ class EntityDamageByEntityListener(private val plugin: BedwarsPlugin) : Listener
         if (player.health - finalDamage <= 0.0) {
             return
         }
-        val newHp = (((player.health - finalDamage) * 10.0).roundToInt() / 10.0).let {
+        val newHp = (player.health - finalDamage).setDecimalPlaces(1).let {
             if (it.toInt().toDouble() == it) {
                 it.toInt().toString()
             } else {
