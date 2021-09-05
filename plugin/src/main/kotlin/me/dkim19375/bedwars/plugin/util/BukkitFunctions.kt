@@ -143,10 +143,10 @@ fun ItemStack.getWrapper(potionDuration: Int = 900, configItem: String? = null):
             configItem = configItem,
             potionAmplifier = potion.level + 1,
             potionDuration = potionDuration,
-            enchants = enchantments.keys.toList()
+            enchants = enchantments.toMap()
         )
     }
-    return ItemWrapper(type, amount, null, configItem, 1, potionDuration, enchantments.keys.toList())
+    return ItemWrapper(type, amount, null, configItem, 1, potionDuration, enchantments.toMap())
 }
 
 fun Material.isTool() = when (this) {
