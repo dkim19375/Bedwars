@@ -14,6 +14,7 @@
 #   potion-duration: 600 (in TICKS (20 ticks per second, only needed if "material" is POTION)
 #   enchants: (Optional)
 #     - 'DAMAGE_ALL'
+#     - 'KNOCKBACK:2' (Knockback level 2)
 #   cost: 10
 #   cost-item: 'IRON' (Item category: IRON, GOLD, EMERALD)
 #   display-name: 'Damage Potion' (Optional)
@@ -198,6 +199,8 @@ stone-pickaxe:
   slot: 21
   material: 'STONE_PICKAXE'
   amount: 1
+  enchants:
+    - 'DIG_SPEED'
   cost: 15
   cost-item: 'IRON'
   display-name: 'Stone Pickaxe'
@@ -207,22 +210,37 @@ iron-pickaxe:
   slot: 22
   material: 'IRON_PICKAXE'
   amount: 1
+  enchants:
+    - 'DIG_SPEED:2'
   cost: 4
   cost-item: 'GOLD'
   display-name: 'Iron Pickaxe'
   item-category: 'TOOLS'
 
-diamond-pickaxe:
+gold-pickaxe:
   slot: 23
+  material: 'GOLD_PICKAXE'
+  amount: 1
+  enchants:
+    - 'DIG_SPEED:3'
+  cost: 3
+  cost-item: 'GOLD'
+  display-name: 'Gold Pickaxe'
+  item-category: 'TOOLS'
+
+diamond-pickaxe:
+  slot: 24
   material: 'DIAMOND_PICKAXE'
   amount: 1
+  enchants:
+    - 'DIG_SPEED:3'
   cost: 8
   cost-item: 'GOLD'
   display-name: 'Diamond Pickaxe'
   item-category: 'TOOLS'
 
 wood-axe:
-  slot: 24
+  slot: 25
   material: 'WOOD_AXE'
   amount: 1
   cost: 8
@@ -232,27 +250,44 @@ wood-axe:
   item-category: 'TOOLS'
 
 stone-axe:
-  slot: 25
+  slot: 28
   material: 'STONE_AXE'
   amount: 1
+  enchants:
+    - 'DIG_SPEED'
   cost: 15
   cost-item: 'IRON'
   display-name: 'Stone Axe'
   item-category: 'TOOLS'
 
 iron-axe:
-  slot: 28
+  slot: 29
   material: 'IRON_AXE'
   amount: 1
+  enchants:
+    - 'DIG_SPEED:2'
   cost: 4
   cost-item: 'GOLD'
   display-name: 'Iron Axe'
   item-category: 'TOOLS'
 
+gold-axe:
+  slot: 30
+  material: 'GOLD_AXE'
+  amount: 1
+  enchants:
+    - 'DIG_SPEED:3'
+  cost: 3
+  cost-item: 'GOLD'
+  display-name: 'Gold Axe'
+  item-category: 'TOOLS'
+
 diamond-axe:
-  slot: 29
+  slot: 31
   material: 'DIAMOND_AXE'
   amount: 1
+  enchants:
+    - 'DIG_SPEED:3'
   cost: 8
   cost-item: 'GOLD'
   display-name: 'Diamond Axe'

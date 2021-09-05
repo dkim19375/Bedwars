@@ -40,7 +40,7 @@ import java.util.logging.Level
 
 data class ItemWrapper(
     val material: Material, val amount: Int, val potionType: PotionType? = null, val configItem: String? = null,
-    val potionAmplifier: Int = 1, val potionDuration: Int = 0, val enchants: List<Enchantment> = listOf()
+    val potionAmplifier: Int = 1, val potionDuration: Int = 0, val enchants: Map<Enchantment, Int> = emptyMap()
 ) {
     fun toItemStack(color: DyeColor?): ItemStack {
         val plugin = JavaPlugin.getPlugin(BedwarsPlugin::class.java)
@@ -48,9 +48,9 @@ data class ItemWrapper(
         if (potionType != null) {
             val potion = Potion(potionType, if (!(1..2).contains(potionAmplifier - 1)) 2 else (potionAmplifier - 1))
             val item = potion.toItemStack(amount).setConfigItem(configItem)
-            enchants.forEach { e ->
-                if (e.canEnchantItem(item)) {
-                    item.addEnchantment(e, 1)
+            enchants.forEach { (enchant, level) ->
+                if (enchant.canEnchantItem(item)) {
+                    item.addEnchantment(enchant, level)
                 }
             }
             item.itemMeta = item.itemMeta?.apply {
@@ -80,8 +80,8 @@ data class ItemWrapper(
                 }
             }
         }.setConfigItem(configItem).setUnbreakable(true)
-        enchants.forEach { e ->
-            item.addUnsafeEnchantment(e, 1)
+        enchants.forEach { (enchant, level) ->
+            item.addUnsafeEnchantment(enchant, level)
         }
         item.itemMeta = item.itemMeta?.apply {
             if (this is LeatherArmorMeta && color != null) {
@@ -139,7 +139,13 @@ data class ItemWrapper(
             val potionType = enumValueOfOrNull<PotionType>(config.getString("potion-type"))
             val potionAmplifier = config.getInt("potion-amplifier", 1)
             val potionDuration = config.getInt("potion-duration", 0)
-            val enchants = config.getStringList("enchants").mapNotNull { Enchantment.getByName(it.uppercase()) }
+            val enchants = config.getStringList("enchants").mapNotNull { str ->
+                val split = str.split(':')
+                if (split.isEmpty()) {
+                    return@mapNotNull null
+                }
+                Enchantment.getByName(split[0].uppercase()) to (split.getOrNull(1)?.toIntOrNull() ?: 1)
+            }.toMap()
             return ItemWrapper(material, amount, potionType, config.name, potionAmplifier, potionDuration, enchants)
         }
     }
