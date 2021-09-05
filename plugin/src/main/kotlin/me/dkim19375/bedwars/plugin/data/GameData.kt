@@ -18,6 +18,7 @@
 
 package me.dkim19375.bedwars.plugin.data
 
+import com.google.gson.annotations.SerializedName
 import me.dkim19375.bedwars.api.data.BedwarsBedData
 import me.dkim19375.bedwars.api.data.BedwarsGameData
 import me.dkim19375.bedwars.api.data.BedwarsSpawnerData
@@ -31,15 +32,21 @@ import org.bukkit.World
 import java.util.*
 
 data class GameData(
+    @SerializedName("world")
     private val tempWorld: World,
     val minPlayers: Int = 2,
     val maxPlayers: Int = 8,
+    @SerializedName("teams")
     private val tempTeams: Set<TeamData>,
     val shopVillagers: Set<UUID>,
     val upgradeVillagers: Set<UUID>,
+    @SerializedName("spawners")
     private val tempSpawners: Set<SpawnerData>,
+    @SerializedName("beds")
     private val tempBeds: Set<BedData>,
+    @SerializedName("spec")
     private val tempSpec: Location,
+    @SerializedName("lobby")
     private val tempLobby: Location
 ) : BedwarsGameData {
     val world: World
