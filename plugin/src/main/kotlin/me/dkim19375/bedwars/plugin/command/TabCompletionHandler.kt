@@ -137,7 +137,7 @@ class TabCompletionHandler(private val plugin: BedwarsPlugin) : TabCompleter {
         } && sender is Player) {
         completesListMap["setup"].toList()
     } else {
-        getBedwarsGames().plus(if (sender is Player && getAllGames().any { it.equals(sender.world.name, true) }) {
+        getAllGames().plus(if (sender is Player && getAllGames().any { it.equals(sender.world.name, true) }) {
             completesListMap["setup"].toList()
         } else {
             emptyList()
