@@ -61,18 +61,20 @@ class TabCompletionHandler(private val plugin: BedwarsPlugin) : TabCompleter {
         return (1..sender.getMaxHelpPages()).map { i -> i.toString() }
     }
 
-    private fun getTeams(player: CommandSender, gameName: String): List<String> {
-        if (player !is Player) {
-            return emptyList()
-        }
-        val game = plugin.gameManager.getGame(gameName) ?: return completesListMap["colors"].toList()
+    private fun getTeams(gameName: String): List<String> {
+        val game = getEditorFromWorld(gameName) ?: return completesListMap["colors"].toList()
         return game.data.teams.map { data -> data.team.displayName }
     }
 
-    private fun getMissingTeams(sender: CommandSender, game: String): List<String> {
+    private fun getMissingTeams(game: String): List<String> {
         val list = completesListMap["colors"].toMutableList()
-        list.removeAll(getTeams(sender, game))
+        list.removeAll(getTeams(game))
         return list
+    }
+
+    private fun getEditorFromWorld(worldName: String): DataEditor? {
+        val world = Bukkit.getWorld(worldName) ?: return null
+        return DataEditor.findFromWorld(world, plugin)
     }
 
     private fun getBedwarsGames(): List<String> = plugin.gameManager.getGames().keys.toList()
@@ -143,7 +145,7 @@ class TabCompletionHandler(private val plugin: BedwarsPlugin) : TabCompleter {
     }
 
     private fun getRestArgs(sender: CommandSender, args: Array<String>): Pair<String, List<String>> {
-        return if (sender is Player && plugin.gameManager.getGame(args[1]) == null) {
+        return if (sender is Player && getEditorFromWorld(args[1]) == null) {
             sender.world.name to args.drop(1)
         } else {
             args[1] to args.drop(2)
@@ -220,8 +222,8 @@ class TabCompletionHandler(private val plugin: BedwarsPlugin) : TabCompleter {
                     "team", "bed" -> {
                         Bukkit.broadcastMessage("Got ${newArgs[0].lowercase()}, next: ${newArgs[1].lowercase()}")
                         return when (newArgs[1].lowercase()) {
-                            "add" -> getPartial(newArgs[2], getMissingTeams(sender, worldName))
-                            "remove" -> getPartial(newArgs[2], getTeams(sender, worldName))
+                            "add" -> getPartial(newArgs[2], getMissingTeams(worldName))
+                            "remove" -> getPartial(newArgs[2], getTeams(worldName))
                             else -> emptyList()
                         }
                     }
