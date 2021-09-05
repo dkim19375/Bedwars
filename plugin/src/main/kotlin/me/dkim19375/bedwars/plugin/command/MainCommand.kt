@@ -452,9 +452,14 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                 )
                 sender.sendMessage("${ChatColor.AQUA}Shop villagers: ${ChatColor.GOLD}${data.shopVillagers.size}")
                 sender.sendMessage("${ChatColor.AQUA}Upgrade villagers: ${ChatColor.GOLD}${data.upgradeVillagers.size}")
-                sender.sendMessage("${ChatColor.AQUA}Can build: ${ChatColor.GOLD}${
-                    data.canBuild().isEmpty().getGreenOrRed()
-                }")
+                if (plugin.gameManager.getGame(data.world) == null
+                    || plugin.gameManager.getGame(data.world)?.isEditing() == true
+                ) {
+                    val canBuild = data.canBuild().isEmpty()
+                    sender.sendMessage("${ChatColor.AQUA}Can build: ${ChatColor.GOLD}${canBuild.getGreenOrRed()}${
+                        if (canBuild) "Yes" else "No"
+                    }")
+                }
                 sender.sendMessage("${ChatColor.DARK_BLUE}------------------------------------------------")
                 return true
             }

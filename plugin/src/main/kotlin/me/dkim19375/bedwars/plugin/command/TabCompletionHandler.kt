@@ -173,7 +173,7 @@ class TabCompletionHandler(private val plugin: BedwarsPlugin) : TabCompleter {
                     "stats" -> getPartialPerm(
                         token = args[1],
                         collection = Bukkit.getOnlinePlayers().map(Player::getName)
-                            .plus(plugin.mainDataFile.get().nameCache.keys),
+                            .toSet().plus(plugin.mainDataFile.get().nameCache.keys),
                         sender = sender,
                         perm = Permissions.STATISTICS
                     )
