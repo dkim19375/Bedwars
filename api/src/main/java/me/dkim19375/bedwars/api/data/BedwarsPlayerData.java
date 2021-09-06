@@ -23,6 +23,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,14 +33,17 @@ public interface BedwarsPlayerData {
 
     @API
     @NotNull
+    @Contract(pure = true)
     GameMode getPlayerGamemode();
 
     @API
     @NotNull
+    @Contract(pure = true)
     ItemStack[] getPlayerArmor();
 
     @API
     @NotNull
+    @Contract(pure = true)
     List<@Nullable ItemStack> getPlayerInventory();
 
     @API
@@ -48,9 +52,11 @@ public interface BedwarsPlayerData {
 
     @API
     @NotNull
+    @Contract(pure = true)
     Location getPlayerLocation();
 
     @API
+    @Contract(pure = true)
     double getPlayerHealth();
 
     @API

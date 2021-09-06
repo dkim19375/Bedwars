@@ -40,7 +40,7 @@ class BedwarsAPIImpl(private val plugin: BedwarsPlugin) : BedwarsAPI {
         it.key to it.value.getAPI()
     }.toImmutableMap()
 
-    override fun getGame(name: String): BedwarsGameAPI? = gameManager.getGame(name)?.getAPI()
+    override fun getGame(name: String?): BedwarsGameAPI? = gameManager.getGame(name)?.getAPI()
 
     override fun deleteGame(game: BedwarsGameAPI) = gameManager.deleteGame(game.gameData as GameData)
 

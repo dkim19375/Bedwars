@@ -24,31 +24,34 @@ import me.dkim19375.dkimcore.annotation.API;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 public class BedwarsGameStartCountDownEvent extends Event implements BedwarsEvent, Cancellable {
     @NotNull
     private static final HandlerList HANDLERS = new HandlerList();
     private boolean cancelled = false;
+    @NotNull
     private final BedwarsGameAPI game;
 
     public BedwarsGameStartCountDownEvent(@NotNull BedwarsGameAPI game) {
         this.game = game;
     }
 
-    @Override
     @NotNull
+    @Override
     public HandlerList getHandlers() {
         return HANDLERS;
     }
 
-    @NotNull
     @API
+    @NotNull
     public static HandlerList getHandlerList() {
         return HANDLERS;
     }
 
     @Override
+    @Contract(pure = true)
     public boolean isCancelled() {
         return cancelled;
     }
@@ -58,8 +61,9 @@ public class BedwarsGameStartCountDownEvent extends Event implements BedwarsEven
         cancelled = cancel;
     }
 
-    @Override
     @NotNull
+    @Override
+    @Contract(pure = true)
     public BedwarsGameAPI getGame() {
         return game;
     }

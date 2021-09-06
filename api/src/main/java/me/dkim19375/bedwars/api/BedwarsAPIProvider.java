@@ -18,6 +18,7 @@
 
 package me.dkim19375.bedwars.api;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,6 +35,7 @@ public class BedwarsAPIProvider {
         return api;
     }
 
+    @ApiStatus.Internal
     public static void register(@NotNull BedwarsAPI api) {
         if (BedwarsAPIProvider.api != null) {
             throw new UnsupportedOperationException("The Bedwars API is already set!");

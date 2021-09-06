@@ -19,9 +19,11 @@
 package me.dkim19375.bedwars.api.event;
 
 import me.dkim19375.bedwars.api.BedwarsGameAPI;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 public interface BedwarsEvent {
     @NotNull
+    @Contract(pure = true)
     BedwarsGameAPI getGame();
 }

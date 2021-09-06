@@ -22,20 +22,24 @@ import me.dkim19375.bedwars.api.enumclass.Team;
 import me.dkim19375.dkimcore.annotation.API;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public interface BedwarsBedData {
     @API
     @NotNull
+    @Contract(pure = true)
     Team getTeamType();
 
     @API
     @NotNull
+    @Contract(pure = true)
     Location getBedLocation();
 
     @API
     @NotNull
+    @Contract(pure = true)
     BlockFace getBlockFace();
 
     @API

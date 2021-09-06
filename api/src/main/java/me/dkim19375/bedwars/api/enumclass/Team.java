@@ -19,10 +19,12 @@
 package me.dkim19375.bedwars.api.enumclass;
 
 import me.dkim19375.bedwars.api.BedwarsAPI;
+import me.dkim19375.dkimcore.annotation.API;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -50,16 +52,19 @@ public enum Team {
     }
 
     @NotNull
+    @Contract(pure = true)
     public DyeColor getColor() {
         return color;
     }
 
     @NotNull
+    @Contract(pure = true)
     public ChatColor getChatColor() {
         return chatColor;
     }
 
     @NotNull
+    @Contract(pure = true)
     public String getDisplayName() {
         return displayName;
     }
@@ -76,11 +81,13 @@ public enum Team {
         }
     }
 
+    @API
     @NotNull
     public ItemStack getColored(@NotNull Material material, @NotNull BedwarsAPI api) {
         return getColored(new ItemStack(material), api);
     }
 
+    @API
     @NotNull
     public ItemStack getColored(@NotNull ItemStack item, @NotNull BedwarsAPI api) {
         return api.getColored(this, item);

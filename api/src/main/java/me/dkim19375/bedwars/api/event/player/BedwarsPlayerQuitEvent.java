@@ -32,14 +32,14 @@ public class BedwarsPlayerQuitEvent extends BedwarsPlayerEvent {
         super(player, game);
     }
 
-    @Override
     @NotNull
+    @Override
     public HandlerList getHandlers() {
         return HANDLERS;
     }
 
-    @NotNull
     @API
+    @NotNull
     public static HandlerList getHandlerList() {
         return HANDLERS;
     }

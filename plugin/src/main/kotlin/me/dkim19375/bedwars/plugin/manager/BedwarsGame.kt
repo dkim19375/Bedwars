@@ -95,6 +95,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     private fun reset(start: Boolean = false) {
+        checkAsync("game reset")
         countdown = 10
         time = 0
         tempPlayers.clear()
@@ -123,6 +124,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     fun start(force: Boolean): Result {
+        checkAsync("game start")
         val result = canStart(force)
         if (result != Result.SUCCESS) {
             return result
@@ -167,6 +169,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     private fun setupAfterStart() {
+        checkAsync("game setup after start")
         update()
         val event = BedwarsGameStartEvent(getAPI())
         Bukkit.getPluginManager().callEvent(event)
@@ -235,6 +238,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     fun stop(winner: Player?, team: Team) {
+        checkAsync("game stop")
         state = GameState.GAME_END
         for (player in getPlayersInGame()) {
             val playerTeam = getTeamOfPlayer(player) ?: continue
@@ -310,6 +314,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     fun forceStop(whenDone: () -> Unit = {}) {
+        checkAsync("force stop")
         getPlayersInGame().plus(tempPlayers).plus(eliminated).toSet().getPlayers().forEach(this::revertPlayer)
         state = GameState.REGENERATING_WORLD
         reset()
@@ -336,6 +341,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     fun update(force: Boolean = false) {
+        checkAsync("game update")
         if (state != GameState.STARTED) {
             if (state != GameState.STARTING || force) {
                 return
@@ -372,6 +378,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     fun addPlayer(player: Player): Result {
+        checkAsync("add player")
         if (state != GameState.LOBBY && state != GameState.STARTING) {
             if (state == GameState.STARTED) {
                 return Result.GAME_RUNNING
@@ -441,6 +448,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     fun playerKilled(player: Player, inventory: List<ItemStack>) {
+        checkAsync("player killed")
         val team = getTeamOfPlayer(player) ?: return
         val hasBed = beds.getOrDefault(team, false)
         plugin.mainDataFile.get().getStatistics(player).run {
@@ -576,6 +584,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     fun revertPlayer(player: Player) {
+        checkAsync("player reverting")
         plugin.scoreboardManager.getScoreboard(player, false).deactivate()
         player.scoreboard = Bukkit.getScoreboardManager().mainScoreboard
         plugin.gameManager.hiddenPlayers[player.uniqueId]?.let { set ->
@@ -616,6 +625,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     fun leavePlayer(player: Player, update: Boolean = true) {
+        checkAsync("player leave")
         if (state != GameState.GAME_END) {
             plugin.mainDataFile.get().getStatistics(player).losses++
             plugin.dataFileManager.save = true
@@ -676,6 +686,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     fun saveMap() {
+        checkAsync("map saving")
         for (uuid in getPlayersInGame()) {
             val player = Bukkit.getPlayer(uuid) ?: continue
             leavePlayer(player)
@@ -704,6 +715,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     fun getPlayersInTeam(team: Team): Set<UUID> = players.getOrDefault(team, setOf())
 
     fun regenerateMap(whenDone: () -> Unit = {}) {
+        checkAsync("map regenerating")
         val dir = Paths.get(plugin.dataFolder.absolutePath, "worlds", data.world.name).toFile()
         if (!dir.exists()) {
             // Something went wrong here

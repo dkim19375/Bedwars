@@ -18,6 +18,7 @@
 
 package me.dkim19375.bedwars.api.enumclass;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 public enum Result {
@@ -37,6 +38,7 @@ public enum Result {
     }
 
     @NotNull
+    @Contract(pure = true)
     public String getMessage() {
         return message;
     }

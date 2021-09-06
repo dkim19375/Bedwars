@@ -247,3 +247,9 @@ fun ItemMeta.addAllFlags() = ItemFlag.values().toList().forEach { addItemFlags(i
 fun Team.getColored(material: Material): ItemStack = getColored(ItemStack(material))
 
 fun Team.getColored(item: ItemStack): ItemStack = item.getWrapper().toItemStack(color)
+
+fun checkAsync(reason: String) {
+    if (!Bukkit.isPrimaryThread()) {
+        throw IllegalStateException("Asynchronous $reason! (Bedwars)")
+    }
+}

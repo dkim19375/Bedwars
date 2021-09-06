@@ -26,6 +26,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,18 +54,21 @@ public class BedwarsBedBrokenEvent extends Event implements BedwarsEvent, Cancel
         return HANDLERS;
     }
 
-    @NotNull
     @API
+    @NotNull
     public static HandlerList getHandlerList() {
         return HANDLERS;
     }
 
+    @API
     @NotNull
+    @Contract(pure = true)
     public BedwarsBedData getBedData() {
         return bedData;
     }
 
     @Override
+    @Contract(pure = true)
     public boolean isCancelled() {
         return cancelled;
     }
@@ -73,13 +78,15 @@ public class BedwarsBedBrokenEvent extends Event implements BedwarsEvent, Cancel
         cancelled = cancel;
     }
 
-    @Override
     @NotNull
+    @Override
+    @Contract(pure = true)
     public BedwarsGameAPI getGame() {
         return game;
     }
 
     @Nullable
+    @Contract(pure = true)
     public Player getPlayer() {
         return player;
     }

@@ -113,7 +113,7 @@ class BedwarsGameAPIImpl(private val game: BedwarsGame) : BedwarsGameAPI {
 
     override fun regenerateMap(whenDone: Runnable) = game.regenerateMap(whenDone::run)
 
-    override fun getPlayersInTeam(team: Team): Set<Player> = game.getPlayersInTeam(team).getPlayers()
+    override fun getPlayersInTeam(team: Team): Set<Player> = game.getPlayersInTeam(team).getPlayers().toImmutableSet()
 }
 
 fun BedwarsGame.getAPI(): BedwarsGameAPIImpl = BedwarsGameAPIImpl(this)

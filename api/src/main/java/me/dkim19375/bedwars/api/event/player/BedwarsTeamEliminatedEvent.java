@@ -21,6 +21,7 @@ package me.dkim19375.bedwars.api.event.player;
 import me.dkim19375.bedwars.api.enumclass.Team;
 import me.dkim19375.dkimcore.annotation.API;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 public class BedwarsTeamEliminatedEvent extends BedwarsPlayerEvent {
@@ -37,24 +38,27 @@ public class BedwarsTeamEliminatedEvent extends BedwarsPlayerEvent {
         eliminatedEvent = playerEvent;
     }
 
-    @Override
     @NotNull
+    @Override
     public HandlerList getHandlers() {
         return HANDLERS;
     }
 
-    @NotNull
     @API
+    @NotNull
     public static HandlerList getHandlerList() {
         return HANDLERS;
     }
 
     @NotNull
+    @Contract(pure = true)
     public Team getTeam() {
         return team;
     }
 
+    @API
     @NotNull
+    @Contract(pure = true)
     public BedwarsPlayerEliminatedEvent getEliminatedEvent() {
         return eliminatedEvent;
     }

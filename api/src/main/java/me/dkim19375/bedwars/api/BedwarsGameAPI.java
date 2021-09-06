@@ -25,8 +25,7 @@ import me.dkim19375.bedwars.api.enumclass.Result;
 import me.dkim19375.bedwars.api.enumclass.Team;
 import me.dkim19375.dkimcore.annotation.API;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.*;
 
 import java.util.Map;
 import java.util.Set;
@@ -35,52 +34,74 @@ import java.util.UUID;
 public interface BedwarsGameAPI {
     @API
     @NotNull
+    @Contract(pure = true)
     GameState getState();
 
     @API
+    @Contract(pure = true)
     int getCountdown();
 
     @API
+    @Contract(pure = true)
     long getElapsedTime();
 
     @API
     @NotNull
+    @Unmodifiable
+    @Contract(pure = true)
     Map<Team, Set<Player>> getGamePlayers();
 
     @API
     @NotNull
+    @Unmodifiable
+    @Contract(pure = true)
     Set<Player> getPlayers();
 
     @API
     @NotNull
+    @Unmodifiable
+    @Contract(pure = true)
     Set<Player> getEliminated();
 
     @API
     @NotNull
+    @Unmodifiable
+    @Contract(pure = true)
     Set<Player> getPlayersInLobby();
 
     @API
     @NotNull
+    @Contract(pure = true)
     BedwarsGameData getGameData();
 
     @API
     @NotNull
+    @Unmodifiable
+    @Contract(pure = true)
     Map<Team, Boolean> getBedStatus();
 
     @API
     @NotNull
+    @Unmodifiable
+    @Contract(pure = true)
     Map<Player, BedwarsPlayerData> getBeforeData();
 
     @API
     @NotNull
+    @Unmodifiable
+    @Contract(pure = true)
     Map<Player, Integer> getKills();
 
     @API
     @NotNull
+    @Unmodifiable
+    @Contract(pure = true)
     Map<Player, Team> getTrackers();
 
     @API
     @NotNull
+    @Unmodifiable
+    @Contract(pure = true)
     Set<Player> getSpectators();
 
     @API
@@ -101,14 +122,17 @@ public interface BedwarsGameAPI {
     void forceStop(@NotNull Runnable whenDone);
 
     @API
+    @Contract(pure = true)
     boolean isEditing();
 
     @API
     @NotNull
+    @Contract(pure = true)
     Result canStart();
 
     @API
     @NotNull
+    @Contract(pure = true)
     Result canStart(boolean force);
 
     @API
@@ -135,10 +159,12 @@ public interface BedwarsGameAPI {
 
     @API
     @Nullable
+    @Contract(pure = true)
     Team getTeamOfPlayer(@NotNull Player player);
 
     @API
     @Nullable
+    @Contract(pure = true)
     Team getTeamOfPlayer(@NotNull UUID player);
 
     @API
@@ -152,5 +178,7 @@ public interface BedwarsGameAPI {
 
     @API
     @NotNull
+    @Unmodifiable
+    @Contract(pure = true)
     Set<Player> getPlayersInTeam(@NotNull Team team);
 }

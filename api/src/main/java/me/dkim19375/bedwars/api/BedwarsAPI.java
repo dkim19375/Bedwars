@@ -24,8 +24,10 @@ import me.dkim19375.bedwars.api.enumclass.Team;
 import me.dkim19375.dkimcore.annotation.API;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Map;
 import java.util.UUID;
@@ -33,11 +35,14 @@ import java.util.UUID;
 public interface BedwarsAPI {
     @API
     @NotNull
+    @Unmodifiable
+    @Contract(pure = true)
     Map<String, BedwarsGameAPI> getGames();
 
     @API
     @Nullable
-    BedwarsGameAPI getGame(@NotNull String name);
+    @Contract(value = "null -> null", pure = true)
+    BedwarsGameAPI getGame(@Nullable String name);
 
     @API
     void deleteGame(@NotNull BedwarsGameAPI game);
@@ -46,6 +51,7 @@ public interface BedwarsAPI {
     void saveGameData(@NotNull BedwarsGameData data);
 
     @API
+    @Contract(pure = true)
     ItemStack getColored(@NotNull Team team, @NotNull ItemStack item);
 
     @API

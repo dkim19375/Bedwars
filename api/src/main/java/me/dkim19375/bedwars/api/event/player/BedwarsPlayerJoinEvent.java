@@ -23,6 +23,7 @@ import me.dkim19375.dkimcore.annotation.API;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 public class BedwarsPlayerJoinEvent extends BedwarsPlayerEvent implements Cancellable {
@@ -34,19 +35,20 @@ public class BedwarsPlayerJoinEvent extends BedwarsPlayerEvent implements Cancel
         super(player, game);
     }
 
-    @Override
     @NotNull
+    @Override
     public HandlerList getHandlers() {
         return HANDLERS;
     }
 
-    @NotNull
     @API
+    @NotNull
     public static HandlerList getHandlerList() {
         return HANDLERS;
     }
 
     @Override
+    @Contract(pure = true)
     public boolean isCancelled() {
         return cancelled;
     }

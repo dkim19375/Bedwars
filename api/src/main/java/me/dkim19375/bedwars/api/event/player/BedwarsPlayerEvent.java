@@ -22,6 +22,7 @@ import me.dkim19375.bedwars.api.BedwarsGameAPI;
 import me.dkim19375.bedwars.api.event.BedwarsEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerEvent;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class BedwarsPlayerEvent extends PlayerEvent implements BedwarsEvent {
@@ -34,8 +35,9 @@ public abstract class BedwarsPlayerEvent extends PlayerEvent implements BedwarsE
         this.game = game;
     }
 
-    @Override
     @NotNull
+    @Override
+    @Contract(pure = true)
     public BedwarsGameAPI getGame() {
         return game;
     }

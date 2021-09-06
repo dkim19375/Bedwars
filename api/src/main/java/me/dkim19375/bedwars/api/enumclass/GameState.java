@@ -20,6 +20,8 @@ package me.dkim19375.bedwars.api.enumclass;
 
 import me.dkim19375.bedwars.api.BedwarsGameAPI;
 import org.bukkit.ChatColor;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents the current {@link GameState} of the {@link BedwarsGameAPI}
@@ -32,18 +34,24 @@ public enum GameState {
     REGENERATING_WORLD("Restarting", ChatColor.RED),
     GAME_END("Game Ended", ChatColor.RED);
 
+    @NotNull
     private final String displayname;
+    @NotNull
     private final ChatColor color;
 
-    GameState(String displayname, ChatColor color) {
+    GameState(@NotNull String displayname, @NotNull ChatColor color) {
         this.displayname = displayname;
         this.color = color;
     }
 
+    @NotNull
+    @Contract(pure = true)
     public String getDisplayname() {
         return displayname;
     }
 
+    @NotNull
+    @Contract(pure = true)
     public ChatColor getColor() {
         return color;
     }

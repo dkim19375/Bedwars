@@ -19,56 +19,67 @@
 package me.dkim19375.bedwars.api.data;
 
 import me.dkim19375.dkimcore.annotation.API;
+import org.jetbrains.annotations.Contract;
 
 public interface BedwarsStatisticsData {
     @API
+    @Contract(pure = true)
     int getKillCount();
 
     @API
     void setKillCount(int amount);
 
     @API
+    @Contract(pure = true)
     int getFinalKillCount();
 
     @API
     void setFinalKillCount(int amount);
 
     @API
+    @Contract(pure = true)
     int getDeathCount();
 
     @API
     void setDeathCount(int amount);
 
     @API
+    @Contract(pure = true)
     int getFinalDeathCount();
 
     @API
     void setFinalDeathCount(int amount);
 
     @API
+    @Contract(pure = true)
     int getWinCount();
 
     @API
     void setWinCount(int amount);
 
     @API
+    @Contract(pure = true)
     int getLossCount();
 
     @API
     void setLossCount(int amount);
 
     @API
+    @Contract(pure = true)
     int getBedsBrokenCount();
 
     @API
     void setBedsBrokenCount(int amount);
 
     @API
+    @Contract(pure = true)
     double getKillDeathRatio();
 
     @API
+    @Contract(pure = true)
     double getFinalKillDeathRatio();
 
     @API
+    @Contract(pure = true)
     double getWinLossRatio();
 }
