@@ -21,6 +21,7 @@ package me.dkim19375.bedwars.plugin.listener
 import me.dkim19375.bedwars.api.enumclass.GameState
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -30,7 +31,9 @@ import org.bukkit.event.entity.EntityDamageEvent
 class EntityDamageListener(private val plugin: BedwarsPlugin) : Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private fun EntityDamageEvent.onDamage() {
+        Bukkit.broadcastMessage("Called, is cancelled: $isCancelled")
         if (plugin.gameManager.getVillagersUUID().contains(entity.uniqueId)) {
+            Bukkit.broadcastMessage("Cancelled: Villager")
             isCancelled = true
         }
         val player = entity as? Player ?: return
@@ -39,6 +42,7 @@ class EntityDamageListener(private val plugin: BedwarsPlugin) : Listener {
         lobbyDamage(game)
         spectatorDamage(player, game)
         fallDamage()
+        Bukkit.broadcastMessage("Finished call, is cancelled: $isCancelled")
     }
 
     private fun EntityDamageEvent.fallDamage() {

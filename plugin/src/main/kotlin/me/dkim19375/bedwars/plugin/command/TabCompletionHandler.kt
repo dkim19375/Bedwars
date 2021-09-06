@@ -220,7 +220,6 @@ class TabCompletionHandler(private val plugin: BedwarsPlugin) : TabCompleter {
                         }
                     }
                     "team", "bed" -> {
-                        Bukkit.broadcastMessage("Got ${newArgs[0].lowercase()}, next: ${newArgs[1].lowercase()}")
                         return when (newArgs[1].lowercase()) {
                             "add" -> getPartial(newArgs[2], getMissingTeams(worldName))
                             "remove" -> getPartial(newArgs[2], getTeams(worldName))

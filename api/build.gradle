@@ -1,3 +1,72 @@
+//file:noinspection GroovyAssignabilityCheck
+/*plugins {
+    id 'io.github.gradle-nexus.publish-plugin' version '1.1.0'
+    id 'maven-publish'
+    id 'signing'
+}*/
+
 dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
 }
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+/*
+publishing {
+    def project = project
+    publications {
+        mavenJava(MavenPublication) {
+            groupId 'io.github.dkim19375'
+            artifactId 'bedwars'
+            version project.version
+
+            from components.java
+
+            pom {
+                name = 'Bedwars'
+                description = 'A spigot plugin for Bedwars!'
+                url = 'https://github.com/dkim19375/Bedwars'
+
+                packaging = 'jar'
+
+                licenses {
+                    license {
+                        name = 'GPL-3.0 License'
+                        url = 'https://opensource.org/licenses/GPL-3.0'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'dkim19375'
+                    }
+                }
+
+                scm {
+                    connection = 'scm:git:git://github.com/dkim19375/Bedwars.git'
+                    developerConnection = 'scm:git:ssh://github.com:dkim19375/Bedwars.git'
+                    url = 'https://github.com/dkim19375/Bedwars'
+                }
+            }
+        }
+    }
+}
+
+nexusPublishing {
+    packageGroup.set("io.github.dkim19375")
+    repositories {
+        sonatype {
+            nexusUrl = uri("https://s01.oss.sonatype.org/service/local/")
+            snapshotRepositoryUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+            username = project.findProperty("mavenUsername")
+            password = project.findProperty("mavenPassword")
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}*/

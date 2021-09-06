@@ -89,7 +89,7 @@ sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 compileJava.options.encoding 'UTF-8'
 
 group 'me.dkim19375'
-version '1.0.0'
+version '1.0-SNAPSHOT'
 
 subprojects {
     apply plugin: 'com.github.johnrengelman.shadow'
