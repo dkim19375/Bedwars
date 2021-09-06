@@ -1,3 +1,4 @@
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/dkim19375/Bedwars/Java%20CI%20with%20Gradle%20(Java%208))
 # Bedwars
 ## A bedwars plugin (based off Hypixel) targeted towards 1.8 servers 
 

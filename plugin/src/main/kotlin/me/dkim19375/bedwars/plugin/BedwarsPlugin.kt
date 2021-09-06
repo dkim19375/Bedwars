@@ -219,10 +219,10 @@ class BedwarsPlugin : CoreJavaPlugin() {
             PlayerMoveListener(), EntityExplodeListener(this), BlockPlaceListener(this),
             BlockBreakListener(this), PlayerQuitListener(this), PlayerDeathListener(this),
             EntityDamageListener(this), ItemTransferListener(this), DamageByOtherListener(this),
-            PotionConsumeListener(this), InventoryClickListener(this), PlayerDropItemListener(this),
+            PotionConsumeListener(this), InventoryClickListener(this), PlayerPickupItemListener(this),
             WorldInitListener(this), CommandListeners(this), AsyncPlayerChatListener(this),
             PlayerCoordsChangeListener(this), EntityDamageByEntityListener(this), CraftItemListener(this),
-            PlayerInteractListener(this), ProjectileLaunchListener(this), PlayerPickupItemListener(this),
+            PlayerInteractListener(this), ProjectileLaunchListener(this),
             partiesListeners, scoreboardManager
         )
     }
