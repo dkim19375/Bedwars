@@ -5,3 +5,6 @@
 1.9+ should mostly work, but 99% of the tests ran on 1.8, which occasional tests on 1.17.
 
 Versions 1.9 -> 1.16 will probably receive little to no tests.
+
+## Wiki
+For information on how to use this plugin, **please** check the [wiki](https://github.com/dkim19375/Bedwars/wiki)
