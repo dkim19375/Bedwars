@@ -33,7 +33,7 @@ import org.bukkit.potion.PotionEffectType
 import java.util.*
 
 @Suppress("MemberVisibilityCanBePrivate")
-class UpgradesManager(plugin: BedwarsPlugin, val game: BedwarsGame) {
+class UpgradesManager(private val plugin: BedwarsPlugin, private val game: BedwarsGame) {
     val sharpness = mutableSetOf<Team>()
     val protection = mutableMapOf<Team, Int>()
     val haste = mutableMapOf<Team, Int>()
@@ -178,13 +178,16 @@ class UpgradesManager(plugin: BedwarsPlugin, val game: BedwarsGame) {
 
     fun canAlertTrap(player: Player): Boolean {
         val teamOfPlayer = game.getTeamOfPlayer(player) ?: return false
+        val trapConfig = plugin.config.getConfigurationSection("trap")
+        val range = trapConfig?.getIntOrNull("range") ?: 7
+        val cooldown = (trapConfig?.getIntOrNull("cooldown") ?: 20) * 1000
         game.data.beds.firstOrNull { d ->
             (teamOfPlayer != d.team) &&
-                    (d.location.getSafeDistance(player.location) < 7) &&
+                    (d.location.getSafeDistance(player.location) < range) &&
                     (firstTrap.containsKey(d.team))
         } ?: return false
         val time = times[player.uniqueId]
-        if (time == null || System.currentTimeMillis() - time > 20000) {
+        if (time == null || System.currentTimeMillis() - time > cooldown) {
             times.remove(player.uniqueId)
             return true
         }

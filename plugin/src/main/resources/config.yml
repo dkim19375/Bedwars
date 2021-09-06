@@ -31,3 +31,6 @@ tab:
   hide-players:
     same-world: true # Allows you to see players in the same world even if they're not in the same game
     enabled: true
+trap:
+  range: 7 # 7 blocks from the bed
+  cooldown: 20 # 20 seconds until you can trigger the trap again
