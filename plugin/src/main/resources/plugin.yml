@@ -7,6 +7,7 @@ depend:
   - PlaceholderAPI
   - ProtocolLib
 
+soft-depend:
   - Parties
   - Multiverse-Core
 
