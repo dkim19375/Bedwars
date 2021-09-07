@@ -44,7 +44,7 @@ data class ItemWrapper(
 ) {
     fun toItemStack(color: DyeColor?): ItemStack {
         val plugin = JavaPlugin.getPlugin(BedwarsPlugin::class.java)
-        val configManager = plugin.configManager
+        val configManager = plugin.shopConfigManager
         if (potionType != null) {
             val potion = Potion(potionType, if (!(1..2).contains(potionAmplifier - 1)) 2 else (potionAmplifier - 1))
             val item = potion.toItemStack(amount).setConfigItem(configItem)

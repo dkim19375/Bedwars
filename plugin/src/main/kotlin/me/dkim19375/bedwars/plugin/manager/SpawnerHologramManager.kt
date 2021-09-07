@@ -19,6 +19,7 @@
 package me.dkim19375.bedwars.plugin.manager
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
+import me.dkim19375.bedwars.plugin.config.MainConfigSettings
 import me.dkim19375.bedwars.plugin.data.SpawnerData
 import me.dkim19375.bedwars.plugin.data.SpawnerHologram
 import me.dkim19375.bedwars.plugin.enumclass.SpawnerType
@@ -27,6 +28,7 @@ import me.dkim19375.bedwars.plugin.util.setHologramNBT
 import me.dkim19375.bedwars.plugin.util.toRomanNumeral
 import me.dkim19375.bedwars.plugin.util.update
 import me.dkim19375.dkimbukkitcore.function.formatAll
+import me.mattstudios.config.properties.Property
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.ArmorStand
@@ -38,17 +40,22 @@ class SpawnerHologramManager(private val plugin: BedwarsPlugin, private val game
 
     fun start() {
         stop()
-        val config = plugin.config.getConfigurationSection("holograms.display-spawners")
-        val types = config?.getKeys(false)?.filter { config.getBoolean(it) }?.mapNotNull(SpawnerType::fromString)
-            ?: listOf(SpawnerType.DIAMOND, SpawnerType.EMERALD)
+        val configManager = plugin.mainConfigManager
+        val settings = MainConfigSettings
+        val types = setOf(
+            SpawnerType.IRON to configManager.get(settings.IRON_HOLOGRAMS),
+            SpawnerType.GOLD to configManager.get(settings.GOLD_HOLOGRAMS),
+            SpawnerType.DIAMOND to configManager.get(settings.DIAMOND_HOLOGRAMS),
+            SpawnerType.EMERALD to configManager.get(settings.EMERALD_HOLOGRAMS)
+        ).filter(Pair<*, Boolean>::second).map(Pair<SpawnerType, *>::first)
         for (type in types) {
             val locations = game.data.spawners
                 .filter { it.type == type }
                 .map(SpawnerData::location)
                 .map(Location::update)
             for (location in locations) {
-                val getEntity: (String, Double) -> Pair<ArmorStand, Location> = { configKey, default ->
-                    val height = (plugin.config.get("holograms.heights.$configKey") as? Number)?.toDouble() ?: default
+                val getEntity: (Property<Double>) -> Pair<ArmorStand, Location> = { setting ->
+                    val height = configManager.get(setting)
                     val newLoc = location.clone().add(0.0, height, 0.0)
                     newLoc.world.spawn(newLoc, ArmorStand::class.java).setHologramNBT(true).apply {
                         setBasePlate(false)
@@ -61,9 +68,9 @@ class SpawnerHologramManager(private val plugin: BedwarsPlugin, private val game
                         customName = "TEST"
                     } to newLoc.clone()
                 }
-                val timeEntity = getEntity("spawn-time", 3.5)
-                val typeEntity = getEntity("spawner-type", 3.8)
-                val tierEntity = getEntity("tier-type", 4.1)
+                val timeEntity = getEntity(settings.HEIGHTS_SPAWN_TIME)
+                val typeEntity = getEntity(settings.HEIGHTS_SPAWNER_TYPE)
+                val tierEntity = getEntity(settings.HEIGHTS_TIER_TYPE)
                 holograms.add(
                     SpawnerHologram(
                         type = type,
@@ -96,20 +103,20 @@ class SpawnerHologramManager(private val plugin: BedwarsPlugin, private val game
                 return
             }
         }
+        val configManager = plugin.mainConfigManager
         for (hologram in holograms.toSet()) {
-            val section = plugin.config.getConfigurationSection("holograms.spawner-type-text")
             hologram.getTypeArmorStand()?.customName = (when (hologram.type) {
-                SpawnerType.IRON -> (section?.getString("iron") ?: "&7&lIron")
-                SpawnerType.GOLD -> (section?.getString("gold") ?: "&6&lGold")
-                SpawnerType.DIAMOND -> (section?.getString("diamond") ?: "&b&lDiamond")
-                SpawnerType.EMERALD -> (section?.getString("emerald") ?: "&a&lEmerald")
+                SpawnerType.IRON -> configManager.get(MainConfigSettings.IRON_HOLOGRAMS_TEXT)
+                SpawnerType.GOLD -> configManager.get(MainConfigSettings.GOLD_HOLOGRAMS_TEXT)
+                SpawnerType.DIAMOND -> configManager.get(MainConfigSettings.DIAMOND_HOLOGRAMS_TEXT)
+                SpawnerType.EMERALD -> configManager.get(MainConfigSettings.EMERALD_HOLOGRAMS_TEXT)
             }).formatAll()
-            val timeFormat = plugin.config.getString("holograms.spawner-time-text") ?: "&eSpawns in &c%time% &eseconds"
+            val timeFormat = configManager.get(MainConfigSettings.SPAWNER_TIME_TEXT)
             val timeText = timeFormat
                 .replace("%time%", game.spawnerManager.getTimeUntilNextDrop(hologram.type).seconds.toString())
                 .formatAll()
             hologram.getTimeArmorStand()?.customName = timeText
-            val tierFormat = plugin.config.getString("holograms.spawner-tier-text") ?: "&eTier &c%tier%"
+            val tierFormat = configManager.get(MainConfigSettings.SPAWNER_TIER_TEXT)
             val tierText = tierFormat
                 .replace("%tier%", game.spawnerManager.upgradeLevels.getOrDefault(hologram.type, 1).toRomanNumeral())
                 .formatAll()

@@ -47,7 +47,7 @@ fun ItemStack.setConfigItem(item: String?): ItemStack = nbtUtils.setConfigItem(t
 
 // custom
 
-fun ItemStack.getConfigItem(): MainShopConfigItem? = plugin.configManager.getItemFromName(nbtUtils.getConfigItem(this))
+fun ItemStack.getConfigItem(): MainShopConfigItem? = plugin.shopConfigManager.getItemFromName(nbtUtils.getConfigItem(this))
 
 fun ArmorStand.isHologram(): Boolean = nbtUtils.isHologram(this)
 

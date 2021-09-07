@@ -32,6 +32,7 @@ import me.dkim19375.bedwars.api.event.player.BedwarsPlayerQuitEvent
 import me.dkim19375.bedwars.api.event.player.BedwarsTeamEliminatedEvent
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.api.getAPI
+import me.dkim19375.bedwars.plugin.config.MainConfigSettings
 import me.dkim19375.bedwars.plugin.data.GameData
 import me.dkim19375.bedwars.plugin.data.MainShopConfigItem
 import me.dkim19375.bedwars.plugin.data.PlayerData
@@ -170,6 +171,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
 
     private fun setupAfterStart() {
         checkAsync("game setup after start")
+        val configManager = plugin.mainConfigManager
         update()
         val event = BedwarsGameStartEvent(getAPI())
         Bukkit.getPluginManager().callEvent(event)
@@ -182,8 +184,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             val player = Bukkit.getPlayer(uuid) ?: continue
             val teamData = teams[i % teams.size]
             val team = teamData.team
-            val format =
-                plugin.config.getString("tab.name") ?: "%team_color%&l%team_first_letter% %team_color%%player_name%"
+            val format = configManager.get(MainConfigSettings.TAB_NAME)
             val replaceMap = mapOf<String, Any>(
                 "team_color" to team.chatColor,
                 "team_name" to team.displayName,
@@ -410,7 +411,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             if (!teleport) {
                 return@let
             }
-            if (!plugin.config.getBoolean("parties.teleport-automatically")) {
+            if (!plugin.mainConfigManager.get(MainConfigSettings.PARTIES_TELEPORT_AUTO)) {
                 return@let
             }
             val party = partyPlayer.partyId?.let { plugin.partiesAPI?.getParty(it) } ?: return@let
@@ -527,7 +528,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     }
 
     fun giveItems(player: Player, items: List<ItemStack?>?, team: Team) {
-        val configManager = plugin.configManager
+        val configManager = plugin.shopConfigManager
         var armorType: ArmorType = ArmorType.LEATHER
         var addPick = false
         var addAxe = false

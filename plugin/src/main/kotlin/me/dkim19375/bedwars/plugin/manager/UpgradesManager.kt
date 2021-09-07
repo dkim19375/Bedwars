@@ -22,6 +22,7 @@ import dev.triumphteam.gui.builder.item.ItemBuilder
 import me.dkim19375.bedwars.api.enumclass.GameState
 import me.dkim19375.bedwars.api.enumclass.Team
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
+import me.dkim19375.bedwars.plugin.config.MainConfigSettings
 import me.dkim19375.bedwars.plugin.enumclass.TrapType
 import me.dkim19375.bedwars.plugin.util.*
 import org.bukkit.Bukkit
@@ -178,9 +179,9 @@ class UpgradesManager(private val plugin: BedwarsPlugin, private val game: Bedwa
 
     fun canAlertTrap(player: Player): Boolean {
         val teamOfPlayer = game.getTeamOfPlayer(player) ?: return false
-        val trapConfig = plugin.config.getConfigurationSection("trap")
-        val range = trapConfig?.getIntOrNull("range") ?: 7
-        val cooldown = (trapConfig?.getIntOrNull("cooldown") ?: 20) * 1000
+        val manager = plugin.mainConfigManager
+        val range = manager.get(MainConfigSettings.TRAP_RANGE)
+        val cooldown = manager.get(MainConfigSettings.TRAP_COOLDOWN) * 1000
         game.data.beds.firstOrNull { d ->
             (teamOfPlayer != d.team) &&
                     (d.location.getSafeDistance(player.location) < range) &&

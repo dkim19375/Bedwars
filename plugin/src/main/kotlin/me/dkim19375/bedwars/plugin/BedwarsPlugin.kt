@@ -31,7 +31,8 @@ import me.dkim19375.bedwars.plugin.api.BedwarsAPIImpl
 import me.dkim19375.bedwars.plugin.builder.GameBuilder
 import me.dkim19375.bedwars.plugin.command.MainCommand
 import me.dkim19375.bedwars.plugin.command.TabCompletionHandler
-import me.dkim19375.bedwars.plugin.config.ConfigManager
+import me.dkim19375.bedwars.plugin.config.MainConfigManager
+import me.dkim19375.bedwars.plugin.config.ShopConfigManager
 import me.dkim19375.bedwars.plugin.data.GameData
 import me.dkim19375.bedwars.plugin.data.MainDataFile
 import me.dkim19375.bedwars.plugin.data.MainShopConfigItem
@@ -51,6 +52,7 @@ import me.tigerhix.lib.scoreboard.ScoreboardLib
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.World
+import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.plugin.Plugin
 import java.io.File
 import java.io.FileInputStream
@@ -63,7 +65,8 @@ val NEW_SOUND: Boolean = MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_
 
 @Suppress("MemberVisibilityCanBePrivate")
 class BedwarsPlugin : CoreJavaPlugin() {
-    val configManager = ConfigManager(this)
+    val mainConfigManager = MainConfigManager(this)
+    val shopConfigManager = ShopConfigManager(this)
     val shopFile = ConfigFile(this, "shop.yml")
     val gameDataFiles = mutableMapOf<String, JsonFile<GameData>>()
     val userCache: MutableMap<String, UUID> = Collections.synchronizedMap(mutableMapOf<String, UUID>())
@@ -92,6 +95,10 @@ class BedwarsPlugin : CoreJavaPlugin() {
             MainShopConfigItem::class.java to ShopConfigItemSerializer(this),
             World::class.java to WorldSerializer()
         )
+    }
+
+    override fun getConfig(): FileConfiguration? {
+        return null
     }
 
     override fun onLoad() {
@@ -147,6 +154,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
         gameManager.getGames().values.forEach(BedwarsGame::forceStop)
         gameManager.save()
         ProtocolLibrary.getProtocolManager().removePacketListeners(this)
+        unregisterConfig(mainConfigManager)
         unregisterConfig(mainDataFile)
         unregisterConfig(shopFile)
         BedwarsPAPIExpansion(this).unregister()
@@ -169,7 +177,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
             gameDataFiles[name] = newData
         }
         gameManager.reloadData()
-        configManager.update()
+        shopConfigManager.update()
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -201,6 +209,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
             typeAdapters = jsonSerializers,
             default = { MainDataFile() }
         )
+        registerConfig(mainConfigManager)
         registerConfig(mainDataFile)
         registerConfig(shopFile)
         dataFileManager = DataFileManager(this)

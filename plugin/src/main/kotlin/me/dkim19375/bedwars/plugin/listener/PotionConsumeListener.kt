@@ -42,7 +42,7 @@ class PotionConsumeListener(private val plugin: BedwarsPlugin) : Listener {
         Bukkit.getScheduler().runTask(plugin) {
             player.inventory.remove(Material.GLASS_BOTTLE)
         }
-        val item = plugin.configManager.mainItems.firstOrNull { it.item.potionType == potionType }?.item ?: return
+        val item = plugin.shopConfigManager.mainItems.firstOrNull { it.item.potionType == potionType }?.item ?: return
         when (type) {
             PotionEffectType.INVISIBILITY -> {
                 player.addPotionEffect(PotionEffect(type, 2, item.potionAmplifier), true)

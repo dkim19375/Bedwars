@@ -36,7 +36,7 @@ import org.bukkit.inventory.ItemStack
 
 @Suppress("MemberVisibilityCanBePrivate")
 class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin, private val game: BedwarsGame) {
-    private val configManager = plugin.configManager
+    private val configManager = plugin.shopConfigManager
     val menu: Gui = Gui.gui()
         .rows(6)
         .title("Quick Buy".toComponent())

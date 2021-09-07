@@ -20,6 +20,7 @@ package me.dkim19375.bedwars.plugin.listener
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.NEW_SOUND
+import me.dkim19375.bedwars.plugin.config.MainConfigSettings
 import me.dkim19375.bedwars.plugin.enumclass.SpawnerType
 import me.dkim19375.bedwars.plugin.util.getPlayers
 import me.dkim19375.bedwars.plugin.util.giveItem
@@ -53,14 +54,13 @@ class PlayerPickupItemListener(private val plugin: BedwarsPlugin) : Listener {
             collected.remove(item.uniqueId)
             item.remove()
         }
-        val section = plugin.config.getConfigurationSection("generator.split")
-        val generators = section?.getStringList("generators")?.mapNotNull(SpawnerType::fromString)?.toSet() ?: setOf(
-            SpawnerType.IRON,
-            SpawnerType.GOLD
-        )
+        val generators =
+            plugin.mainConfigManager.get(MainConfigSettings.SPLIT_GENERATORS).mapNotNull(SpawnerType::fromString)
+                .toSet()
         val generator = SpawnerType.fromMaterial(itemStack.type)
-        val enabled = (section?.getBoolean("enabled", true) != false)
-                && generator != null && generators.contains(generator)
+        val enabled = plugin.mainConfigManager.get(MainConfigSettings.SPLIT_ENABLED)
+                && generator != null
+                && generators.contains(generator)
         val players = (if (enabled && isDrop) {
             item.getNearbyEntities(1.7, 2.0, 1.7).mapNotNull { (it as? Player)?.uniqueId }
         } else {

@@ -40,7 +40,7 @@ class ShopConfigItemSerializer(private val plugin: BedwarsPlugin) : JsonSerializ
         typeOfT: Type,
         context: JsonDeserializationContext,
     ): MainShopConfigItem {
-        return plugin.configManager.getItemFromName(json.asJsonObject.get("name").asString)
+        return plugin.shopConfigManager.getItemFromName(json.asJsonObject.get("name").asString)
             ?: throw IllegalStateException("Property \"name\" could not be found during deserialization!")
     }
 }

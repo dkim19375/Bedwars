@@ -22,6 +22,7 @@ import me.dkim19375.bedwars.api.enumclass.GameState
 import me.dkim19375.bedwars.api.enumclass.Team
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.builder.GameBuilder
+import me.dkim19375.bedwars.plugin.config.MainConfigSettings
 import me.dkim19375.bedwars.plugin.data.GameData
 import me.dkim19375.bedwars.plugin.util.getIgnoreCase
 import me.dkim19375.bedwars.plugin.util.getPlayers
@@ -97,9 +98,9 @@ class GameManager(private val plugin: BedwarsPlugin) {
         if (game.state !in setOf(GameState.STARTED, GameState.STARTING, GameState.LOBBY, GameState.GAME_END)) {
             return
         }
-        val section = plugin.config.getConfigurationSection("tab.hide-players")
-        val sameWorld = section?.getBoolean("same-world", true) ?: true
-        if (section?.getBoolean("enabled", true) == false) {
+        val manager = plugin.mainConfigManager
+        val sameWorld = manager.get(MainConfigSettings.HIDE_SAME_WORLD)
+        if (!manager.get(MainConfigSettings.HIDE_ENABLED)) {
             return
         }
         for (player in game.getPlayersInGame().getPlayers()) {

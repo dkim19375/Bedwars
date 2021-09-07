@@ -26,9 +26,7 @@ import org.bukkit.Material
 import org.bukkit.configuration.file.FileConfiguration
 
 @Suppress("MemberVisibilityCanBePrivate")
-class ConfigManager(private val plugin: BedwarsPlugin) {
-    private val config: FileConfiguration
-        get() = plugin.config
+class ShopConfigManager(private val plugin: BedwarsPlugin) {
     private val shopFile: ConfigFile
         get() = plugin.shopFile
     private val shopConfig: FileConfiguration
