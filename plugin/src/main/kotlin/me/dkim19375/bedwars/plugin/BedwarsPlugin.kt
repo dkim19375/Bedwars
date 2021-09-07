@@ -21,7 +21,6 @@ package me.dkim19375.bedwars.plugin
 import com.alessiodp.parties.api.Parties
 import com.alessiodp.parties.api.interfaces.PartiesAPI
 import com.comphenix.protocol.ProtocolLibrary
-import com.google.gson.GsonBuilder
 import com.onarandombox.MultiverseCore.MultiverseCore
 import com.onarandombox.MultiverseCore.api.MVWorldManager
 import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion
@@ -71,19 +70,6 @@ class BedwarsPlugin : CoreJavaPlugin() {
     val gameDataFiles = mutableMapOf<String, JsonFile<GameData>>()
     val userCache: MutableMap<String, UUID> = Collections.synchronizedMap(mutableMapOf<String, UUID>())
     val mainDataFile: JsonFile<MainDataFile> by lazy {
-        val current = try {
-            File(dataFolder, "data/data.json").path.reader().use {
-                GsonBuilder()
-                    .setPrettyPrinting()
-                    .apply {
-                        jsonSerializers.forEach(this::registerTypeHierarchyAdapter)
-                    }.create().fromJson(it, MainDataFile::class.java)
-            }
-        } catch (t: Throwable) {
-            t.printStackTrace()
-            null
-        }
-        logInfo("current: $current")
         JsonFile(
             type = MainDataFile::class,
             fileName = File(dataFolder, "data/data.json").path,
