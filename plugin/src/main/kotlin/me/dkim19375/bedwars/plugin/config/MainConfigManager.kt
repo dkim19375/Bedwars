@@ -5,5 +5,4 @@ import me.dkim19375.dkimcore.file.YamlFile
 import java.io.File
 
 class MainConfigManager(plugin: BedwarsPlugin) :
-    YamlFile(MainConfigSettings, File(plugin.dataFolder, "config.yml").path) {
-}
+    YamlFile(MainConfigSettings, File(plugin.dataFolder, "config.yml").path)

@@ -52,7 +52,6 @@ import me.tigerhix.lib.scoreboard.ScoreboardLib
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.World
-import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.plugin.Plugin
 import java.io.File
 import java.io.FileInputStream
@@ -95,10 +94,6 @@ class BedwarsPlugin : CoreJavaPlugin() {
             MainShopConfigItem::class.java to ShopConfigItemSerializer(this),
             World::class.java to WorldSerializer()
         )
-    }
-
-    override fun getConfig(): FileConfiguration? {
-        return null
     }
 
     override fun onLoad() {
