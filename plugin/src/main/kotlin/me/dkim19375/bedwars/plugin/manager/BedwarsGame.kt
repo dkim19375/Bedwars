@@ -40,6 +40,7 @@ import me.dkim19375.bedwars.plugin.enumclass.ArmorType
 import me.dkim19375.bedwars.plugin.util.*
 import me.dkim19375.dkimbukkitcore.data.LocationWrapper
 import me.dkim19375.dkimbukkitcore.function.formatAll
+import me.dkim19375.dkimbukkitcore.function.getPlayers
 import me.dkim19375.dkimbukkitcore.function.logInfo
 import me.dkim19375.dkimcore.extension.runCatchingOrNull
 import org.apache.commons.io.FileUtils

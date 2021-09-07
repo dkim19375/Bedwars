@@ -75,7 +75,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin,
             2, 1, 2, 9, ItemBuilder.from(grayGlass)
                 .setName("${ChatColor.DARK_GRAY}\u2191 ${ChatColor.GRAY}Categories")
                 .addLore("${ChatColor.DARK_GRAY}\u2193 ${ChatColor.GRAY}Items")
-                .asGuiItem()
+                .asNewGuiItem()
         )
         menu.update()
     }
@@ -83,7 +83,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin,
     private fun getGuiItem(name: String, whatToShow: () -> Unit, material: Material = Material.HARD_CLAY) =
         getItemBuilderForTop(material)
             .name("${ChatColor.GREEN}$name")
-            .asGuiItem {
+            .asNewGuiItem {
                 checkIfSettingQuickBuy()
                 whatToShow()
             }
@@ -103,7 +103,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin,
             2, col, ItemBuilder.from(glass)
                 .setName("${ChatColor.DARK_GRAY}\u2191 ${ChatColor.GRAY}Categories")
                 .addLore("${ChatColor.DARK_GRAY}\u2193 ${ChatColor.GRAY}Items")
-                .asGuiItem()
+                .asNewGuiItem()
         )
     }
 
@@ -137,27 +137,27 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin,
             }
         }
         val item = plugin.dataFileManager.getQuickBuySlot(slot, player.uniqueId)
-            ?: return ItemBuilder.from(getNoneInQuickBuyItem()).asGuiItem {
+            ?: return ItemBuilder.from(getNoneInQuickBuyItem()).asNewGuiItem {
                 if (isSettingQuickBuy) {
                     quickBuyAction(player)
                 }
             }
         return formatItem(item, true)
             .lore("${ChatColor.AQUA}Sneak Click to remove from Quick Buy!")
-            .asGuiItem { event ->
+            .asNewGuiItem { event ->
                 event.isCancelled = true
                 item.itemCategory.getShowMethod()
-                val player = event.view.player as? Player ?: return@asGuiItem
+                val player = event.view.player as? Player ?: return@asNewGuiItem
                 if (isSettingQuickBuy) {
                     quickBuyAction(player)
-                    return@asGuiItem
+                    return@asNewGuiItem
                 }
                 if (!event.isShiftClick) {
                     onClick(item, event) {}
-                    return@asGuiItem
+                    return@asNewGuiItem
                 }
                 plugin.dataFileManager.setQuickBuySlot(slot, player.uniqueId, null)
-                menu.setItem(slot, ItemBuilder.from(getNoneInQuickBuyItem()).asGuiItem())
+                menu.setItem(slot, ItemBuilder.from(getNoneInQuickBuyItem()).asNewGuiItem())
                 menu.update()
                 player.sendMessage("${ChatColor.GREEN}Successfully removed ${item.displayname} from Quick Buy!")
             }
@@ -187,17 +187,14 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin,
         }
         val pair = item.item.material.getToolTier()
         val tier = pair?.first
-        val inventoryTier = player.inventory.getToolTier().let { (pickaxe, axe) ->
-            pair ?: return@let null
-            if (pair.second) {
-                pickaxe
-            } else {
-                axe
-            }
+        val type = pair?.second
+        val inventoryTier = player.inventory.getToolTier().let { map ->
+            type ?: return@let null
+            map[type]
         }
         if (tier != null && inventoryTier != null) {
             if (tier.tier <= inventoryTier.tier) {
-                player.sendMessage("${ChatColor.RED}You already have a higher tier!")
+                player.sendMessage("${ChatColor.RED}You already have a higher (or same) tier!")
                 player.playErrorSound()
                 return
             }
@@ -208,7 +205,6 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin,
         player.inventory.removeItem(ItemStack(item.costItem.material, item.cost))
         val team = plugin.gameManager.getTeamOfPlayer(player)
         player.sendMessage("${ChatColor.GREEN}You purchased ${ChatColor.GOLD}${item.displayname}!")
-        removeSword(item.item.material)
         player.giveItem(item.item.toItemStack(team?.color))
         player.playBoughtSound()
         game.upgradesManager.applyUpgrades(player)
@@ -309,30 +305,30 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin,
             if (item.defaultOnSpawn) {
                 continue
             }
-            menu.setItem(item.slot, formatItem(item).asGuiItem {
+            menu.setItem(item.slot, formatItem(item).asNewGuiItem {
                 if (it.isShiftClick) {
                     if (getBuySlots().none { i ->
                             plugin.dataFileManager.getQuickBuySlot(i, player.uniqueId) == null
                         }) {
                         player.sendMessage("${ChatColor.RED}You have no available Quick Buy slots!")
-                        return@asGuiItem
+                        return@asNewGuiItem
                     }
                     if (isSettingQuickBuy) {
                         checkIfSettingQuickBuy()
-                        return@asGuiItem
+                        return@asNewGuiItem
                     }
                     showQuickBuy()
                     isSettingQuickBuy = true
                     quickBuyItem = item
                     player.sendMessage("${ChatColor.GREEN}Setting Quick Buy!")
-                    return@asGuiItem
+                    return@asNewGuiItem
                 }
                 if (item.permanent) {
                     if (player.inventory.getAllContents().toList().filterNotNull().any { i ->
                             i.type == item.item.material
                         }) {
                         player.sendMessage("${ChatColor.RED}You already have that item!")
-                        return@asGuiItem
+                        return@asNewGuiItem
                     }
                 }
                 onClick(item, it, item.itemCategory.getShowMethod())
@@ -379,13 +375,6 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin,
 
     fun showUtility() {
         showShopScreen(8, "Utility", ItemType.UTILITY)
-    }
-
-    private fun removeSword(item: Material) {
-        if (!item.isWeapon()) {
-            return
-        }
-        player.inventory.remove(Material.WOOD_SWORD)
     }
 
     enum class ItemType {

@@ -21,6 +21,7 @@ package me.dkim19375.bedwars.plugin
 import com.alessiodp.parties.api.Parties
 import com.alessiodp.parties.api.interfaces.PartiesAPI
 import com.comphenix.protocol.ProtocolLibrary
+import com.google.gson.GsonBuilder
 import com.onarandombox.MultiverseCore.MultiverseCore
 import com.onarandombox.MultiverseCore.api.MVWorldManager
 import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion
@@ -64,27 +65,59 @@ val NEW_SOUND: Boolean = MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_
 
 @Suppress("MemberVisibilityCanBePrivate")
 class BedwarsPlugin : CoreJavaPlugin() {
-    val mainConfigManager = MainConfigManager(this)
+    val mainConfigManager: MainConfigManager by lazy { MainConfigManager(this) }
     val shopConfigManager = ShopConfigManager(this)
     val shopFile = ConfigFile(this, "shop.yml")
     val gameDataFiles = mutableMapOf<String, JsonFile<GameData>>()
     val userCache: MutableMap<String, UUID> = Collections.synchronizedMap(mutableMapOf<String, UUID>())
-    lateinit var gameManager: GameManager
-        private set
-    lateinit var mainDataFile: JsonFile<MainDataFile>
-        private set
-    lateinit var dataFileManager: DataFileManager
-        private set
-    lateinit var scoreboardManager: ScoreboardManager
-        private set
-    lateinit var packetManager: PacketManager
-        private set
-    lateinit var partiesListeners: PartiesListeners
-        private set
+    val mainDataFile: JsonFile<MainDataFile> by lazy {
+        val current = try {
+            File(dataFolder, "data/data.json").path.reader().use {
+                GsonBuilder()
+                    .setPrettyPrinting()
+                    .apply {
+                        jsonSerializers.forEach(this::registerTypeHierarchyAdapter)
+                    }.create().fromJson(it, MainDataFile::class.java)
+            }
+        } catch (t: Throwable) {
+            t.printStackTrace()
+            null
+        }
+        logInfo("current: $current")
+        JsonFile(
+            type = MainDataFile::class,
+            fileName = File(dataFolder, "data/data.json").path,
+            prettyPrinting = true,
+            typeAdapters = jsonSerializers,
+            default = { MainDataFile() }
+        )
+    }
+    val gameManager: GameManager by lazy { GameManager(this) }
+    val dataFileManager: DataFileManager by lazy { DataFileManager(this) }
+    val scoreboardManager: ScoreboardManager by lazy { ScoreboardManager(this) }
+    val packetManager: PacketManager by lazy { PacketManager(this) }
+    val partiesListeners: PartiesListeners by lazy { PartiesListeners(this) }
     var worldManager: MVWorldManager? = null
         private set
-    lateinit var mainWorld: String
-        private set
+    val mainWorld: String by lazy {
+        val properties = Properties()
+        val catch = { e: Throwable ->
+            e.printStackTrace()
+            "world"
+        }
+        return@lazy try {
+            FileInputStream("server.properties").use { stream ->
+                properties.load(stream)
+                properties.getProperty("level-name", "world")
+            }
+        } catch (e: IOException) {
+            catch(e)
+        } catch (e: SecurityException) {
+            catch(e)
+        } catch (e: IllegalArgumentException) {
+            catch(e)
+        }
+    }
 
     var partiesAPI: PartiesAPI? = null
 
@@ -107,23 +140,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
                 }ms!"
             )
             BedwarsAPIProvider.register(BedwarsAPIImpl(this))
-            val properties = Properties()
-            val catch = { e: Throwable ->
-                e.printStackTrace()
-                mainWorld = "world"
-            }
-            try {
-                FileInputStream("server.properties").use { stream ->
-                    properties.load(stream)
-                    mainWorld = properties.getProperty("level-name", "world")
-                }
-            } catch (e: IOException) {
-                catch(e)
-            } catch (e: SecurityException) {
-                catch(e)
-            } catch (e: IllegalArgumentException) {
-                catch(e)
-            }
+            mainWorld
             initNBTVariables(this)
             NBTInjector.inject()
             ScoreboardLib.setPluginInstance(this)
@@ -161,7 +178,6 @@ class BedwarsPlugin : CoreJavaPlugin() {
             val name = file.toPath().nameWithoutExtension
             val world = Bukkit.getWorld(name) ?: continue
             val data = GameBuilder(world).build(true) ?: continue
-            Bukkit.broadcastMessage("Data: $data")
             val newData = JsonFile(
                 type = GameData::class,
                 fileName = file.path,
@@ -197,21 +213,14 @@ class BedwarsPlugin : CoreJavaPlugin() {
     private fun initVariables() {
         hookOntoLib("Parties", false) { _: BedwarsPlugin -> partiesAPI = Parties.getApi() }
         hookOntoLib("Multiverse-Core") { pl: MultiverseCore -> worldManager = pl.mvWorldManager }
-        mainDataFile = JsonFile(
-            type = MainDataFile::class,
-            fileName = File(dataFolder, "data/data.json").path,
-            prettyPrinting = true,
-            typeAdapters = jsonSerializers,
-            default = { MainDataFile() }
-        )
         registerConfig(mainConfigManager)
         registerConfig(mainDataFile)
         registerConfig(shopFile)
-        dataFileManager = DataFileManager(this)
-        gameManager = GameManager(this)
-        scoreboardManager = ScoreboardManager(this)
-        packetManager = PacketManager(this)
-        partiesListeners = PartiesListeners(this)
+        dataFileManager
+        gameManager
+        scoreboardManager
+        packetManager
+        partiesListeners
     }
 
     private fun registerCommands() {

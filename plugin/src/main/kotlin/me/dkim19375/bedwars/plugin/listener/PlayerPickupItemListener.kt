@@ -22,9 +22,10 @@ import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.NEW_SOUND
 import me.dkim19375.bedwars.plugin.config.MainConfigSettings
 import me.dkim19375.bedwars.plugin.enumclass.SpawnerType
-import me.dkim19375.bedwars.plugin.util.getPlayers
 import me.dkim19375.bedwars.plugin.util.giveItem
 import me.dkim19375.bedwars.plugin.util.isDrop
+import me.dkim19375.bedwars.plugin.util.setDrop
+import me.dkim19375.dkimbukkitcore.function.getPlayers
 import me.dkim19375.dkimbukkitcore.function.playSound
 import org.bukkit.Bukkit
 import org.bukkit.Sound
@@ -34,7 +35,7 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerPickupItemEvent
 import java.util.*
-import kotlin.random.Random
+import kotlin.random.Random.Default.nextDouble
 
 class PlayerPickupItemListener(private val plugin: BedwarsPlugin) : Listener {
     private val collected = mutableSetOf<UUID>()
@@ -46,8 +47,13 @@ class PlayerPickupItemListener(private val plugin: BedwarsPlugin) : Listener {
             isCancelled = true
             return
         }
+        item.pickupDelay = Int.MAX_VALUE
         val itemStack = item.itemStack.clone()
-        val isDrop = item.isDrop()
+        val isDrop = item.isDrop().let {
+            it.second.remove()
+            it.first
+        }
+        item.setDrop(false).remove()
         isCancelled = true
         collected.add(item.uniqueId)
         Bukkit.getScheduler().runTask(plugin) {
@@ -68,9 +74,8 @@ class PlayerPickupItemListener(private val plugin: BedwarsPlugin) : Listener {
         }).plus(player.uniqueId).toSet().getPlayers()
         val sound = if (NEW_SOUND) Sound.valueOf("ENTITY_ITEM_PICKUP") else Sound.ITEM_PICKUP
         for (loopPlayer in players) {
-            Bukkit.broadcastMessage("Gave player ${loopPlayer.name} item ${itemStack.type.name} (${itemStack.amount})")
             loopPlayer.giveItem(itemStack.clone())
-            loopPlayer.playSound(sound, 0.2f, Random.nextDouble(1.0, 2.5).coerceAtMost(2.0).toFloat())
+            loopPlayer.playSound(sound, 0.2f, nextDouble(1.0, 2.5).coerceAtMost(2.0).toFloat())
             plugin.packetManager.collectItem(item, loopPlayer)
         }
     }

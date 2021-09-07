@@ -30,7 +30,6 @@ import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.kyori.adventure.title.Title
 import net.kyori.adventure.util.Ticks
-import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.Material
@@ -42,7 +41,6 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
 import org.bukkit.permissions.Permissible
 import org.bukkit.plugin.java.JavaPlugin
-import java.util.*
 import kotlin.math.ceil
 
 private val plugin: BedwarsPlugin by lazy { JavaPlugin.getPlugin(BedwarsPlugin::class.java) }
@@ -140,8 +138,6 @@ fun PlayerInventory.containsWeapon(): Boolean = getAllContents()
     .filterNotNull()
     .map(ItemStack::getType)
     .any(Material::isWeapon)
-
-fun Set<UUID>.getPlayers(): Set<Player> = mapNotNull(Bukkit::getPlayer).toSet()
 
 fun Set<Player>.getUsernames() = map(Player::getName).toSet()
 

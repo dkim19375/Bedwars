@@ -52,6 +52,9 @@ class DataFileManager(private val plugin: BedwarsPlugin) {
     fun setQuickBuySlot(slot: Int, player: UUID, item: MainShopConfigItem?) {
         if (item == null) {
             data.quickBuySlots.getOrPut(player) { mutableMapOf() }.remove(slot)
+            if (data.quickBuySlots[player]?.isEmpty() == true) {
+                data.quickBuySlots.remove(player)
+            }
             save = true
             return
         }

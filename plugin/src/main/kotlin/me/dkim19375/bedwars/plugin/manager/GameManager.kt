@@ -25,8 +25,8 @@ import me.dkim19375.bedwars.plugin.builder.GameBuilder
 import me.dkim19375.bedwars.plugin.config.MainConfigSettings
 import me.dkim19375.bedwars.plugin.data.GameData
 import me.dkim19375.bedwars.plugin.util.getIgnoreCase
-import me.dkim19375.bedwars.plugin.util.getPlayers
 import me.dkim19375.bedwars.plugin.util.sendActionBar
+import me.dkim19375.dkimbukkitcore.function.getPlayers
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.World

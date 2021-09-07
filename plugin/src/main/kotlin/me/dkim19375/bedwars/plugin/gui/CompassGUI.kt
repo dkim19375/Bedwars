@@ -57,7 +57,7 @@ class CompassGUI(private val player: Player, private val game: BedwarsGame) {
                 " ",
                 "${ChatColor.YELLOW}Click to open!"
             )).addAllFlags()
-            .asGuiItem {
+            .asNewGuiItem {
                 TrackerGUI(player, game).showPlayer()
             }
         menu.setItem(2, 5, shopItem)

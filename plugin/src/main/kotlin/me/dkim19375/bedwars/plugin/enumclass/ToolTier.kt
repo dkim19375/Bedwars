@@ -20,43 +20,52 @@ package me.dkim19375.bedwars.plugin.enumclass
 
 import me.dkim19375.bedwars.plugin.util.getAllContents
 import me.dkim19375.bedwars.plugin.util.isTool
+import me.dkim19375.bedwars.plugin.util.isWeapon
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
 
-enum class ToolTier(val pickaxe: Material, val axe: Material, val tier: Int) {
-    WOOD(Material.WOOD_PICKAXE, Material.WOOD_AXE, 1),
-    STONE(Material.STONE_PICKAXE, Material.STONE_AXE, 2),
-    IRON(Material.IRON_PICKAXE, Material.IRON_AXE, 3),
-    DIAMOND(Material.DIAMOND_PICKAXE, Material.DIAMOND_AXE, 4);
+enum class ToolTier(val pickaxe: Material, val axe: Material, val sword: Material, val tier: Int) {
+    WOOD(Material.WOOD_PICKAXE, Material.WOOD_AXE, Material.WOOD_SWORD, 1),
+    STONE(Material.STONE_PICKAXE, Material.STONE_AXE, Material.STONE_SWORD, 2),
+    IRON(Material.IRON_PICKAXE, Material.IRON_AXE, Material.IRON_SWORD, 3),
+    DIAMOND(Material.DIAMOND_PICKAXE, Material.DIAMOND_AXE, Material.DIAMOND_SWORD, 4);
 }
 
-fun Material.getToolTier(): Pair<ToolTier, Boolean>? {
+fun Material.getToolTier(): Pair<ToolTier, ToolType>? {
     for (tier in ToolTier.values()) {
         if (tier.pickaxe == this) {
-            return tier to true
+            return tier to ToolType.PICKAXE
         }
         if (tier.axe == this) {
-            return tier to false
+            return tier to ToolType.AXE
+        }
+        if (tier.sword == this) {
+            return tier to ToolType.SWORD
         }
     }
     return null
 }
 
-fun PlayerInventory.getToolTier(): Pair<ToolTier?, ToolTier?> {
-    var pickaxe: ToolTier? = null
-    var axe: ToolTier? = null
-    for (item in getAllContents().filterNotNull().map(ItemStack::getType).filter(Material::isTool)) {
+fun PlayerInventory.getToolTier(): Map<ToolType, ToolTier> {
+    val map = mutableMapOf<ToolType, ToolTier>()
+    for (item in getAllContents().filterNotNull().map(ItemStack::getType)
+        .filter { it.isTool() || it.isWeapon() }) {
         val newTier = item.getToolTier() ?: continue
-        if (newTier.second) {
-            if (pickaxe == null || pickaxe.tier < newTier.first.tier) {
-                pickaxe = newTier.first
+        val pickaxe = map[ToolType.PICKAXE]
+        val axe = map[ToolType.AXE]
+        val sword = map[ToolType.SWORD]
+        when (newTier.second) {
+            ToolType.PICKAXE -> if (pickaxe == null || pickaxe.tier < newTier.first.tier) {
+                map[ToolType.PICKAXE] = newTier.first
             }
-            continue
-        }
-        if (axe == null || axe.tier < newTier.first.tier) {
-            axe = newTier.first
+            ToolType.AXE -> if (axe == null || axe.tier < newTier.first.tier) {
+                map[ToolType.AXE] = newTier.first
+            }
+            ToolType.SWORD -> if (sword == null || sword.tier < newTier.first.tier) {
+                map[ToolType.SWORD] = newTier.first
+            }
         }
     }
-    return pickaxe to axe
+    return map
 }

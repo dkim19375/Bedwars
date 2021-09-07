@@ -57,4 +57,4 @@ fun ItemStack.setUnbreakable(unbreakable: Boolean): ItemStack = nbtUtils.setUnbr
 
 fun Item.setDrop(drop: Boolean): Item = nbtUtils.setDrop(this, drop)
 
-fun Item.isDrop(): Boolean = nbtUtils.isDrop(this)
+fun Item.isDrop(): Pair<Boolean, Item> = nbtUtils.isDrop(this)

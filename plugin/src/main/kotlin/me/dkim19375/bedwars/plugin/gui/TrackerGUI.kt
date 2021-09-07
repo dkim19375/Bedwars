@@ -71,12 +71,12 @@ class TrackerGUI(private val player: Player, private val game: BedwarsGame) {
                             "${ChatColor.RED}You do not have enough ${MainShopGUI.CostType.EMERALD.color}Emeralds!"
                         }
                     ).addAllFlags()
-                    .asGuiItem {
+                    .asNewGuiItem {
                         val amount = player.getItemAmount(Material.EMERALD)
                         if (amount < 2) {
                             player.sendMessage("${ChatColor.RED}You need ${2 - amount} more Emeralds!")
                             player.playErrorSound()
-                            return@asGuiItem
+                            return@asNewGuiItem
                         }
                         player.sendMessage("${ChatColor.GREEN}You purchased ${ChatColor.GOLD}${team.displayName} Tracking")
                         player.sendMessage("${ChatColor.RED}You will lose ability to track this team when you die!")

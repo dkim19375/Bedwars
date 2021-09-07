@@ -94,4 +94,10 @@ data class StatisticsData(
         }
         return (toDouble() / other.toDouble()).setDecimalPlaces(15)
     }
+
+    override fun toString(): String {
+        return "StatisticsData(kills=$kills, finalKills=$finalKills, deaths=$deaths, finalDeaths=$finalDeaths, wins=$wins, losses=$losses, bedsBroken=$bedsBroken)"
+    }
+
+
 }

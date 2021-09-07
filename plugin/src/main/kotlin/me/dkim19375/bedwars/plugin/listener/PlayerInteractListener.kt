@@ -70,12 +70,10 @@ class PlayerInteractListener(private val plugin: BedwarsPlugin) : Listener {
     }
 
     private fun PlayerInteractEvent.gameOverItems(game: BedwarsGame) {
-        // Bukkit.broadcastMessage("1, item: ${item?.type?.name}")
         item ?: return
         if (!game.eliminated.contains(player.uniqueId) && game.state != GameState.GAME_END) {
             return
         }
-        // Bukkit.broadcastMessage("2, item: ${item?.type?.name}")
         when (material) {
             Material.COMPASS -> TeleporterGUI(player, game).showPlayer()
             Material.PAPER -> {
@@ -85,7 +83,6 @@ class PlayerInteractListener(private val plugin: BedwarsPlugin) : Listener {
             Material.BED -> game.leavePlayer(player)
             else -> return
         }
-        // Bukkit.broadcastMessage("3, item: ${item?.type?.name}")
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

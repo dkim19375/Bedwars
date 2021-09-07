@@ -18,28 +18,36 @@
 
 package me.dkim19375.bedwars.plugin.serializer
 
-import com.google.gson.*
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonToken
+import com.google.gson.stream.JsonWriter
 import org.bukkit.Bukkit
 import org.bukkit.World
-import java.lang.reflect.Type
 
-class WorldSerializer : JsonSerializer<World>,
-    JsonDeserializer<World> {
-    override fun serialize(
-        src: World,
-        typeOfSrc: Type,
-        context: JsonSerializationContext,
-    ): JsonElement {
-        val obj = JsonObject()
-        obj.addProperty("name", src.name)
-        return obj
+class WorldSerializer : TypeAdapter<World>() {
+    override fun write(out: JsonWriter, value: World?) {
+        value ?: return
+        out.beginObject()
+        out.name("name")
+        out.value(value.name)
+        out.endObject()
     }
 
-    override fun deserialize(
-        json: JsonElement,
-        typeOfT: Type,
-        context: JsonDeserializationContext,
-    ): World {
-        return Bukkit.getWorld(json.asJsonObject.get("name").asString) ?: throw IllegalArgumentException("unknown world")
+    @Suppress("DuplicatedCode")
+    override fun read(input: JsonReader): World {
+        input.beginObject()
+        var name: String? = null
+        while (input.hasNext()) {
+            if (input.peek() == JsonToken.NAME) {
+                if (input.nextName() == "name") {
+                    name = input.nextString()
+                    break
+                }
+                input.skipValue()
+            }
+        }
+        input.endObject()
+        return Bukkit.getWorld(name) ?: throw IllegalArgumentException("unknown world")
     }
 }

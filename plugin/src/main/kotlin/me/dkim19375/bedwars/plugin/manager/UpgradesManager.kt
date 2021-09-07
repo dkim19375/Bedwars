@@ -25,6 +25,7 @@ import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.config.MainConfigSettings
 import me.dkim19375.bedwars.plugin.enumclass.TrapType
 import me.dkim19375.bedwars.plugin.util.*
+import me.dkim19375.dkimbukkitcore.function.getPlayers
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.enchantments.Enchantment

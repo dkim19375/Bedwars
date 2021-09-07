@@ -15,7 +15,6 @@ slimJar {
     relocate 'reactor', "${basePackage}.reactor"
     relocate 'net.kyori', "${basePackage}.kyori"
     relocate 'javassist', "${basePackage}.javassist"
-    relocate 'com.google.gson', "${basePackage}.gson"
     relocate 'io.github.slimjar', "${basePackage}.slimjar"
     relocate 'org.yaml.snakeyaml', "${basePackage}.snakeyaml"
     relocate 'dev.triumphteam.gui', "${basePackage}.triumphgui"
@@ -63,7 +62,6 @@ final dependencyStrings = [
         'de.tr7zw:nbt-injector:2.8.0',
         'commons-io:commons-io:2.11.0',
         'net.kyori:adventure-api:4.8.1',
-        'com.google.code.gson:gson:2.8.8',
         'org.jetbrains:annotations:22.0.0',
         'dev.triumphteam:triumph-gui:3.0.3',
         'me.mattstudios:triumph-config:1.0.5-SNAPSHOT',

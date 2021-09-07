@@ -21,7 +21,9 @@ package me.dkim19375.bedwars.plugin.util
 import dev.triumphteam.gui.builder.item.BaseItemBuilder
 import dev.triumphteam.gui.builder.item.ItemBuilder
 import dev.triumphteam.gui.builder.item.SkullBuilder
+import dev.triumphteam.gui.guis.GuiItem
 import org.bukkit.ChatColor
+import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 
@@ -48,3 +50,8 @@ fun <B : BaseItemBuilder<out B>> BaseItemBuilder<out B>.addAllFlags(): B = ItemF
     .minus(listOf(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_POTION_EFFECTS))
     .map { flags(it) }
     .first()
+
+fun BaseItemBuilder<*>.asNewGuiItem(action: (InventoryClickEvent) -> Unit = {}): GuiItem = asGuiItem {
+    it.isCancelled = true
+    action(it)
+}

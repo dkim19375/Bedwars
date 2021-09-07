@@ -75,7 +75,6 @@ class SpawnerManager(private val plugin: BedwarsPlugin, private val game: Bedwar
                         spawner.location.z)
                     val item = loc.world.dropItem(loc, ItemStack(spawner.type.material)).setDrop(true)
                     val entities = item.getNearbyEntities(4.0, 4.0, 4.0)
-                    Bukkit.broadcastMessage("Going to drop ${spawner.type.name}")
                     var amount = 0
                     for (entity in entities) {
                         val itemEntity = entity as? Item ?: continue
@@ -83,9 +82,7 @@ class SpawnerManager(private val plugin: BedwarsPlugin, private val game: Bedwar
                             amount += itemEntity.itemStack.amount
                         }
                     }
-                    Bukkit.broadcastMessage("Amount: $amount")
                     if (amount > spawner.type.maxAmount) {
-                        Bukkit.broadcastMessage("Cancelled")
                         item.remove()
                     }
                 }

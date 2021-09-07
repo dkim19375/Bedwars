@@ -20,8 +20,8 @@ package me.dkim19375.bedwars.plugin.listener
 
 import me.dkim19375.bedwars.api.enumclass.GameState
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
-import me.dkim19375.bedwars.plugin.util.getPlayers
 import me.dkim19375.bedwars.plugin.util.setGray
+import me.dkim19375.dkimbukkitcore.function.getPlayers
 import org.bukkit.ChatColor
 import org.bukkit.GameMode
 import org.bukkit.entity.Player

@@ -32,7 +32,7 @@ data class MainDataFile(
     var lobby: Location? = null,
     var editing: MutableSet<String> = mutableSetOf(),
     var statistics: MutableMap<UUID, StatisticsData> = mutableMapOf(),
-    var nameCache: MutableMap<String, UUID> = mutableMapOf()
+    var nameCache: MutableMap<String, UUID> = mutableMapOf(),
 ) {
     fun getStatistics(uuid: UUID): StatisticsData {
         Bukkit.getPlayer(uuid)?.let { player ->
@@ -53,4 +53,12 @@ data class MainDataFile(
         plugin.mainDataFile.set(this)
         plugin.mainDataFile.save()
     }
+
+    override fun toString(): String {
+        return "MainDataFile(quickBuySlots=${
+            quickBuySlots.map { (uuid, map) -> uuid to map.map { (slot, item) -> slot to item.name }.toMap() }.toMap()
+        }, lobby=$lobby, editing=$editing, statistics=$statistics, nameCache=$nameCache)"
+    }
+
+
 }

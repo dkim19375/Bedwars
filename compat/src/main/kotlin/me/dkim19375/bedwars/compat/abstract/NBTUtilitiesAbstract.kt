@@ -63,5 +63,5 @@ abstract class NBTUtilitiesAbstract {
 
     abstract fun setDrop(item: Item, drop: Boolean): Item
 
-    abstract fun isDrop(item: Item): Boolean
+    abstract fun isDrop(item: Item): Pair<Boolean, Item>
 }

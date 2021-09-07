@@ -20,7 +20,7 @@ package me.dkim19375.bedwars.plugin.listener
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.NEW_SOUND
-import me.dkim19375.bedwars.plugin.util.getPlayers
+import me.dkim19375.dkimbukkitcore.function.getPlayers
 import me.dkim19375.dkimbukkitcore.function.playSound
 import org.bukkit.Sound
 import org.bukkit.entity.EntityType

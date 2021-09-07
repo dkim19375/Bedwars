@@ -79,5 +79,7 @@ class NBTUtilities(plugin: JavaPlugin) : NBTUtilitiesAbstract() {
         return item
     }
 
-    override fun isDrop(item: Item): Boolean = item.persistentDataContainer.keys.contains(DROP_NS_KEY)
+    override fun isDrop(item: Item): Pair<Boolean, Item> = item.let {
+        it.persistentDataContainer.keys.contains(DROP_NS_KEY) to it
+    }
 }

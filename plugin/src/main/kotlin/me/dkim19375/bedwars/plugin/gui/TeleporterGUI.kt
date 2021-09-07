@@ -22,6 +22,7 @@ import dev.triumphteam.gui.builder.item.ItemBuilder
 import dev.triumphteam.gui.guis.Gui
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
 import me.dkim19375.bedwars.plugin.util.*
+import me.dkim19375.dkimbukkitcore.function.getPlayers
 import org.bukkit.ChatColor
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
@@ -60,7 +61,7 @@ class TeleporterGUI(private val player: Player, private val game: BedwarsGame) {
                     " ",
                     "Click to teleport to the player!".setGray()
                 ).addAllFlags()
-                .asGuiItem {
+                .asNewGuiItem {
                     this.player.teleport(player)
                     menu.close(this.player)
                 }

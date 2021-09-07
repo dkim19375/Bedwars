@@ -18,29 +18,37 @@
 
 package me.dkim19375.bedwars.plugin.serializer
 
-import com.google.gson.*
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonToken
+import com.google.gson.stream.JsonWriter
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.MainShopConfigItem
-import java.lang.reflect.Type
 
-class ShopConfigItemSerializer(private val plugin: BedwarsPlugin) : JsonSerializer<MainShopConfigItem>,
-    JsonDeserializer<MainShopConfigItem> {
-    override fun serialize(
-        src: MainShopConfigItem,
-        typeOfSrc: Type,
-        context: JsonSerializationContext,
-    ): JsonElement {
-        val obj = JsonObject()
-        obj.addProperty("name", src.name)
-        return obj
+class ShopConfigItemSerializer(private val plugin: BedwarsPlugin) : TypeAdapter<MainShopConfigItem>() {
+    override fun write(out: JsonWriter, value: MainShopConfigItem?) {
+        value ?: return
+        out.beginObject()
+        out.name("name")
+        out.value(value.name)
+        out.endObject()
     }
 
-    override fun deserialize(
-        json: JsonElement,
-        typeOfT: Type,
-        context: JsonDeserializationContext,
-    ): MainShopConfigItem {
-        return plugin.shopConfigManager.getItemFromName(json.asJsonObject.get("name").asString)
+    @Suppress("DuplicatedCode")
+    override fun read(input: JsonReader): MainShopConfigItem {
+        input.beginObject()
+        var name: String? = null
+        while (input.hasNext()) {
+            if (input.peek() == JsonToken.NAME) {
+                if (input.nextName() == "name") {
+                    name = input.nextString()
+                    break
+                }
+                input.skipValue()
+            }
+        }
+        input.endObject()
+        return name?.let(plugin.shopConfigManager::getItemFromName)
             ?: throw IllegalStateException("Property \"name\" could not be found during deserialization!")
     }
 }

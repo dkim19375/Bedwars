@@ -25,7 +25,7 @@ import me.dkim19375.bedwars.api.enumclass.GameState
 import me.dkim19375.bedwars.api.enumclass.Result
 import me.dkim19375.bedwars.api.enumclass.Team
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
-import me.dkim19375.bedwars.plugin.util.getPlayers
+import me.dkim19375.dkimbukkitcore.function.getPlayers
 import me.dkim19375.dkimcore.extension.toImmutableMap
 import me.dkim19375.dkimcore.extension.toImmutableSet
 import org.bukkit.Bukkit

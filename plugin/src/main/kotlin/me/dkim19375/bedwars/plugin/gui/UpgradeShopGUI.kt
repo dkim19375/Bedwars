@@ -93,7 +93,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
                     "${ChatColor.GRAY}number of traps queued.",
                     "${ChatColor.GRAY}Next trap: ${ChatColor.AQUA}$number Diamond${if (number == 1) "" else "s"}"
                 ).addAllFlags()
-                .asGuiItem { event ->
+                .asNewGuiItem { event ->
                     event.isCancelled = true
                     showMainScreen()
                 }
@@ -136,7 +136,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
             .name("${ChatColor.GREEN}Trap #$number: ${trapType.displayName} Trap")
             .lore(lore)
             .addAllFlags()
-            .asGuiItem { event ->
+            .asNewGuiItem { event ->
                 event.isCancelled = true
                 showMainScreen()
             }
@@ -155,7 +155,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
                 .setName("${ChatColor.DARK_GRAY}\u2191 ${ChatColor.GRAY}Purchasable")
                 .setLore("${ChatColor.DARK_GRAY}\u2193 ${ChatColor.GRAY}Traps Queue")
                 .addAllFlags()
-                .asGuiItem {
+                .asNewGuiItem {
                     it.isCancelled = true
                 }
         )
@@ -237,23 +237,23 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
                     " ",
                     "${ChatColor.YELLOW}Click to browse!"
                 ).addAllFlags()
-            menu.setItem(2, 3, sharpSword.asGuiItem { event ->
+            menu.setItem(2, 3, sharpSword.asNewGuiItem { event ->
                 event.isCancelled = true
                 onClick(UpgradeType.SHARPNESS)
             })
-            menu.setItem(2, 4, armor.asGuiItem { event ->
+            menu.setItem(2, 4, armor.asNewGuiItem { event ->
                 event.isCancelled = true
                 onClick(UpgradeType.PROTECTION)
             })
-            menu.setItem(2, 5, maniacMiner.asGuiItem { event ->
+            menu.setItem(2, 5, maniacMiner.asNewGuiItem { event ->
                 event.isCancelled = true
                 onClick(UpgradeType.HASTE)
             })
-            menu.setItem(2, 6, healPoolItem.asGuiItem { event ->
+            menu.setItem(2, 6, healPoolItem.asNewGuiItem { event ->
                 event.isCancelled = true
                 onClick(UpgradeType.HEAL_POOL)
             })
-            menu.setItem(2, 7, buyTrapItem.asGuiItem { event ->
+            menu.setItem(2, 7, buyTrapItem.asNewGuiItem { event ->
                 event.isCancelled = true
                 showTrapScreen()
             })
@@ -347,7 +347,7 @@ class UpgradeShopGUI(private val player: Player, private val team: Team, private
         .name("${ChatColor.RED}$name")
         .lore(firstLore.plus(getCostList(cost, hasEnough)))
         .addAllFlags()
-        .asGuiItem {
+        .asNewGuiItem {
             it.isCancelled = true
             onTrapClick(type)
             showTrapScreen()

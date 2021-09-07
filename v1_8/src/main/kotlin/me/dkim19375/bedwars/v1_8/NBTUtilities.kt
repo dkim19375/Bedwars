@@ -84,5 +84,7 @@ class NBTUtilities : NBTUtilitiesAbstract() {
         }
     }
 
-    override fun isDrop(item: Item): Boolean = item.getNBT().second.keys.contains(DROP_KEY)
+    override fun isDrop(item: Item): Pair<Boolean, Item> = item.getNBT().let {
+        it.second.keys.contains(DROP_KEY) to it.first
+    }
 }

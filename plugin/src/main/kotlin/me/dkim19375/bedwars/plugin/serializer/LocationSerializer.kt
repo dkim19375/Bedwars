@@ -18,40 +18,90 @@
 
 package me.dkim19375.bedwars.plugin.serializer
 
-import com.google.gson.*
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonToken
+import com.google.gson.stream.JsonWriter
 import org.bukkit.Bukkit
 import org.bukkit.Location
-import java.lang.reflect.Type
 
-class LocationSerializer : JsonSerializer<Location>,
-    JsonDeserializer<Location> {
-    override fun serialize(
-        src: Location,
-        typeOfSrc: Type,
-        context: JsonSerializationContext,
-    ): JsonElement {
-        val obj = JsonObject()
-        obj.addProperty("world", src.world.name)
-        obj.addProperty("x", src.x)
-        obj.addProperty("y", src.y)
-        obj.addProperty("z", src.z)
-        obj.addProperty("yaw", src.yaw)
-        obj.addProperty("pitch", src.pitch)
-        return obj
+class LocationSerializer : TypeAdapter<Location>() {
+    override fun write(out: JsonWriter, value: Location?) {
+        value ?: return
+        out.beginObject()
+        out.name("world")
+        out.value(value.world.name)
+        out.name("x")
+        out.value(value.x)
+        out.name("y")
+        out.value(value.y)
+        out.name("z")
+        out.value(value.z)
+        out.name("yaw")
+        out.value(value.yaw)
+        out.name("pitch")
+        out.value(value.pitch)
+        out.endObject()
     }
 
-    override fun deserialize(
-        json: JsonElement,
-        typeOfT: Type,
-        context: JsonDeserializationContext,
-    ): Location {
-        val obj = json.asJsonObject
-        val world = Bukkit.getWorld(obj.get("world").asString) ?: throw IllegalArgumentException("unknown world")
-        return Location(world,
-            obj.getAsJsonPrimitive("x").asDouble,
-            obj.getAsJsonPrimitive("y").asDouble,
-            obj.getAsJsonPrimitive("z").asDouble,
-            obj.getAsJsonPrimitive("yaw").asFloat,
-            obj.getAsJsonPrimitive("pitch").asFloat)
+    override fun read(input: JsonReader): Location {
+        input.beginObject()
+        var world: String? = null
+        var x: Double? = null
+        var y: Double? = null
+        var z: Double? = null
+        var yaw: Float? = null
+        var pitch: Float? = null
+        var fieldName: String? = null
+        @Suppress("UNUSED_VALUE") // idk im just following the tutorial
+        while (input.hasNext()) {
+            var token = input.peek()
+            if (token == JsonToken.NAME) {
+                fieldName = input.nextName()
+            }
+            if (fieldName == "world") {
+                token = input.peek()
+                world = input.nextString()
+                continue
+            }
+            if (fieldName == "x") {
+                token = input.peek()
+                x = input.nextDouble()
+                continue
+            }
+            if (fieldName == "y") {
+                token = input.peek()
+                y = input.nextDouble()
+                continue
+            }
+            if (fieldName == "z") {
+                token = input.peek()
+                z = input.nextDouble()
+                continue
+            }
+            if (fieldName == "yaw") {
+                token = input.peek()
+                yaw = input.nextDouble().toFloat()
+                continue
+            }
+            if (fieldName == "pitch") {
+                token = input.peek()
+                pitch = input.nextDouble().toFloat()
+                continue
+            }
+            input.skipValue()
+        }
+        input.endObject()
+        val couldNotBeFound: (String) -> String = { name: String ->
+            "Property \"$name\" could not be found during deserialization!"
+        }
+        world ?: throw IllegalStateException(couldNotBeFound("world"))
+        x ?: throw IllegalStateException(couldNotBeFound("x"))
+        y ?: throw IllegalStateException(couldNotBeFound("y"))
+        z ?: throw IllegalStateException(couldNotBeFound("z"))
+        yaw ?: throw IllegalStateException(couldNotBeFound("yaw"))
+        @Suppress("UNUSED_VALUE")
+        pitch ?: throw IllegalStateException(couldNotBeFound("pitch"))
+        return Location(Bukkit.getWorld(world), x, y, z, yaw, pitch)
     }
 }
