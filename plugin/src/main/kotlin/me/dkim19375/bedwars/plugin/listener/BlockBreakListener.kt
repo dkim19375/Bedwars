@@ -20,6 +20,7 @@ package me.dkim19375.bedwars.plugin.listener
 
 import me.dkim19375.bedwars.api.enumclass.GameState
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
+import me.dkim19375.bedwars.plugin.config.MainConfigSettings
 import me.dkim19375.bedwars.plugin.util.getBedHead
 import me.dkim19375.bedwars.plugin.util.isBed
 import me.dkim19375.bedwars.plugin.util.setConfigItem
@@ -43,8 +44,8 @@ class BlockBreakListener(private val plugin: BedwarsPlugin) : Listener {
         }
         if (!block.type.isBed()) {
             val loc = LocationWrapper(block.location)
-            if (loc in game.placedBlocks) {
-                val configItem = game.placedBlocks[loc]
+            if (loc in game.placedBlocks || !plugin.mainConfigManager.get(MainConfigSettings.MAP_PROTECTION)) {
+                val configItem = game.placedBlocks[loc] ?: return
                 isCancelled = true
                 block.drops.forEach { block.world.dropItem(block.location, it.setConfigItem(configItem)) }
                 block.type = Material.AIR

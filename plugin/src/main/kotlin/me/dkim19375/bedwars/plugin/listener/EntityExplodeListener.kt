@@ -19,6 +19,7 @@
 package me.dkim19375.bedwars.plugin.listener
 
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
+import me.dkim19375.bedwars.plugin.config.MainConfigSettings
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
 import me.dkim19375.dkimbukkitcore.data.toWrapper
 import org.bukkit.Location
@@ -64,7 +65,7 @@ class EntityExplodeListener(private val plugin: BedwarsPlugin) : Listener {
         val materials = Material.values().toSet()
             .minus(listOf(Material.GLASS, Material.STAINED_GLASS, Material.BED, Material.BED_BLOCK))
         for (block in blockList.toList()) {
-            if (block.location?.toWrapper() !in game.placedBlocks) {
+            if (block.location?.toWrapper() !in game.placedBlocks && plugin.mainConfigManager.get(MainConfigSettings.MAP_PROTECTION)) {
                 blockList.remove(block)
                 continue
             }
@@ -90,7 +91,7 @@ class EntityExplodeListener(private val plugin: BedwarsPlugin) : Listener {
     }
 
     private fun shouldBeRemoved(block: Block, game: BedwarsGame): Boolean {
-        if (block.location?.toWrapper() !in game.placedBlocks) {
+        if (block.location?.toWrapper() !in game.placedBlocks && plugin.mainConfigManager.get(MainConfigSettings.MAP_PROTECTION)) {
             return false
         }
         if (block.type in setOf(Material.BED_BLOCK, Material.BED, Material.GLASS, Material.STAINED_GLASS)) {

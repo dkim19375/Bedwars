@@ -80,6 +80,10 @@ object MainConfigSettings : SettingsHolder {
     @Path("trap.cooldown")
     val TRAP_COOLDOWN: Property<Int> = Property.create(20)
 
+    // map
+    @Path("map.protection")
+    val MAP_PROTECTION: Property<Boolean> = Property.create(true)
+
     override fun registerComments(conf: CommentsConfiguration) {
         conf.setComment(
             "tab.hide-players",
