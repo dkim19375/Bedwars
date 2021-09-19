@@ -29,6 +29,7 @@ import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.Entity
+import org.bukkit.entity.EntityType
 import org.bukkit.entity.Item
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -37,6 +38,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.material.Bed
+import org.bukkit.material.SpawnEgg
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.potion.Potion
 import java.util.*
@@ -135,18 +137,17 @@ fun ItemStack.toPotion(): Potion? = try {
 
 fun ItemStack.getWrapper(potionDuration: Int = 900, configItem: String? = null): ItemWrapper {
     val potion = toPotion()
-    if (potion != null) {
-        return ItemWrapper(
-            material = type,
-            amount = amount,
-            potionType = potion.type,
-            configItem = configItem,
-            potionAmplifier = potion.level + 1,
-            potionDuration = potionDuration,
-            enchants = enchantments.toMap()
-        )
-    }
-    return ItemWrapper(type, amount, null, configItem, 1, potionDuration, enchantments.toMap())
+    return ItemWrapper(
+        material = type,
+        amount = amount,
+        potionType = potion?.type,
+        configItem = configItem,
+        potionAmplifier = potion?.level?.plus(1) ?: 1,
+        potionDuration = potionDuration,
+        enchants = enchantments.toMap(),
+        lore = itemMeta?.lore,
+        mobType = (data as? SpawnEgg)?.spawnedType
+    )
 }
 
 fun Material.isTool() = when (this) {
@@ -184,7 +185,7 @@ fun Location.getOppositeYaw(): Location {
 
 fun Location.update(): Location = Location(Bukkit.getWorld(world?.name), x, y, z, yaw, pitch)
 
-fun Location?.getSafeDistance(other: Location?): Double {
+fun Location?.getSafeDistance(other: Location?, ignoreHeight: Boolean = false): Double {
     this ?: return Double.MAX_VALUE
     other ?: return Double.MAX_VALUE
     if (world.name != other.world.name) {
@@ -193,9 +194,15 @@ fun Location?.getSafeDistance(other: Location?): Double {
     return try {
         distance(
             if (world.uid != other.world.uid) {
-                Location(world, other.x, other.y, other.z, other.yaw, other.pitch)
+                Location(world, other.x, if (ignoreHeight) y else other.y, other.z, other.yaw, other.pitch)
             } else {
-                other
+                if (ignoreHeight) {
+                    other.clone().apply {
+                        y = this@getSafeDistance.y
+                    }
+                } else {
+                    other
+                }
             }
         )
     } catch (_: IllegalArgumentException) {
@@ -252,4 +259,17 @@ fun checkAsync(reason: String) {
     if (!Bukkit.isPrimaryThread()) {
         throw IllegalStateException("Asynchronous $reason! (Bedwars)")
     }
+}
+
+fun ConfigurationSection.getStringListOrNull(path: String): List<String>? {
+    if (!isSet(path)) {
+        return null
+    }
+    return getStringList(path)
+}
+
+fun Material.getProjectileType(): EntityType? = when (this) {
+    Material.EGG -> EntityType.EGG
+    Material.SNOW_BALL -> EntityType.SNOWBALL
+    else -> null
 }

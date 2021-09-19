@@ -18,9 +18,13 @@
 
 package me.dkim19375.bedwars.plugin.listener
 
+import me.dkim19375.bedwars.api.enumclass.SpecialItemType
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
+import me.dkim19375.bedwars.plugin.util.Delay
+import me.dkim19375.bedwars.plugin.util.getConfigItem
 import me.dkim19375.bedwars.plugin.util.toPotion
 import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -32,6 +36,23 @@ import org.bukkit.potion.PotionEffectType
 class PotionConsumeListener(private val plugin: BedwarsPlugin) : Listener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     private fun PlayerItemConsumeEvent.onEvent() {
+        checkPotions()
+        checkMilk()
+    }
+
+    private fun PlayerItemConsumeEvent.checkMilk() {
+        val game = plugin.gameManager.getGame(player) ?: return
+        val config = item.getConfigItem() ?: return
+        if (config.specialItem != SpecialItemType.MAGIC_MILK) {
+            return
+        }
+        game.upgradesManager.magicMilk[player.uniqueId] = Bukkit.getScheduler().runTaskLater(plugin, {
+            game.upgradesManager.magicMilk.remove(player.uniqueId)
+            player.sendMessage("${ChatColor.RED}Your Magic Milk wore off!")
+        }, Delay.fromSeconds(30).ticks)
+    }
+
+    private fun PlayerItemConsumeEvent.checkPotions() {
         if (item.type != Material.POTION) {
             return
         }

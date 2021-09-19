@@ -33,6 +33,8 @@ class PlayerDeathListener(private val plugin: BedwarsPlugin) : Listener {
     @EventHandler
     private fun PlayerDeathEvent.onDeath() {
         val game = plugin.gameManager.getGame(entity) ?: return
+        game.upgradesManager.magicMilk[entity.uniqueId]?.cancel()
+        game.upgradesManager.magicMilk.remove(entity.uniqueId)
         if (game.state !in listOf(GameState.STARTED, GameState.GAME_END)) {
             return
         }

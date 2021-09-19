@@ -18,55 +18,37 @@
 
 package me.dkim19375.bedwars.plugin.data
 
+import me.dkim19375.bedwars.api.enumclass.SpecialItemType
+import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.gui.MainShopGUI
 import me.dkim19375.bedwars.plugin.util.enumValueOfOrNull
 import me.dkim19375.bedwars.plugin.util.getIntOrNull
 import me.dkim19375.dkimbukkitcore.function.logInfo
+import org.bukkit.ChatColor
 import org.bukkit.configuration.ConfigurationSection
 import java.util.logging.Level
 
 data class MainShopConfigItem(
-    val name: String, val slot: Int, val item: ItemWrapper, val cost: Int, val costItem: MainShopGUI.CostType,
-    val displayname: String?, val permanent: Boolean = false, val defaultOnSpawn: Boolean = false,
-    val itemCategory: MainShopGUI.ItemType
+    val name: String,
+    val slot: Int,
+    val item: ItemWrapper,
+    val cost: Int,
+    val costItem: MainShopGUI.CostType,
+    val itemCategory: MainShopGUI.ItemType,
+    val displayname: String? = null,
+    val permanent: Boolean = false,
+    val defaultOnSpawn: Boolean = false,
+    val downgrade: () -> MainShopConfigItem? = { null },
+    val commands: List<String> = emptyList(),
+    val cosmetic: Boolean = false,
+    val specialItem: SpecialItemType? = null
 ) {
-    @Suppress("DuplicatedCode")
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as MainShopConfigItem
-
-        if (slot != other.slot) return false
-        if (item != other.item) return false
-        if (cost != other.cost) return false
-        if (costItem != other.costItem) return false
-        if (displayname != other.displayname) return false
-        if (permanent != other.permanent) return false
-        if (defaultOnSpawn != other.defaultOnSpawn) return false
-        if (itemCategory != other.itemCategory) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = slot
-        result = 31 * result + item.hashCode()
-        result = 31 * result + cost
-        result = 31 * result + costItem.hashCode()
-        result = 31 * result + (displayname?.hashCode() ?: 0)
-        result = 31 * result + permanent.hashCode()
-        result = 31 * result + defaultOnSpawn.hashCode()
-        result = 31 * result + itemCategory.hashCode()
-        return result
-    }
-
     companion object {
         private fun logError(config: ConfigurationSection, section: String, reason: String = "does not exist!") {
             logInfo("Section ${config.name}.$section $reason", Level.SEVERE)
         }
 
-        fun deserialize(config: ConfigurationSection): MainShopConfigItem? {
+        fun deserialize(config: ConfigurationSection, plugin: BedwarsPlugin): MainShopConfigItem? {
             val row = config.getIntOrNull("row")
             val column = config.getIntOrNull("column")
             val slot = config.getIntOrNull("slot") ?: run {
@@ -82,17 +64,8 @@ data class MainShopConfigItem(
             }
             val itemWrapper = ItemWrapper.fromConfig(config) ?: return null
             val costAmount = config.getInt("cost", 1)
-            val costType = enumValueOfOrNull<MainShopGUI.CostType>(config.getString("cost-item")) ?: run {
-                logError(
-                    config,
-                    "cost-item",
-                    if (config.isSet("cost-item")) "- Invalid cost-item! Valid: (${
-                        MainShopGUI.CostType.values().map(MainShopGUI.CostType::name).joinToString()
-                    })" else "does not exist!"
-                )
-                return null
-            }
-            val displayname = config.getString("display-name")
+            val costType = enumValueOfOrNull(config.getString("cost-item")) ?: MainShopGUI.CostType.IRON
+            val name = config.getString("name")
             val permanent = config.getBoolean("permanent")
             val defaultOnSpawn = config.getBoolean("default-on-spawn")
             val type = enumValueOfOrNull<MainShopGUI.ItemType>(config.getString("item-category")) ?: run {
@@ -105,17 +78,27 @@ data class MainShopConfigItem(
                 )
                 return null
             }
+            val downgrade = config.getString("downgrade")
+            val commands = config.getStringList("commands")
+            val cosmetic = config.getBoolean("cosmetic")
+            val specialItem = SpecialItemType.fromString(config.getString("special-type"))
             return MainShopConfigItem(
                 name = config.name,
                 slot = slot,
                 item = itemWrapper,
                 cost = costAmount,
                 costItem = costType,
-                displayname = displayname,
+                itemCategory = type,
+                displayname = name,
                 permanent = permanent,
                 defaultOnSpawn = defaultOnSpawn,
-                itemCategory = type
+                downgrade = { downgrade?.let(plugin.shopConfigManager::getItemFromName) },
+                commands = commands,
+                cosmetic = cosmetic,
+                specialItem = specialItem
             )
         }
     }
+
+    fun getFriendlyName(): String = displayname ?: ChatColor.stripColor(item.name) ?: name
 }

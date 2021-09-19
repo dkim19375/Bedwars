@@ -24,6 +24,7 @@ import me.dkim19375.bedwars.compat.abstract.NBTUtilitiesAbstract
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.MainShopConfigItem
 import org.bukkit.entity.ArmorStand
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Item
 import org.bukkit.entity.LivingEntity
 import org.bukkit.inventory.ItemStack
@@ -58,3 +59,7 @@ fun ItemStack.setUnbreakable(unbreakable: Boolean): ItemStack = nbtUtils.setUnbr
 fun Item.setDrop(drop: Boolean): Item = nbtUtils.setDrop(this, drop)
 
 fun Item.isDrop(): Pair<Boolean, Item> = nbtUtils.isDrop(this)
+
+fun <T : Entity> T.disableDrops(): T = nbtUtils.disableDrops(this)
+
+fun <T : Entity> T.isDropsDisabled(): Pair<Boolean, T> = nbtUtils.isDropsDisabled(this)

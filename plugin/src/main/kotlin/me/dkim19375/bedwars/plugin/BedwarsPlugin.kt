@@ -66,13 +66,12 @@ val NEW_SOUND: Boolean = MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_
 class BedwarsPlugin : CoreJavaPlugin() {
     val mainConfigManager: MainConfigManager by lazy { MainConfigManager(this) }
     val shopConfigManager = ShopConfigManager(this)
-    val shopFile = ConfigFile(this, "shop.yml")
+    val shopFile by lazy { ConfigFile(this, "shop.yml") }
     val gameDataFiles = mutableMapOf<String, JsonFile<GameData>>()
-    val userCache: MutableMap<String, UUID> = Collections.synchronizedMap(mutableMapOf<String, UUID>())
     val mainDataFile: JsonFile<MainDataFile> by lazy {
         JsonFile(
             type = MainDataFile::class,
-            fileName = File(dataFolder, "data/data.json").path,
+            file = File(dataFolder, "data/data.json"),
             prettyPrinting = true,
             typeAdapters = jsonSerializers,
             default = { MainDataFile() }
@@ -109,9 +108,9 @@ class BedwarsPlugin : CoreJavaPlugin() {
 
     val jsonSerializers by lazy {
         mapOf<Class<*>, Any>(
-            Location::class.java to LocationSerializer(),
-            MainShopConfigItem::class.java to ShopConfigItemSerializer(this),
-            World::class.java to WorldSerializer()
+            Location::class.java to LocationSerializer().nullSafe(),
+            MainShopConfigItem::class.java to ShopConfigItemSerializer(this).nullSafe(),
+            World::class.java to WorldSerializer().nullSafe()
         )
     }
 
@@ -166,7 +165,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
             val data = GameBuilder(world).build(true) ?: continue
             val newData = JsonFile(
                 type = GameData::class,
-                fileName = file.path,
+                file = file,
                 prettyPrinting = true,
                 typeAdapters = jsonSerializers,
                 default = { data }
@@ -221,7 +220,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
             PotionConsumeListener(this), InventoryClickListener(this), PlayerPickupItemListener(this),
             WorldInitListener(this), CommandListeners(this), AsyncPlayerChatListener(this),
             PlayerCoordsChangeListener(this), EntityDamageByEntityListener(this), CraftItemListener(this),
-            PlayerInteractListener(this), ProjectileLaunchListener(this),
+            PlayerInteractListener(this), ProjectileLaunchListener(this), EntityDeathListener(),
             partiesListeners, scoreboardManager
         )
     }

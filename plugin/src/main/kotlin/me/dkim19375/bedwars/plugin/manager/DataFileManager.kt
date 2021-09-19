@@ -66,7 +66,7 @@ class DataFileManager(private val plugin: BedwarsPlugin) {
         removeGameData(data)
         val newData = JsonFile(
             type = GameData::class,
-            fileName = File(plugin.dataFolder, "data/games/${data.world.name}.json").path,
+            file = File(plugin.dataFolder, "data/games/${data.world.name}.json"),
             prettyPrinting = true,
             typeAdapters = plugin.jsonSerializers,
             default = { data }

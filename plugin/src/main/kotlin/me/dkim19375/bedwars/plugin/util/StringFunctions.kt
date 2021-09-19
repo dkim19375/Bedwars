@@ -34,3 +34,16 @@ fun String.toComponent(): TextComponent = LegacyComponentSerializer.legacySectio
 fun List<String>.toComponents(): List<TextComponent> = map(String::toComponent)
 
 fun Array<String>.toComponents(): Array<TextComponent> = map(String::toComponent).toTypedArray()
+
+fun getProgressBar(
+    current: Int,
+    max: Int,
+    totalBars: Int,
+    symbol: Char,
+    completedColor: ChatColor,
+    notCompletedColor: ChatColor,
+): String {
+    val percent = current.toDouble() / max
+    val progressBars = (totalBars * percent).toInt()
+    return "${("$completedColor$symbol").repeat(progressBars)}${("$notCompletedColor$symbol").repeat(totalBars - progressBars)}"
+}

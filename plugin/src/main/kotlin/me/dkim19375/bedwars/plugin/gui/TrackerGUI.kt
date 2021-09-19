@@ -50,7 +50,7 @@ class TrackerGUI(private val player: Player, private val game: BedwarsGame) {
         reset()
         val items = mutableListOf<GuiItem>()
         val hasEnough = player.getItemAmount(Material.EMERALD) >= 2
-        for (team in game.beds.filter { (_, active) -> active }.keys
+        for (team in game.players.keys
             .filter { game.getTeamOfPlayer(player) != it }
             .filter { game.trackers[player.uniqueId] != it }) {
             items.add(

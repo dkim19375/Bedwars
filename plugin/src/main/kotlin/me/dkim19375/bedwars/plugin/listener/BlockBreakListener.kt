@@ -47,7 +47,9 @@ class BlockBreakListener(private val plugin: BedwarsPlugin) : Listener {
             if (loc in game.placedBlocks || !plugin.mainConfigManager.get(MainConfigSettings.MAP_PROTECTION)) {
                 val configItem = game.placedBlocks[loc] ?: return
                 isCancelled = true
-                block.drops.forEach { block.world.dropItem(block.location, it.setConfigItem(configItem)) }
+                block.drops.forEach {
+                    block.world.dropItem(block.location.toWrapper().getLocation(), it.setConfigItem(configItem))
+                }
                 block.type = Material.AIR
                 return
             }

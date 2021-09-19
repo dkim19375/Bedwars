@@ -25,7 +25,7 @@ fun <T> T?.default(default: T): T {
 inline fun <reified T : Enum<T>> enumValueOfOrNull(name: String?): T? = name?.let {
     try {
         enumValueOf<T>(it.uppercase())
-    } catch (e: Throwable) {
+    } catch (e: IllegalArgumentException) {
         null
     }
 }

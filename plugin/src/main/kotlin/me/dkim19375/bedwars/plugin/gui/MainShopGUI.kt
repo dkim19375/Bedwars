@@ -27,6 +27,8 @@ import me.dkim19375.bedwars.plugin.enumclass.ArmorType
 import me.dkim19375.bedwars.plugin.enumclass.getToolTier
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
 import me.dkim19375.bedwars.plugin.util.*
+import me.dkim19375.dkimbukkitcore.function.formatAll
+import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.DyeColor
 import org.bukkit.Material
@@ -159,7 +161,7 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin,
                 plugin.dataFileManager.setQuickBuySlot(slot, player.uniqueId, null)
                 menu.setItem(slot, ItemBuilder.from(getNoneInQuickBuyItem()).asNewGuiItem())
                 menu.update()
-                player.sendMessage("${ChatColor.GREEN}Successfully removed ${item.displayname} from Quick Buy!")
+                player.sendMessage("${ChatColor.GREEN}Successfully removed ${item.getFriendlyName()} from Quick Buy!")
             }
     }
 
@@ -172,11 +174,12 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin,
                 return
             }
             player.inventory.removeItem(ItemStack(item.costItem.material, item.cost))
-            player.sendMessage("${ChatColor.GREEN}You purchased ${ChatColor.GOLD}${item.displayname}!")
+            player.sendMessage("${ChatColor.GREEN}You purchased ${ChatColor.GOLD}${item.getFriendlyName()}!")
             val armorType = ArmorType.fromMaterial(item.item.material) ?: return
             player.inventory.boots = ItemStack(armorType.boots)
             player.inventory.leggings = ItemStack(armorType.leggings)
             game.upgradesManager.applyUpgrades(player)
+            item.commands.map { it.formatAll(player) }.forEach { Bukkit.dispatchCommand(Bukkit.getConsoleSender(), it) }
             player.playBoughtSound()
             return
         }
@@ -204,10 +207,11 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin,
         }
         player.inventory.removeItem(ItemStack(item.costItem.material, item.cost))
         val team = plugin.gameManager.getTeamOfPlayer(player)
-        player.sendMessage("${ChatColor.GREEN}You purchased ${ChatColor.GOLD}${item.displayname}!")
+        player.sendMessage("${ChatColor.GREEN}You purchased ${ChatColor.GOLD}${item.getFriendlyName()}!")
         player.giveItem(item.item.toItemStack(team?.color))
-        player.playBoughtSound()
         game.upgradesManager.applyUpgrades(player)
+        item.commands.map { it.formatAll(player) }.forEach { Bukkit.dispatchCommand(Bukkit.getConsoleSender(), it) }
+        player.playBoughtSound()
     }
 
     private fun getBuySlots(): List<Int> {
@@ -231,6 +235,9 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin,
     private fun formatItem(item: MainShopConfigItem, quickBuy: Boolean = false): ItemBuilder {
         val team = plugin.gameManager.getTeamOfPlayer(player)
         val itemstack = item.item.toItemStack(team?.color)
+        if (item.cosmetic) {
+            return ItemBuilder.from(itemstack)
+        }
         val amount = player.getItemAmount(item.costItem.material)
         val builder: ItemBuilder
         val loreToAdd = mutableListOf(
@@ -266,19 +273,19 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin,
         }
         builder = if (amount >= item.cost) {
             ItemBuilder.from(itemstack)
-                .name("${ChatColor.GREEN}${item.displayname}")
+                .name("${ChatColor.GREEN}${item.getFriendlyName()}")
                 .lore(loreToAdd)
                 .lore("${ChatColor.YELLOW}Click to purchase!")
         } else {
             ItemBuilder.from(itemstack)
-                .name("${ChatColor.RED}${item.displayname}")
+                .name("${ChatColor.RED}${item.getFriendlyName()}")
                 .lore(loreToAdd)
                 .lore("${ChatColor.RED}You do not have enough ${item.costItem.color}${item.costItem.displayname}!")
         }
+        game.upgradesManager.applyToItem(builder, player)
         if (getRemainingQuickSlots() < 1) {
             return builder
         }
-        game.upgradesManager.applyToItem(builder, player)
         return builder.lore("")
     }
 
@@ -303,6 +310,10 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin,
         putGreenGlass(col + 1)
         for (item in configManager.getByType(type)) {
             if (item.defaultOnSpawn) {
+                continue
+            }
+            if (item.cosmetic) {
+                menu.setItem(item.slot, formatItem(item).asNewGuiItem())
                 continue
             }
             menu.setItem(item.slot, formatItem(item).asNewGuiItem {

@@ -43,8 +43,13 @@ import me.dkim19375.dkimbukkitcore.function.formatAll
 import me.dkim19375.dkimbukkitcore.function.getPlayers
 import me.dkim19375.dkimbukkitcore.function.logInfo
 import me.dkim19375.dkimcore.extension.runCatchingOrNull
+import me.dkim19375.dkimcore.extension.setDecimalPlaces
+import me.mattstudios.config.properties.Property
 import org.apache.commons.io.FileUtils
 import org.bukkit.*
+import org.bukkit.block.Block
+import org.bukkit.entity.Creature
+import org.bukkit.entity.EntityType
 import org.bukkit.entity.Item
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -77,6 +82,8 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     val kills = mutableMapOf<UUID, Int>()
     val trackers = mutableMapOf<UUID, Team>()
     val spectators = mutableSetOf<UUID>()
+    val bridgeEggs = mutableSetOf<UUID>()
+    val bedBugs = mutableSetOf<UUID>()
 
     var data = data
         private set
@@ -531,31 +538,28 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     fun giveItems(player: Player, items: List<ItemStack?>?, team: Team) {
         val configManager = plugin.shopConfigManager
         var armorType: ArmorType = ArmorType.LEATHER
-        var addPick = false
-        var addAxe = false
-        var addShears = false
+        val keepItems = mutableSetOf<MainShopConfigItem>()
         player.inventory.clearAll()
+        for (item in configManager.mainItems.filter(MainShopConfigItem::defaultOnSpawn)) {
+            if (item.item.material.isArmor()) {
+                continue
+            }
+            keepItems.add(item)
+        }
         items?.forEach { item ->
             item ?: return@forEach
-            if (item.type.name.endsWith("PICKAXE")) {
-                addPick = true
-                return@forEach
+            val config = item.getConfigItem()
+            val downgrade = config?.downgrade?.invoke()
+            if (downgrade != null && !downgrade.defaultOnSpawn) {
+                keepItems.add(downgrade)
             }
-            if (item.type.name.endsWith("AXE")) {
-                addAxe = true
-                return@forEach
-            }
-            if (item.type == Material.SHEARS) {
-                addShears = true
-                return@forEach
+            if (config?.permanent == true && !config.defaultOnSpawn) {
+                keepItems.add(config)
             }
             val armor = ArmorType.fromMaterial(item.type) ?: return@forEach
             if (armor != ArmorType.LEATHER) {
                 armorType = armor
             }
-        }
-        configManager.getItemFromMaterial(Material.WOOD_SWORD)?.item?.toItemStack(team.color)?.let {
-            player.inventory.addItem(it)
         }
         player.inventory.setItem(
             17, ItemBuilder.from(Material.COMPASS)
@@ -567,20 +571,8 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         player.inventory.chestplate = team.getColored(ItemStack(Material.LEATHER_CHESTPLATE))
         player.inventory.leggings = team.getColored(ItemStack(armorType.leggings))
         player.inventory.boots = team.getColored(ItemStack(armorType.boots))
-        if (addPick) {
-            configManager.getItemFromMaterial(Material.WOOD_PICKAXE)?.item?.toItemStack(team.color)?.let {
-                player.inventory.addItem(it)
-            }
-        }
-        if (addAxe) {
-            configManager.getItemFromMaterial(Material.WOOD_AXE)?.item?.toItemStack(team.color)?.let {
-                player.inventory.addItem(it)
-            }
-        }
-        if (addShears) {
-            configManager.getItemFromMaterial(Material.SHEARS)?.item?.toItemStack(team.color)?.let {
-                player.inventory.addItem(it)
-            }
+        for (item in keepItems) {
+            player.inventory.addItem(item.item.toItemStack(team.color))
         }
         upgradesManager.applyUpgrades(player)
     }
@@ -784,5 +776,66 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
                     "${teamOfPlayer.chatColor}${player.displayName}${ChatColor.GRAY}!"
         )
         update()
+    }
+
+    fun createSpecialEntity(
+        block: Block,
+        type: EntityType,
+        time: Property<Int>,
+        showName: Boolean,
+        player: Player,
+    ) {
+        val entity = block.world.spawn(block.location, type.entityClass).disableDrops().let {
+            if (it !is Creature) {
+                return@createSpecialEntity
+            }
+            it
+        }
+        entity.isCustomNameVisible = showName
+        val totalTime = plugin.mainConfigManager.get(time) * 50
+        val totalTimeSeconds = (totalTime.toDouble() / 1000.0).let {
+            it.setDecimalPlaces(if (it.toString().split('.')[1].length >= 2) 2 else 1)
+        }
+        player.sendMessage("${ChatColor.GREEN}Your creature will fight for you for $totalTimeSeconds seconds")
+        val start = System.currentTimeMillis()
+        object : BukkitRunnable() {
+            override fun run() {
+                if (entity.isDead || !entity.isValid) {
+                    cancel()
+                    return
+                }
+                val remainingTime = (((start + totalTime) - System.currentTimeMillis()).toDouble() / 1_000.0)
+                    .setDecimalPlaces(1)
+                if (remainingTime <= 0.0) {
+                    entity.remove()
+                    cancel()
+                    return
+                }
+                if (showName) {
+                    entity.customName = "${remainingTime}s ${ChatColor.DARK_GRAY}[${
+                        getProgressBar(
+                            current = entity.health.toInt(),
+                            max = entity.maxHealth.toInt(),
+                            totalBars = 10,
+                            symbol = '■',
+                            completedColor = ChatColor.WHITE,
+                            notCompletedColor = ChatColor.GRAY
+                        )
+                    }${ChatColor.DARK_GRAY}]"
+                }
+                val team = getTeamOfPlayer(player) ?: return
+                if (entity.target?.uniqueId != player.uniqueId) {
+                    return
+                }
+                var newPlayer: Pair<Player, Double>? = null
+                for (nonTeamPlayer in getPlayersInGame().minus(getPlayersInTeam(team)).getPlayers()) {
+                    val distance = entity.location.distance(nonTeamPlayer.location)
+                    if (newPlayer == null || newPlayer.second > distance) {
+                        newPlayer = nonTeamPlayer to distance
+                    }
+                }
+                entity.target = newPlayer?.first
+            }
+        }.runTaskTimer(plugin, 1L, 1L)
     }
 }

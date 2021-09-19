@@ -20,6 +20,7 @@ package me.dkim19375.bedwars.compat.abstract
 
 import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion
 import org.bukkit.entity.ArmorStand
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Item
 import org.bukkit.entity.LivingEntity
 import org.bukkit.inventory.ItemStack
@@ -29,21 +30,23 @@ import org.bukkit.plugin.java.JavaPlugin
 abstract class NBTUtilitiesAbstract {
 
     companion object {
-        fun getInstance(plugin: JavaPlugin): NBTUtilitiesAbstract = if (MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_16_R1)) {
-            Class.forName("me.dkim19375.bedwars.v1_16.NBTUtilities")
-                .getConstructor(JavaPlugin::class.java)
-                .newInstance(plugin) as NBTUtilitiesAbstract
-        } else {
-            Class.forName("me.dkim19375.bedwars.v1_8.NBTUtilities")
-                .getConstructor()
-                .newInstance() as NBTUtilitiesAbstract
-        }
+        fun getInstance(plugin: JavaPlugin): NBTUtilitiesAbstract =
+            if (MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_16_R1)) {
+                Class.forName("me.dkim19375.bedwars.v1_16.NBTUtilities")
+                    .getConstructor(JavaPlugin::class.java)
+                    .newInstance(plugin) as NBTUtilitiesAbstract
+            } else {
+                Class.forName("me.dkim19375.bedwars.v1_8.NBTUtilities")
+                    .getConstructor()
+                    .newInstance() as NBTUtilitiesAbstract
+            }
     }
 
     protected val CONFIG_ITEM_KEY = "BedwarsConfigItem"
     protected val HOLOGRAM_KEY = "BedwarsArmorStand"
+    protected val MOB_DROP_KEY = "BedwarsMobDrop"
+    protected val GEN_DROP_KEY = "BedwarsGenDrop"
     protected val TRACKER_KEY = "BedwarsPlayerTracker"
-    protected val DROP_KEY = "BedwarsGenDrop"
 
     abstract fun <T : LivingEntity> addAI(entity: T)
 
@@ -64,4 +67,8 @@ abstract class NBTUtilitiesAbstract {
     abstract fun setDrop(item: Item, drop: Boolean): Item
 
     abstract fun isDrop(item: Item): Pair<Boolean, Item>
+
+    abstract fun <T : Entity> disableDrops(entity: T): T
+
+    abstract fun <T : Entity> isDropsDisabled(entity: T): Pair<Boolean, T>
 }

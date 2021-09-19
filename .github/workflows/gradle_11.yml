@@ -26,9 +26,3 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew shadowJar
-    - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v2.2.4
-      with:
-        name: Bedwars Plugin JAR
-        path: build/libs/*.jar
-        if-no-files-found: error

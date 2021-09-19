@@ -174,7 +174,7 @@ fun Player.sendOtherTitle(
     subtitle: String? = null,
     fadeIn: Int = 10,
     stay: Int = 50,
-    fadeOut: Int = 10
+    fadeOut: Int = 10,
 ) = sendTitle(title, subtitle, fadeIn, stay, fadeOut)
 
 fun Player.sendTitle(
@@ -182,7 +182,7 @@ fun Player.sendTitle(
     subtitle: String? = null,
     fadeIn: Int = 10,
     stay: Int = 50,
-    fadeOut: Int = 10
+    fadeOut: Int = 10,
 ) = BukkitAudiences.create(JavaPlugin.getPlugin(BedwarsPlugin::class.java)).player(this).showTitle(
     Title.title(
         LegacyComponentSerializer.legacySection().deserialize(title ?: ""),
@@ -192,7 +192,7 @@ fun Player.sendTitle(
 )
 
 private fun <T : Entity> T.getTarget(
-    entities: Iterable<T>
+    entities: Iterable<T>,
 ): T? {
     var target: T? = null
     val threshold = 1.0
@@ -217,9 +217,9 @@ private fun <T : Entity> T.getTarget(
 }
 
 fun ItemStack.getNewItem(player: Player?): ItemStack {
-    player ?: return clone()
-    val configItem = getConfigItem() ?: return clone()
-    var newItem: ItemStack = clone()
+    player ?: return this
+    val configItem = getConfigItem() ?: return this
+    var newItem: ItemStack = this
     player.inventory.contents.forEach contentLoop@{ invItem ->
         invItem ?: return@contentLoop
         val invConfigItem = invItem.getConfigItem() ?: return@contentLoop
@@ -232,11 +232,9 @@ fun ItemStack.getNewItem(player: Player?): ItemStack {
     return newItem
 }
 
-fun Player.giveItem(vararg items: ItemStack?) {
-    for (item in items) {
-        item?.getNewItem(this)?.let { inventory.addItem(it) }
-    }
-}
+fun Player.giveItem(vararg items: ItemStack?): Map<Int, ItemStack> = inventory.addItem(*items.mapNotNull {
+    it?.getNewItem(this)
+}.toTypedArray())
 
 fun Entity.teleportUpdated(location: Location): Boolean = teleport(location.update())
 

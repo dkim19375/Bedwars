@@ -84,11 +84,18 @@ object MainConfigSettings : SettingsHolder {
     @Path("map.protection")
     val MAP_PROTECTION: Property<Boolean> = Property.create(true)
 
+    // mobs
+    @Path("mobs.time.dream-defender")
+    val TIME_DREAM_DEFENDER: Property<Int> = Property.create(4800)
+    @Path("mobs.time.bed-bugs")
+    val TIME_BED_BUG: Property<Int> = Property.create(300)
+
     override fun registerComments(conf: CommentsConfiguration) {
         conf.setComment(
             "tab.hide-players",
             "Players in-game won't see players not in the game and players not in the game won't see players in-game",
             "unless in the same world (and same-world is true)"
         )
+        conf.setComment("mobs.time", "The time that these mobs will stay in TICKS (20 ticks = 1 second)")
     }
 }

@@ -37,7 +37,7 @@ class ShopConfigManager(private val plugin: BedwarsPlugin) {
     fun update() {
         mainItems = shopConfig.getKeys(false)
             .mapNotNull(shopConfig::getConfigurationSection)
-            .mapNotNull(MainShopConfigItem::deserialize)
+            .mapNotNull { MainShopConfigItem.deserialize(it, plugin) }
             .toSet()
     }
 

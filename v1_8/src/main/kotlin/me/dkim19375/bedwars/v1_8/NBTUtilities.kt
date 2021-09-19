@@ -38,6 +38,22 @@ class NBTUtilities : NBTUtilitiesAbstract() {
         return patched to NBTInjector.getNbtData(patched)
     }
 
+    private fun <T : Entity> T.modifyByte(key: String, add: Boolean = true): T = if (add) {
+        getNBT().let {
+            it.second.setByte(key, 0)
+            it.first
+        }
+    } else {
+        getNBT().let {
+            it.second.removeKey(key)
+            it.first
+        }
+    }
+
+    private fun <T : Entity> T.hasByte(key: String): Pair<Boolean, T> = getNBT().let {
+        it.second.keys.contains(key) to it.first
+    }
+
     private fun NBTCompound.getStringOrNull(key: String): String? = if (keys.contains(key)) getString(key) else null
 
     private fun <T : Entity> T.getVanillaNBT(): NBTCompound = NBTEntity(this)
@@ -55,36 +71,19 @@ class NBTUtilities : NBTUtilitiesAbstract() {
 
     override fun getConfigItem(item: ItemStack): String? = item.getNBT().getStringOrNull(CONFIG_ITEM_KEY)
 
-    override fun isHologram(armorStand: ArmorStand): Boolean = armorStand.getNBT().second.keys.contains(HOLOGRAM_KEY)
+    override fun isHologram(armorStand: ArmorStand): Boolean = armorStand.hasByte(HOLOGRAM_KEY).first
 
-    override fun setHologramNBT(armorStand: ArmorStand, holo: Boolean): ArmorStand = if (holo) {
-        armorStand.getNBT().let {
-            it.second.setByte(HOLOGRAM_KEY, 0)
-            it.first
-        }
-    } else {
-        armorStand.getNBT().let {
-            it.second.removeKey(HOLOGRAM_KEY)
-            it.first
-        }
-    }
+    override fun setHologramNBT(armorStand: ArmorStand, holo: Boolean): ArmorStand =
+        armorStand.modifyByte(HOLOGRAM_KEY, holo)
 
     override fun setUnbreakable(item: ItemStack, unbreakable: Boolean): ItemStack =
         item.getNBT().apply { setInteger("Unbreakable", if (unbreakable) 1 else 0) }.item
 
-    override fun setDrop(item: Item, drop: Boolean): Item = if (drop) {
-        item.getNBT().let {
-            it.second.setByte(DROP_KEY, 0)
-            it.first
-        }
-    } else {
-        item.getNBT().let {
-            it.second.removeKey(DROP_KEY)
-            it.first
-        }
-    }
+    override fun setDrop(item: Item, drop: Boolean): Item = item.modifyByte(GEN_DROP_KEY, drop)
 
-    override fun isDrop(item: Item): Pair<Boolean, Item> = item.getNBT().let {
-        it.second.keys.contains(DROP_KEY) to it.first
-    }
+    override fun isDrop(item: Item): Pair<Boolean, Item> = item.hasByte(GEN_DROP_KEY)
+
+    override fun <T : Entity> disableDrops(entity: T): T = entity.modifyByte(MOB_DROP_KEY)
+
+    override fun <T : Entity> isDropsDisabled(entity: T): Pair<Boolean, T> = entity.hasByte(MOB_DROP_KEY)
 }

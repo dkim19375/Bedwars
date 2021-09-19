@@ -32,6 +32,7 @@ import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
+import org.bukkit.scheduler.BukkitTask
 import java.util.*
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -44,6 +45,7 @@ class UpgradesManager(private val plugin: BedwarsPlugin, private val game: Bedwa
     val secondTrap = mutableMapOf<Team, TrapType>()
     val thirdTrap = mutableMapOf<Team, TrapType>()
     private val times = mutableMapOf<UUID, Long>()
+    val magicMilk = mutableMapOf<UUID, BukkitTask>()
 
     fun reset() {
         sharpness.clear()
@@ -70,19 +72,25 @@ class UpgradesManager(private val plugin: BedwarsPlugin, private val game: Bedwa
     }
 
     private fun applyHaste(player: Player) {
+        player.removePotionEffect(PotionEffectType.FAST_DIGGING)
         val team = game.getTeamOfPlayer(player) ?: return
         val haste = haste[team] ?: return
         player.addPotionEffect(PotionEffect(PotionEffectType.FAST_DIGGING, 120, haste - 1))
     }
 
     private fun applyHealPool(player: Player) {
+        player.removePotionEffect(PotionEffectType.REGENERATION)
         val team = game.getTeamOfPlayer(player) ?: return
         if (!healPool.contains(team)) {
             return
         }
-        game.data.beds.firstOrNull { d ->
-            team == d.team && d.location.getSafeDistance(player.location) < 7
-        } ?: return
+        if (game.data.beds.none { d ->
+                team == d.team && d.location.getSafeDistance(player.location, true) < 7
+            } && game.data.teams.none { d ->
+                team == d.team && d.location.getSafeDistance(player.location, true) < 10
+            }) {
+            return
+        }
         player.addPotionEffect(PotionEffect(PotionEffectType.REGENERATION, 120, 0))
     }
 
@@ -149,6 +157,10 @@ class UpgradesManager(private val plugin: BedwarsPlugin, private val game: Bedwa
             teamOfPlayer != d.team
             d.location.getSafeDistance(player.location) < 8
         } ?: return
+        times[player.uniqueId] = System.currentTimeMillis()
+        if (magicMilk.containsKey(player.uniqueId)) {
+            return
+        }
         val team = bedData.team
         val trap = firstTrap[team] ?: return
         firstTrap.remove(team)
@@ -162,9 +174,6 @@ class UpgradesManager(private val plugin: BedwarsPlugin, private val game: Bedwa
             this.secondTrap[team] = thirdTrap
             this.thirdTrap.remove(team)
         }
-
-        // on trigger
-        times[player.uniqueId] = System.currentTimeMillis()
         applyToPlayer(player, trap)
         for (uuid in game.getPlayersInTeam(team)) {
             val p = Bukkit.getPlayer(uuid) ?: continue

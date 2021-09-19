@@ -21,7 +21,6 @@ package me.dkim19375.bedwars.plugin.listener
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.util.getPlayer
 import me.dkim19375.bedwars.plugin.util.isArmor
-import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -41,9 +40,9 @@ class InventoryClickListener(private val plugin: BedwarsPlugin) : Listener {
                 isCancelled = true
             }
         }
-        if (game.eliminated.contains(whoClicked.uniqueId)) {
+/*        if (game.eliminated.contains(whoClicked.uniqueId)) {
             Bukkit.broadcastMessage("Cancelled")
             // isCancelled = true
-        }
+        }*/
     }
 }

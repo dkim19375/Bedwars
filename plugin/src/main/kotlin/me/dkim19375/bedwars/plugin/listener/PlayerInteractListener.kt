@@ -19,15 +19,15 @@
 package me.dkim19375.bedwars.plugin.listener
 
 import me.dkim19375.bedwars.api.enumclass.GameState
+import me.dkim19375.bedwars.api.enumclass.SpecialItemType
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
+import me.dkim19375.bedwars.plugin.config.MainConfigSettings
 import me.dkim19375.bedwars.plugin.gui.CompassGUI
 import me.dkim19375.bedwars.plugin.gui.MainShopGUI
 import me.dkim19375.bedwars.plugin.gui.TeleporterGUI
 import me.dkim19375.bedwars.plugin.gui.UpgradeShopGUI
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
-import me.dkim19375.bedwars.plugin.util.default
-import me.dkim19375.bedwars.plugin.util.isBed
-import me.dkim19375.bedwars.plugin.util.isHologram
+import me.dkim19375.bedwars.plugin.util.*
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.ArmorStand
@@ -39,6 +39,8 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
+import org.bukkit.material.SpawnEgg
+import java.util.*
 
 class PlayerInteractListener(private val plugin: BedwarsPlugin) : Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -49,6 +51,52 @@ class PlayerInteractListener(private val plugin: BedwarsPlugin) : Listener {
         gameOverItems(game)
         bedPrevention()
         setupFireballs()
+        checkSpecialType(SpecialItemType.BED_BUGS, game.bedBugs)
+        checkSpecialType(SpecialItemType.BRIDGE_EGGS, game.bridgeEggs)
+        checkDreamDefenders(game)
+    }
+
+    private fun PlayerInteractEvent.checkSpecialType(type: SpecialItemType, set: MutableSet<UUID>) {
+        if (material == Material.AIR) {
+            return
+        }
+        if (action !in setOf(Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK)) {
+            return
+        }
+        val configItem = item?.getConfigItem() ?: return
+        if (configItem.specialItem != type) {
+            return
+        }
+        item.type.getProjectileType() ?: return
+        set.add(player.uniqueId)
+    }
+
+    private fun PlayerInteractEvent.checkDreamDefenders(game: BedwarsGame) {
+        if (material == Material.AIR) {
+            return
+        }
+        if (action !in setOf(Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK)) {
+            return
+        }
+        val configItem = item?.getConfigItem() ?: return
+        if (configItem.specialItem != SpecialItemType.DREAM_DEFENDER) {
+            return
+        }
+        if (action.name.startsWith("LEFT")) {
+            return
+        }
+        if (item.type != Material.MONSTER_EGG) {
+            return
+        }
+        val block = blockFace?.let { clickedBlock?.getRelative(it) } ?: return
+        val type = (item.data as? SpawnEgg)?.spawnedType ?: return
+        isCancelled = true
+        if (item.amount <= 1) {
+            item.type = Material.AIR
+        } else {
+            item.amount = item.amount - 1
+        }
+        game.createSpecialEntity(block, type, MainConfigSettings.TIME_DREAM_DEFENDER, true, player)
     }
 
     private fun PlayerInteractEvent.checkTracker(game: BedwarsGame) {
