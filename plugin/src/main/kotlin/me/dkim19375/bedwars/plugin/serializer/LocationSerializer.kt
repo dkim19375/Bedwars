@@ -26,8 +26,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 
 class LocationSerializer : TypeAdapter<Location>() {
-    override fun write(out: JsonWriter, value: Location?) {
-        value ?: return
+    override fun write(out: JsonWriter, value: Location) {
         out.beginObject()
         out.name("world")
         out.value(value.world.name)

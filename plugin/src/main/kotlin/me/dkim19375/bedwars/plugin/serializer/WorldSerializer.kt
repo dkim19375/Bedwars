@@ -26,8 +26,7 @@ import org.bukkit.Bukkit
 import org.bukkit.World
 
 class WorldSerializer : TypeAdapter<World>() {
-    override fun write(out: JsonWriter, value: World?) {
-        value ?: return
+    override fun write(out: JsonWriter, value: World) {
         out.beginObject()
         out.name("name")
         out.value(value.name)

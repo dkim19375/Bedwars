@@ -159,6 +159,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
 
     override fun reloadConfig() {
         super.reloadConfig()
+        shopConfigManager.update()
         for (file in File(dataFolder, "data/games").listFiles() ?: emptyArray()) {
             val name = file.toPath().nameWithoutExtension
             val world = Bukkit.getWorld(name) ?: continue
@@ -173,7 +174,6 @@ class BedwarsPlugin : CoreJavaPlugin() {
             gameDataFiles[name] = newData
         }
         gameManager.reloadData()
-        shopConfigManager.update()
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -199,8 +199,9 @@ class BedwarsPlugin : CoreJavaPlugin() {
         hookOntoLib("Parties", false) { _: BedwarsPlugin -> partiesAPI = Parties.getApi() }
         hookOntoLib("Multiverse-Core") { pl: MultiverseCore -> worldManager = pl.mvWorldManager }
         registerConfig(mainConfigManager)
-        registerConfig(mainDataFile)
         registerConfig(shopFile)
+        shopConfigManager.update()
+        registerConfig(mainDataFile)
         dataFileManager
         gameManager
         scoreboardManager

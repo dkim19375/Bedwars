@@ -26,8 +26,7 @@ import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.MainShopConfigItem
 
 class ShopConfigItemSerializer(private val plugin: BedwarsPlugin) : TypeAdapter<MainShopConfigItem>() {
-    override fun write(out: JsonWriter, value: MainShopConfigItem?) {
-        value ?: return
+    override fun write(out: JsonWriter, value: MainShopConfigItem) {
         out.beginObject()
         out.name("name")
         out.value(value.name)
@@ -48,7 +47,8 @@ class ShopConfigItemSerializer(private val plugin: BedwarsPlugin) : TypeAdapter<
             }
         }
         input.endObject()
-        return name?.let(plugin.shopConfigManager::getItemFromName)
-            ?: throw IllegalStateException("Property \"name\" could not be found during deserialization!")
+        return plugin.shopConfigManager.getItemFromName(name
+            ?: throw IllegalStateException("Property \"name\" could not be found during deserialization!"))
+            ?: throw IllegalStateException("Item $name not found!")
     }
 }
