@@ -168,7 +168,6 @@ data class ItemWrapper(
                 }
                 Enchantment.getByName(split[0].uppercase()) to (split.getOrNull(1)?.toIntOrNull() ?: 1)
             }.toMap()
-            logInfo("mob type (${config.currentPath}.mob-type): ${config.getString("mob-type")}")
             val mobType = config.getString("mob-type")?.let { enumValueOfOrNull<EntityType>(it) }
             return ItemWrapper(
                 material = material,
