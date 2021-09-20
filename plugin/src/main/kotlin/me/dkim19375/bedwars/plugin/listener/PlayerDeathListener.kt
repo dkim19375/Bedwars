@@ -62,7 +62,7 @@ class PlayerDeathListener(private val plugin: BedwarsPlugin) : Listener {
             materials[cost] = materials.getOrDefault(cost, 0) + drop.amount
         }
         killer ?: newDrops.forEach { drop -> location.dropItem(drop) }
-        game.playerKilled(entity, originalDrops)
+        game.playerKilled(entity, originalDrops, killer)
         for ((cost, amount) in materials) {
             killer?.sendMessage("${cost.color}+$amount ${cost.displayname}")
         }

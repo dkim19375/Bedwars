@@ -456,7 +456,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         }
     }
 
-    fun playerKilled(player: Player, inventory: List<ItemStack>) {
+    fun playerKilled(player: Player, inventory: List<ItemStack>, killer: Player? = null) {
         checkAsync("player killed")
         val team = getTeamOfPlayer(player) ?: return
         val hasBed = beds.getOrDefault(team, false)
@@ -467,7 +467,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
             }
             plugin.dataFileManager.save = true
         }
-        player.killer?.let { killer ->
+        killer?.let {
             plugin.mainDataFile.get().getStatistics(killer).run {
                 kills++
                 if (!hasBed) {
