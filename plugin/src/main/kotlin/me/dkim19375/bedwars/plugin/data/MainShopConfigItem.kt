@@ -23,8 +23,10 @@ import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.gui.MainShopGUI
 import me.dkim19375.bedwars.plugin.util.enumValueOfOrNull
 import me.dkim19375.bedwars.plugin.util.getIntOrNull
+import me.dkim19375.dkimbukkitcore.function.formatAll
 import me.dkim19375.dkimbukkitcore.function.logInfo
 import org.bukkit.ChatColor
+import org.bukkit.OfflinePlayer
 import org.bukkit.configuration.ConfigurationSection
 import java.util.logging.Level
 
@@ -41,7 +43,14 @@ data class MainShopConfigItem(
     val downgrade: () -> MainShopConfigItem? = { null },
     val commands: List<String> = emptyList(),
     val cosmetic: Boolean = false,
-    val specialItem: SpecialItemType? = null
+    val specialItem: SpecialItemType? = null,
+    val weight: Int = 0,
+    val weightCategory: String? = null,
+    val weightMessage: ((OfflinePlayer?) -> String) = { player ->
+        "&cYou already have a higher (or same) level item!".formatAll(player)
+    },
+    val weightAutoRemove: Boolean = false,
+    val weightPrevent: Boolean = false,
 ) {
     companion object {
         private fun logError(config: ConfigurationSection, section: String, reason: String = "does not exist!") {
@@ -82,6 +91,14 @@ data class MainShopConfigItem(
             val commands = config.getStringList("commands")
             val cosmetic = config.getBoolean("cosmetic")
             val specialItem = SpecialItemType.fromString(config.getString("special-type"))
+            val weight = config.getInt("weight")
+            val weightCategory = config.getString("weight-category")
+            val weightMessage = { player: OfflinePlayer? ->
+                (config.getString("weight-message") ?: "&cYou already have a higher (or same) level item!")
+                    .formatAll(player)
+            }
+            val weightAutoRemove = config.getBoolean("weight-autoremove")
+            val weightPrevent = config.getBoolean("weight-prevent")
             return MainShopConfigItem(
                 name = config.name,
                 slot = slot,
@@ -95,7 +112,12 @@ data class MainShopConfigItem(
                 downgrade = { downgrade?.let(plugin.shopConfigManager::getItemFromName) },
                 commands = commands,
                 cosmetic = cosmetic,
-                specialItem = specialItem
+                specialItem = specialItem,
+                weight = weight,
+                weightCategory = weightCategory,
+                weightMessage = weightMessage,
+                weightAutoRemove = weightAutoRemove,
+                weightPrevent = weightPrevent
             )
         }
     }

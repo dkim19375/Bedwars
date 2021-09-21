@@ -21,9 +21,12 @@ package me.dkim19375.bedwars.plugin.config
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.MainShopConfigItem
 import me.dkim19375.bedwars.plugin.gui.MainShopGUI
+import me.dkim19375.bedwars.plugin.util.getConfigItem
 import me.dkim19375.dkimbukkitcore.config.ConfigFile
 import org.bukkit.Material
 import org.bukkit.configuration.file.FileConfiguration
+import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.PlayerInventory
 
 @Suppress("MemberVisibilityCanBePrivate")
 class ShopConfigManager(private val plugin: BedwarsPlugin) {
@@ -31,14 +34,21 @@ class ShopConfigManager(private val plugin: BedwarsPlugin) {
         get() = plugin.shopFile
     private val shopConfig: FileConfiguration
         get() = shopFile.config
-    var mainItems = emptySet<MainShopConfigItem>()
-        private set
+    val mainItems = mutableSetOf<MainShopConfigItem>()
+    val weights = mutableMapOf<String, MutableMap<MainShopConfigItem, Int>>()
 
     fun update() {
-        mainItems = shopConfig.getKeys(false)
+        mainItems.clear()
+        mainItems.addAll(shopConfig.getKeys(false)
             .mapNotNull(shopConfig::getConfigurationSection)
             .mapNotNull { MainShopConfigItem.deserialize(it, plugin) }
-            .toSet()
+            .toSet())
+        weights.clear()
+        for (item in mainItems) {
+            val weight = item.weight
+            val category = item.weightCategory ?: continue
+            weights.getOrPut(category, ::mutableMapOf)[item] = weight
+        }
     }
 
     fun getItemFromMaterial(material: Material): MainShopConfigItem? =
@@ -54,5 +64,38 @@ class ShopConfigManager(private val plugin: BedwarsPlugin) {
             }
         }
         return set.toSet()
+    }
+
+    fun isHigherWeight(lower: MainShopConfigItem, higher: MainShopConfigItem): Boolean {
+        var category: String? = null
+        var weight: Int? = null
+        for ((mapCategory, map) in weights) {
+            val mapWeight = map[lower] ?: continue
+            category = mapCategory
+            weight = mapWeight
+            break
+        }
+        category ?: return true
+        weight ?: return true
+        val higherWeight = weights[category]?.get(higher) ?: return true
+        return higherWeight >= weight
+    }
+
+    fun getWeightInfo(item: MainShopConfigItem): Pair<String, Int>? = weights.toList().mapNotNull { (category, map) ->
+        val weight = map[item] ?: return@mapNotNull null
+        category to weight
+    }.firstOrNull()
+
+    fun canGetItem(inv: PlayerInventory, item: MainShopConfigItem): Boolean = inv.mapNotNull(ItemStack::getConfigItem)
+        .none { invItem ->
+            isHigherWeight(item, invItem)
+        }
+
+    fun getOtherItemsWithWeight(inv: PlayerInventory, item: MainShopConfigItem): Set<ItemStack> {
+        val weightInfo = getWeightInfo(item) ?: return emptySet()
+        return inv.filter {
+            val info = it.getConfigItem()?.let(this@ShopConfigManager::getWeightInfo) ?: return@filter false
+            info.first == weightInfo.first
+        }.toSet()
     }
 }

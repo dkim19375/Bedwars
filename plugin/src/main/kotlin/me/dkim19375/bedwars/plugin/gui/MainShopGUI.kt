@@ -24,7 +24,6 @@ import dev.triumphteam.gui.guis.GuiItem
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.MainShopConfigItem
 import me.dkim19375.bedwars.plugin.enumclass.ArmorType
-import me.dkim19375.bedwars.plugin.enumclass.getToolTier
 import me.dkim19375.bedwars.plugin.manager.BedwarsGame
 import me.dkim19375.bedwars.plugin.util.*
 import me.dkim19375.dkimbukkitcore.function.formatAll
@@ -188,22 +187,22 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin,
             player.playErrorSound()
             return
         }
-        val pair = item.item.material.getToolTier()
-        val tier = pair?.first
-        val type = pair?.second
-        val inventoryTier = player.inventory.getToolTier().let { map ->
-            type ?: return@let null
-            map[type]
-        }
-        if (tier != null && inventoryTier != null) {
-            if (tier.tier <= inventoryTier.tier) {
-                player.sendMessage("${ChatColor.RED}You already have a higher (or same) tier!")
+        val weightCategory = item.weightCategory
+        val weightAutoRemove = item.weightAutoRemove
+        val weightPrevent = item.weightPrevent
+        if (weightCategory != null) {
+            if (!plugin.shopConfigManager.canGetItem(player.inventory, item)) {
+                if (!weightPrevent) {
+                    return
+                }
+                player.sendMessage(item.weightMessage(player))
                 player.playErrorSound()
                 return
             }
-            player.inventory.removeItem(*player.inventory.getAllContents().filterNotNull().filter {
-                it.type.getToolTier()?.second == pair.second
-            }.toTypedArray())
+            if (weightAutoRemove) {
+                val items = plugin.shopConfigManager.getOtherItemsWithWeight(player.inventory, item)
+                player.inventory.removeItem(*items.toTypedArray())
+            }
         }
         player.inventory.removeItem(ItemStack(item.costItem.material, item.cost))
         val team = plugin.gameManager.getTeamOfPlayer(player)

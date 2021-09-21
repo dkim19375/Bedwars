@@ -73,6 +73,9 @@ wood-sword:
   permanent: true
   default-on-spawn: true
   item-category: 'MELEE'
+  weight-category: 'sword'
+  weight-message: '&cYou already have a higher (or same) level!'
+  weight-autoremove: true
 
 stone-sword:
   slot: 19
@@ -82,6 +85,10 @@ stone-sword:
   cost-item: 'IRON'
   name: 'Stone Sword'
   item-category: 'MELEE'
+  weight: 1
+  weight-category: 'sword'
+  weight-message: '&cYou already have a higher (or same) level!'
+  weight-autoremove: true
 
 iron-sword:
   slot: 20
@@ -91,6 +98,10 @@ iron-sword:
   cost-item: 'GOLD'
   name: 'Iron Sword'
   item-category: 'MELEE'
+  weight: 2
+  weight-category: 'sword'
+  weight-message: '&cYou already have a higher (or same) level!'
+  weight-autoremove: true
 
 diamond-sword:
   slot: 21
@@ -100,6 +111,10 @@ diamond-sword:
   cost-item: 'EMERALD'
   name: 'Diamond Sword'
   item-category: 'MELEE'
+  weight: 3
+  weight-category: 'sword'
+  weight-message: '&cYou already have a higher (or same) level!'
+  weight-autoremove: true
 
 knockback-stick:
   slot: 22
@@ -172,6 +187,10 @@ wooden-pickaxe:
   name: 'Wooden Pickaxe'
   permanent: true
   item-category: 'TOOLS'
+  weight-category: 'pickaxe'
+  weight-message: '&cYou already have a higher (or same) level!'
+  weight-autoremove: true
+  weight-prevent: true
 
 stone-pickaxe:
   slot: 21
@@ -184,6 +203,11 @@ stone-pickaxe:
   name: 'Stone Pickaxe'
   item-category: 'TOOLS'
   downgrade: 'wooden-pickaxe'
+  weight: 1
+  weight-category: 'pickaxe'
+  weight-message: '&cYou already have a higher (or same) level!'
+  weight-autoremove: true
+  weight-prevent: true
 
 iron-pickaxe:
   slot: 22
@@ -196,6 +220,11 @@ iron-pickaxe:
   name: 'Iron Pickaxe'
   item-category: 'TOOLS'
   downgrade: 'stone-pickaxe'
+  weight: 2
+  weight-category: 'pickaxe'
+  weight-message: '&cYou already have a higher (or same) level!'
+  weight-autoremove: true
+  weight-prevent: true
 
 gold-pickaxe:
   slot: 23
@@ -208,6 +237,11 @@ gold-pickaxe:
   name: 'Gold Pickaxe'
   item-category: 'TOOLS'
   downgrade: 'iron-pickaxe'
+  weight: 3
+  weight-category: 'pickaxe'
+  weight-message: '&cYou already have a higher (or same) level!'
+  weight-autoremove: true
+  weight-prevent: true
 
 diamond-pickaxe:
   slot: 24
@@ -220,6 +254,11 @@ diamond-pickaxe:
   name: 'Diamond Pickaxe'
   item-category: 'TOOLS'
   downgrade: 'gold-pickaxe'
+  weight: 4
+  weight-category: 'pickaxe'
+  weight-message: '&cYou already have a higher (or same) level!'
+  weight-autoremove: true
+  weight-prevent: true
 
 wood-axe:
   slot: 25
@@ -230,6 +269,10 @@ wood-axe:
   name: 'Wooden Axe'
   permanent: true
   item-category: 'TOOLS'
+  weight-category: 'axe'
+  weight-message: '&cYou already have a higher (or same) level!'
+  weight-autoremove: true
+  weight-prevent: true
 
 stone-axe:
   slot: 28
@@ -242,6 +285,11 @@ stone-axe:
   name: 'Stone Axe'
   item-category: 'TOOLS'
   downgrade: 'wood-axe'
+  weight: 1
+  weight-category: 'axe'
+  weight-message: '&cYou already have a higher (or same) level!'
+  weight-autoremove: true
+  weight-prevent: true
 
 iron-axe:
   slot: 29
@@ -254,6 +302,11 @@ iron-axe:
   name: 'Iron Axe'
   item-category: 'TOOLS'
   downgrade: 'stone-axe'
+  weight: 2
+  weight-category: 'axe'
+  weight-message: '&cYou already have a higher (or same) level!'
+  weight-autoremove: true
+  weight-prevent: true
 
 gold-axe:
   slot: 30
@@ -266,6 +319,11 @@ gold-axe:
   name: 'Gold Axe'
   item-category: 'TOOLS'
   downgrade: 'iron-axe'
+  weight: 3
+  weight-category: 'axe'
+  weight-message: '&cYou already have a higher (or same) level!'
+  weight-autoremove: true
+  weight-prevent: true
 
 diamond-axe:
   slot: 31
@@ -278,6 +336,11 @@ diamond-axe:
   name: 'Diamond Axe'
   item-category: 'TOOLS'
   downgrade: 'gold-axe'
+  weight: 4
+  weight-category: 'axe'
+  weight-message: '&cYou already have a higher (or same) level!'
+  weight-autoremove: true
+  weight-prevent: true
 
 arrow:
   slot: 19
