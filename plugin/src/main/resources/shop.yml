@@ -137,6 +137,9 @@ leather-armor:
   permanent: true
   default-on-spawn: true
   item-category: 'ARMOR'
+  weight-category: 'armor'
+  weight-message: '&cYou already have a higher (or same) level!'
+  weight-prevent: true
 
 chain-armor:
   slot: 19
@@ -147,6 +150,10 @@ chain-armor:
   name: 'Chainmail Armor'
   permanent: true
   item-category: 'ARMOR'
+  weight: 1
+  weight-category: 'armor'
+  weight-message: '&cYou already have a higher (or same) level!'
+  weight-prevent: true
 
 iron-armor:
   slot: 20
@@ -157,6 +164,10 @@ iron-armor:
   name: 'Iron Armor'
   permanent: true
   item-category: 'ARMOR'
+  weight: 2
+  weight-category: 'armor'
+  weight-message: '&cYou already have a higher (or same) level!'
+  weight-prevent: true
 
 diamond-armor:
   slot: 21
@@ -167,6 +178,10 @@ diamond-armor:
   name: 'Diamond Armor'
   permanent: true
   item-category: 'ARMOR'
+  weight: 3
+  weight-category: 'armor'
+  weight-message: '&cYou already have a higher (or same) level!'
+  weight-prevent: true
 
 shears:
   slot: 19

@@ -166,7 +166,18 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin,
 
     private fun givePlayerItem(item: MainShopConfigItem) {
         val game = plugin.gameManager.getGame(player) ?: return
+        val weightCategory = item.weightCategory
+        val weightAutoRemove = item.weightAutoRemove
+        val weightPrevent = item.weightPrevent
+        val preventGetItem = weightCategory != null
+                && weightPrevent
+                && !plugin.shopConfigManager.canGetItem(player.inventory, item)
         if (item.itemCategory == ItemType.ARMOR) {
+            if (preventGetItem) {
+                player.sendMessage(item.weightMessage(player))
+                player.playErrorSound()
+                return
+            }
             if (player.inventory.hasArmor(ArmorType.fromMaterial(item.item.material))) {
                 player.sendMessage("${ChatColor.RED}You already have this!")
                 player.playErrorSound()
@@ -187,21 +198,15 @@ class MainShopGUI(private val player: Player, private val plugin: BedwarsPlugin,
             player.playErrorSound()
             return
         }
-        val weightCategory = item.weightCategory
-        val weightAutoRemove = item.weightAutoRemove
-        val weightPrevent = item.weightPrevent
         if (weightCategory != null) {
-            if (!plugin.shopConfigManager.canGetItem(player.inventory, item)) {
-                if (!weightPrevent) {
-                    return
-                }
-                player.sendMessage(item.weightMessage(player))
-                player.playErrorSound()
-                return
-            }
             if (weightAutoRemove) {
                 val items = plugin.shopConfigManager.getOtherItemsWithWeight(player.inventory, item)
                 player.inventory.removeItem(*items.toTypedArray())
+            }
+            if (preventGetItem) {
+                player.sendMessage(item.weightMessage(player))
+                player.playErrorSound()
+                return
             }
         }
         player.inventory.removeItem(ItemStack(item.costItem.material, item.cost))

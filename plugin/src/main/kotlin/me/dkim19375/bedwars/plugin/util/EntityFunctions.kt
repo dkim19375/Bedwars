@@ -220,8 +220,7 @@ fun ItemStack.getNewItem(player: Player?): ItemStack {
     player ?: return this
     val configItem = getConfigItem() ?: return this
     var newItem: ItemStack = this
-    player.inventory.contents.forEach contentLoop@{ invItem ->
-        invItem ?: return@contentLoop
+    player.inventory.contents.filterNotNull().forEach contentLoop@{ invItem ->
         val invConfigItem = invItem.getConfigItem() ?: return@contentLoop
         if (invConfigItem.name != configItem.name) {
             return@contentLoop

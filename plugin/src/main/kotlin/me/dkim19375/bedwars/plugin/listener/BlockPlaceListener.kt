@@ -34,7 +34,7 @@ class BlockPlaceListener(private val plugin: BedwarsPlugin) : Listener {
     private fun BlockPlaceEvent.onPlace() {
         val game = plugin.gameManager.getGame(player) ?: return
         if (block.type != Material.TNT) {
-            game.placedBlocks[LocationWrapper(block.location)] = itemInHand.getConfigItem()
+            game.placedBlocks[LocationWrapper(block.location)] = itemInHand?.getConfigItem()
             return
         }
         val blockLocation = block.location.toWrapper().getLocation()

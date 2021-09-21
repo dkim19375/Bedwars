@@ -86,7 +86,8 @@ class ShopConfigManager(private val plugin: BedwarsPlugin) {
         category to weight
     }.firstOrNull()
 
-    fun canGetItem(inv: PlayerInventory, item: MainShopConfigItem): Boolean = inv.mapNotNull(ItemStack::getConfigItem)
+    fun canGetItem(inv: PlayerInventory, item: MainShopConfigItem): Boolean = inv.filterNotNull()
+        .mapNotNull(ItemStack::getConfigItem)
         .none { invItem ->
             isHigherWeight(item, invItem)
         }
@@ -94,7 +95,7 @@ class ShopConfigManager(private val plugin: BedwarsPlugin) {
     fun getOtherItemsWithWeight(inv: PlayerInventory, item: MainShopConfigItem): Set<ItemStack> {
         val weightInfo = getWeightInfo(item) ?: return emptySet()
         return inv.filter {
-            val info = it.getConfigItem()?.let(this@ShopConfigManager::getWeightInfo) ?: return@filter false
+            val info = it?.getConfigItem()?.let(this@ShopConfigManager::getWeightInfo) ?: return@filter false
             info.first == weightInfo.first
         }.toSet()
     }
