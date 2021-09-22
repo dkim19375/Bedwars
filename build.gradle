@@ -174,6 +174,12 @@ task removeBuildJars() {
     new File('build/libs').deleteDir()
 }
 
+final servers = [
+        '1.8',
+        '1.16',
+        '1.17'
+]
+
 task copyFile(type: Copy) {
     if (!new File('../.TestServers/1.8/plugins/').exists()) {
         return
@@ -195,19 +201,11 @@ task copyFile_17(type: Copy) {
 }
 
 task deleteAll() {
-    for (File file : new File('../.TestServers/1.17/plugins').listFiles()) {
-        if (file.name.startsWith(project.name)) {
-            file.delete()
-        }
-    }
-    for (File file : new File('../.TestServers/1.16/plugins').listFiles()) {
-        if (file.name.startsWith(project.name)) {
-            file.delete()
-        }
-    }
-    for (File file : new File('../.TestServers/1.8/plugins').listFiles()) {
-        if (file.name.startsWith(project.name)) {
-            file.delete()
+    for (deleteServer in servers) {
+        for (file in new File("../.TestServers/${deleteServer}/plugins").listFiles()) {
+            if (file.name.startsWith(shadowJar.archiveBaseName.get())) {
+                file.delete()
+            }
         }
     }
 }
