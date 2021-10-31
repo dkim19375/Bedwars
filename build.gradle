@@ -132,7 +132,7 @@ subprojects {
         implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.30'
 
 
-        implementation('io.github.dkim19375:dkim-bukkit-core:3.3.12') {
+        implementation('io.github.dkim19375:dkim-bukkit-core:3.3.21') {
             exclude group: 'org.jetbrains.kotlin'
             exclude group: 'org.jetbrains.kotlinx'
         }
