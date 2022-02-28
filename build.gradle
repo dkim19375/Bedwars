@@ -66,7 +66,7 @@ final dependencyStrings = [
         'de.tr7zw:item-nbt-api:2.8.0',
         'de.tr7zw:nbt-injector:2.8.0',
         'commons-io:commons-io:2.11.0',
-        'net.kyori:adventure-api:4.9.3',
+        'net.kyori:adventure-api:4.10.0',
         'org.jetbrains:annotations:23.0.0',
         'dev.triumphteam:triumph-gui:3.1.2',
         'me.mattstudios:triumph-config:1.0.5-SNAPSHOT',
