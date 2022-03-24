@@ -141,7 +141,7 @@ subprojects {
         compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
         compileOnly 'com.comphenix.protocol:ProtocolLib:4.6.0'
         compileOnly 'javax.annotation:javax.annotation-api:1.3.2'
-        compileOnly('com.onarandombox.multiversecore:Multiverse-Core:2.5') {
+        compileOnly('com.onarandombox.multiversecore:Multiverse-Core:4.3.1') {
             exclude group: 'org.mcstats.bukkit'
             exclude group: 'org.spigotmc'
             exclude group: 'org.bukkit'
