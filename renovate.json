@@ -1,6 +1,18 @@
 {
-  "extends": [
-    "config:base"
-  ],
-  "prHourlyLimit": 0
+    "packageRules": [
+        {
+            "matchUpdateTypes": [
+                "minor",
+                "patch",
+                "pin",
+                "digest"
+            ],
+            "automerge": true
+        }
+    ],
+    "platformAutomerge": true,
+    "extends": [
+        "config:base"
+    ],
+    "prHourlyLimit": 0
 }
