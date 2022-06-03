@@ -19,15 +19,13 @@ slimJar {
     relocate 'kotlin', "${basePackage}.kotlin"
     relocate 'reactor', "${basePackage}.reactor"
     relocate 'net.kyori', "${basePackage}.kyori"
+    relocate 'de.tr7zw', "${basePackage}.de.tr7zw"
     relocate 'javassist', "${basePackage}.javassist"
     relocate 'io.github.slimjar', "${basePackage}.slimjar"
     relocate 'org.yaml.snakeyaml', "${basePackage}.snakeyaml"
     relocate 'dev.triumphteam.gui', "${basePackage}.triumphgui"
     relocate 'me.dkim19375.dkimcore', "${basePackage}.dkimcore"
-    relocate 'de.tr7zw.changeme.nbtapi', "${basePackage}.nbtapi"
-    relocate 'de.tr7zw.nbtinjector', "${basePackage}.nbtinjector"
     relocate 'org.apache.commons.io', "${basePackage}.commons.io"
-    relocate 'de.tr7zw.annotations', "${annotationsPackage}.tr7zw"
     relocate 'org.reactivestreams', "${basePackage}.reactivestreams"
     relocate 'me.mattstudios.config', "${basePackage}.triumphconfig"
     relocate 'me.tigerhix.lib.scoreboard', "${basePackage}.scoreboard"
@@ -44,8 +42,9 @@ static def addRepositories(Project project) {
         maven { url = 'https://jitpack.io' }
         maven { url = 'https://repo.alessiodp.com/releases/' }
         maven { url = 'https://repo.essentialsx.net/releases/' }
+        maven { url = 'https://repo.triumphteam.dev/releases/' }
         maven { url = 'https://repo.essentialsx.net/snapshots/' }
-        maven { url = 'https://repo.mattstudios.me/artifactory/public' }
+        maven { url = 'https://repo.triumphteam.dev/snapshots/' }
         maven { url = 'https://repo.codemc.org/repository/maven-public/' }
         maven { url = 'https://repo.dmulloy2.net/nexus/repository/public/' }
         maven { url = 'https://repo.onarandombox.com/content/groups/public/' }
