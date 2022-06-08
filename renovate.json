@@ -11,6 +11,10 @@
         }
     ],
     "platformAutomerge": true,
+    "assignAutomerge": true,
+    "assignees": [
+        "dkim19375"
+    ],
     "extends": [
         "config:base"
     ],
