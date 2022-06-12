@@ -25,7 +25,6 @@ import com.onarandombox.MultiverseCore.MultiverseCore
 import com.onarandombox.MultiverseCore.api.MVWorldManager
 import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion
 import de.tr7zw.nbtinjector.NBTInjector
-import io.github.slimjar.app.builder.ApplicationBuilder
 import me.dkim19375.bedwars.api.BedwarsAPIProvider
 import me.dkim19375.bedwars.plugin.api.BedwarsAPIImpl
 import me.dkim19375.bedwars.plugin.builder.GameBuilder
@@ -61,6 +60,7 @@ import kotlin.io.path.nameWithoutExtension
 import kotlin.system.measureTimeMillis
 
 val NEW_SOUND: Boolean = MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_9_R1)
+val NEW_MATERIALS: Boolean = MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_13_R1)
 
 @Suppress("MemberVisibilityCanBePrivate")
 class BedwarsPlugin : CoreJavaPlugin() {
@@ -116,14 +116,14 @@ class BedwarsPlugin : CoreJavaPlugin() {
 
     override fun onLoad() {
         val time = measureTimeMillis {
-            logInfo("Loading libraries... (This may take a few seconds up to a minute)")
+            /*logInfo("Loading libraries... (This may take a few seconds up to a minute)")
             logInfo(
                 "Finished loading libraries in ${
                     measureTimeMillis {
                         ApplicationBuilder.appending(description.name).build()
                     }
                 }ms!"
-            )
+            )*/
             BedwarsAPIProvider.register(BedwarsAPIImpl(this))
             mainWorld
             initNBTVariables(this)
@@ -221,7 +221,7 @@ class BedwarsPlugin : CoreJavaPlugin() {
             PotionConsumeListener(this), InventoryClickListener(this), PlayerPickupItemListener(this),
             WorldInitListener(this), CommandListeners(this), AsyncPlayerChatListener(this),
             PlayerCoordsChangeListener(this), EntityDamageByEntityListener(this), CraftItemListener(this),
-            PlayerInteractListener(this), ProjectileLaunchListener(this), EntityDeathListener(),
+            PlayerInteractListener(this), EntityDeathListener(),
             partiesListeners, scoreboardManager
         )
     }

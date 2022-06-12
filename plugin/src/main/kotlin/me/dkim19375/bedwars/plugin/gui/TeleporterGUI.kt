@@ -31,7 +31,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 class TeleporterGUI(private val player: Player, private val game: BedwarsGame) {
-    val menu: Gui = Gui.gui()
+    private val menu: Gui = Gui.gui()
         .rows(min(9, max(1, ceil(game.data.maxPlayers.toDouble() / 9.0).toInt())))
         .title("Teleporter".toComponent())
         .disableAllInteractions()

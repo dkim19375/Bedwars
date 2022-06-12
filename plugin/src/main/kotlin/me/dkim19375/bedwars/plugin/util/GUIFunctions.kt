@@ -47,7 +47,7 @@ fun SkullBuilder.lore(vararg lore: String): SkullBuilder = lore(lore.toList())
 fun SkullBuilder.lore(lore: List<String>, setWhite: Boolean = true): SkullBuilder = ItemBuilder.skull(build().lore(lore, setWhite))
 
 fun <B : BaseItemBuilder<out B>> BaseItemBuilder<out B>.addAllFlags(): B = ItemFlag.values().toList()
-    .minus(listOf(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_POTION_EFFECTS))
+    .minus(listOf(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_POTION_EFFECTS).toSet())
     .map { flags(it) }
     .first()
 

@@ -42,7 +42,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
-import java.util.*
+import java.util.UUID
 import kotlin.system.measureTimeMillis
 
 
@@ -301,7 +301,7 @@ class MainCommand(private val plugin: BedwarsPlugin) : CommandExecutor {
                     val games = plugin.gameManager.getRunningGames().values
                     val amount = games.size
                     if (amount <= 0) {
-                        sender.sendMessage("${ChatColor.GREEN}Successfully stopped $amount games in 0 s!")
+                        sender.sendMessage("${ChatColor.GREEN}Successfully stopped 0 games in 0ms!")
                         return true
                     }
                     val start = System.currentTimeMillis()

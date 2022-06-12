@@ -65,14 +65,16 @@ class ProjectileLaunchListener(private val plugin: BedwarsPlugin) : Listener {
         }
     }
 
-    private fun ProjectileLaunchEvent.getSpecialItemTeam(set: (BedwarsGame) -> MutableSet<UUID>): Pair<BedwarsGame, Team>? {
+    private fun ProjectileLaunchEvent.getSpecialItemTeam(set: (BedwarsGame) -> MutableMap<UUID, Int>): Pair<BedwarsGame, Team>? {
         val player = entity.shooter as? Player ?: return null
         val game = plugin.gameManager.getGame(player) ?: return null
         val team = game.getTeamOfPlayer(player) ?: return null
         if (player.uniqueId !in set(game)) {
             return null
         }
-        set(game).remove(player.uniqueId)
+        Bukkit.getScheduler().runTask(plugin) {
+            
+        }
         return game to team
     }
 

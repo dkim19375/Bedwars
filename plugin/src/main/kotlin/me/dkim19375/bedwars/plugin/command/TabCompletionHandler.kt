@@ -68,7 +68,7 @@ class TabCompletionHandler(private val plugin: BedwarsPlugin) : TabCompleter {
 
     private fun getMissingTeams(game: String): List<String> {
         val list = completesListMap["colors"].toMutableList()
-        list.removeAll(getTeams(game))
+        list.removeAll(getTeams(game).toSet())
         return list
     }
 

@@ -29,7 +29,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 class TrackerGUI(private val player: Player, private val game: BedwarsGame) {
-    val menu: Gui = Gui.gui()
+    private val menu: Gui = Gui.gui()
         .rows(4)
         .title("Purchase Enemy Tracker".toComponent())
         .disableAllInteractions()

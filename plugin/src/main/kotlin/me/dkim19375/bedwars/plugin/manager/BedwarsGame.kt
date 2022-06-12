@@ -82,8 +82,8 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
     val kills = mutableMapOf<UUID, Int>()
     val trackers = mutableMapOf<UUID, Team>()
     val spectators = mutableSetOf<UUID>()
-    val bridgeEggs = mutableSetOf<UUID>()
-    val bedBugs = mutableSetOf<UUID>()
+    val bridgeEggs = mutableMapOf<UUID, Int>()
+    val bedBugs = mutableMapOf<UUID, Int>()
 
     var data = data
         private set
@@ -783,7 +783,7 @@ class BedwarsGame(private val plugin: BedwarsPlugin, data: GameData) {
         type: EntityType,
         time: Property<Int>,
         showName: Boolean,
-        player: Player,
+        player: Player
     ) {
         val entity = block.world.spawn(block.location, type.entityClass).disableDrops().let {
             if (it !is Creature) {

@@ -27,7 +27,7 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 
 class CompassGUI(private val player: Player, private val game: BedwarsGame) {
-    val menu: Gui = Gui.gui()
+    private val menu: Gui = Gui.gui()
         .rows(3)
         .title("Tracker & Communication".toComponent())
         .disableAllInteractions()

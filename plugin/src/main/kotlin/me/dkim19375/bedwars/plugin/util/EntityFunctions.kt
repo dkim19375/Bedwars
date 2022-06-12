@@ -124,8 +124,7 @@ fun PlayerInventory.containsArmor(): ArmorType? = getAllContents()
     .toList()
     .filterNotNull()
     .map(ItemStack::getType)
-    .mapNotNull(ArmorType::fromMaterial)
-    .firstOrNull()
+    .firstNotNullOfOrNull(ArmorType::fromMaterial)
 
 fun PlayerInventory.containsTool(): Boolean = getAllContents()
     .toList()
@@ -187,7 +186,11 @@ fun Player.sendTitle(
     Title.title(
         LegacyComponentSerializer.legacySection().deserialize(title ?: ""),
         LegacyComponentSerializer.legacySection().deserialize(subtitle ?: ""),
-        Title.Times.of(Ticks.duration(fadeIn.toLong()), Ticks.duration(stay.toLong()), Ticks.duration(fadeOut.toLong()))
+        Title.Times.times(
+            Ticks.duration(fadeIn.toLong()),
+            Ticks.duration(stay.toLong()),
+            Ticks.duration(fadeOut.toLong())
+        )
     )
 )
 
@@ -282,7 +285,6 @@ fun Player.sendCenteredMessage(message: String?) {
     val spaceLength = DefaultFontInfo.SPACE.length + 1
     var compensated = 0
     val sb = StringBuilder()
-    ChatColor.COLOR_CHAR
     while (compensated < toCompensate) {
         sb.append(" ")
         compensated += spaceLength

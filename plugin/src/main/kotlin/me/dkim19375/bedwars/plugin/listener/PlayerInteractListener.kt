@@ -56,7 +56,10 @@ class PlayerInteractListener(private val plugin: BedwarsPlugin) : Listener {
         checkDreamDefenders(game)
     }
 
-    private fun PlayerInteractEvent.checkSpecialType(type: SpecialItemType, set: MutableSet<UUID>) {
+    private fun PlayerInteractEvent.checkSpecialType(
+        type: SpecialItemType,
+        map: MutableMap<UUID, Int>,
+    ) {
         if (material == Material.AIR) {
             return
         }
@@ -68,7 +71,8 @@ class PlayerInteractListener(private val plugin: BedwarsPlugin) : Listener {
             return
         }
         item.type.getProjectileType() ?: return
-        set.add(player.uniqueId)
+        val value = map[player.uniqueId]
+        map[player.uniqueId] = (value ?: 0) + 1
     }
 
     private fun PlayerInteractEvent.checkDreamDefenders(game: BedwarsGame) {
@@ -126,7 +130,7 @@ class PlayerInteractListener(private val plugin: BedwarsPlugin) : Listener {
             Material.COMPASS -> TeleporterGUI(player, game).showPlayer()
             Material.PAPER -> {
                 game.leavePlayer(player)
-                Bukkit.dispatchCommand(player, "bedwars quickjoin")
+                player.chat("/bedwars quickjoin")
             }
             Material.BED -> game.leavePlayer(player)
             else -> return

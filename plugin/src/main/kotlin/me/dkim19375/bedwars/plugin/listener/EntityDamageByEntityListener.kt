@@ -79,7 +79,7 @@ class EntityDamageByEntityListener(private val plugin: BedwarsPlugin) : Listener
         entity.velocity = Vector(newVelocity.x.coerce(), newVelocity.y.coerce(), newVelocity.z.coerce())
     }
 
-    private fun Double.coerce(): Double = coerceIn(-3.9999999999999999, 3.9999999999999999)
+    private fun Double.coerce(): Double = coerceIn(-3.99999, 3.99999)
 
     private fun EntityDamageByEntityEvent.checkHolo() {
         val clicked = entity as? ArmorStand ?: return

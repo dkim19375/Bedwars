@@ -63,7 +63,7 @@ class EntityExplodeListener(private val plugin: BedwarsPlugin) : Listener {
             }
         }
         val materials = Material.values().toSet()
-            .minus(listOf(Material.GLASS, Material.STAINED_GLASS, Material.BED, Material.BED_BLOCK))
+            .minus(listOf(Material.GLASS, Material.STAINED_GLASS, Material.BED, Material.BED_BLOCK).toSet())
         for (block in blockList.toList()) {
             if (block.location?.toWrapper() !in game.placedBlocks && plugin.mainConfigManager.get(MainConfigSettings.MAP_PROTECTION)) {
                 blockList.remove(block)

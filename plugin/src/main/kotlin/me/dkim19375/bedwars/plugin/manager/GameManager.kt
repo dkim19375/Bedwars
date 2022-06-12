@@ -18,9 +18,11 @@
 
 package me.dkim19375.bedwars.plugin.manager
 
+import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion
 import me.dkim19375.bedwars.api.enumclass.GameState
 import me.dkim19375.bedwars.api.enumclass.Team
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
+import me.dkim19375.bedwars.plugin.NEW_MATERIALS
 import me.dkim19375.bedwars.plugin.builder.GameBuilder
 import me.dkim19375.bedwars.plugin.config.MainConfigSettings
 import me.dkim19375.bedwars.plugin.data.GameData
@@ -29,11 +31,15 @@ import me.dkim19375.bedwars.plugin.util.sendActionBar
 import me.dkim19375.dkimbukkitcore.function.getPlayers
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
+import org.bukkit.Effect
 import org.bukkit.World
+import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.entity.Villager
 import org.bukkit.potion.PotionEffectType
 import java.util.*
+
+private val FOOTSTEP_PARTICLES: Boolean = !MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_13_R1)
 
 @Suppress("MemberVisibilityCanBePrivate")
 class GameManager(private val plugin: BedwarsPlugin) {
@@ -52,7 +58,31 @@ class GameManager(private val plugin: BedwarsPlugin) {
                 updateTab(game)
             }
         }, 20L, 20L)
+        if (FOOTSTEP_PARTICLES) {
+            Bukkit.getScheduler().runTaskTimer(plugin, {
+                // updateInvisParticles()
+            }, 4L, 4L)
+        }
         Bukkit.getScheduler().runTask(plugin, this::reloadData)
+    }
+
+    private fun updateInvisParticles() {
+        if (NEW_MATERIALS) {
+            return
+        }
+        for (player in /* invisPlayers.getPlayers() */ Bukkit.getOnlinePlayers()) {
+            if (player.location.y <= 0) {
+                continue
+            }
+            if (!player.location.block.getRelative(BlockFace.DOWN).type.isSolid) {
+                continue
+            }
+            val newY = player.location.y % 1
+            if (newY > 0.2) {
+                continue
+            }
+            player.world.playEffect(player.location.add(0.0, 0.01, 0.0), Effect.FOOTSTEP, 0)
+        }
     }
 
     private fun updateSaturation(game: BedwarsGame) {

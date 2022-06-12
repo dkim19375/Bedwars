@@ -35,7 +35,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 class UpgradeShopGUI(private val player: Player, private val team: Team, private val plugin: BedwarsPlugin) {
-    val menu: Gui = Gui.gui()
+    private val menu: Gui = Gui.gui()
         .rows(5)
         .title("Upgrades & Traps".toComponent())
         .disableAllInteractions()

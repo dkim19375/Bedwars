@@ -20,7 +20,11 @@ package me.dkim19375.bedwars.plugin.data
 
 import me.dkim19375.bedwars.api.data.BedwarsPlayerData
 import me.dkim19375.bedwars.plugin.BedwarsPlugin
-import me.dkim19375.bedwars.plugin.util.*
+import me.dkim19375.bedwars.plugin.util.clearAll
+import me.dkim19375.bedwars.plugin.util.getAllContents
+import me.dkim19375.bedwars.plugin.util.setAllContents
+import me.dkim19375.bedwars.plugin.util.teleportUpdated
+import me.dkim19375.bedwars.plugin.util.update
 import me.dkim19375.dkimbukkitcore.function.logInfo
 import org.bukkit.GameMode
 import org.bukkit.Location
@@ -34,7 +38,7 @@ data class PlayerData(
     val inventory: List<ItemStack?>,
     val enderChest: Array<ItemStack>,
     val location: Location,
-    val health: Double
+    val health: Double,
 ) : BedwarsPlayerData {
     fun apply(player: Player, plugin: BedwarsPlugin?) {
         player.compassTarget = player.world.spawnLocation.clone()
@@ -82,14 +86,13 @@ data class PlayerData(
 
     override fun getPlayerHealth(): Double = health
 
-    @Suppress("USELESS_ELVIS") // kotlin bug? https://youtrack.jetbrains.com/issue/KT-24392
     override fun clone(
         gamemode: GameMode?,
-        armor: Array<ItemStack>,
+        armor: Array<ItemStack>?,
         inventory: List<ItemStack?>?,
-        enderChest: Array<ItemStack>,
+        enderChest: Array<ItemStack>?,
         location: Location?,
-        health: Double?
+        health: Double?,
     ): BedwarsPlayerData = copy(
         gamemode = gamemode ?: this.gamemode,
         armor = armor ?: this.armor,
@@ -132,7 +135,7 @@ data class PlayerData(
             player: Player,
             default: Location?,
             location: Location?,
-            gamemode: GameMode = GameMode.SURVIVAL
+            gamemode: GameMode = GameMode.SURVIVAL,
         ): PlayerData {
             val data = createData(player, default)
             player.gameMode = gamemode
