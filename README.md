@@ -1,4 +1,4 @@
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/dkim19375/Bedwars/Java%20CI%20with%20Gradle%20(Java%208))
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/dkim19375/Bedwars/gradle_8.yml?branch=master)
 ![Maven Central](https://img.shields.io/maven-central/v/io.github.dkim19375/bedwars?label=maven%20central)
 ![Dev Builds (Sonatype Snapshots)](https://img.shields.io/nexus/s/io.github.dkim19375/bedwars?label=sonatype%20%28snapshots%29&server=https%3A%2F%2Fs01.oss.sonatype.org)
 # Bedwars
