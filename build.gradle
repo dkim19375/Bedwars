@@ -68,7 +68,7 @@ final dependencyStrings = [
         'commons-io:commons-io:2.11.0',
         'net.kyori:adventure-api:4.13.1',
         'org.jetbrains:annotations:24.0.1',
-        'dev.triumphteam:triumph-gui:3.1.4',
+        'dev.triumphteam:triumph-gui:3.1.5',
         'me.mattstudios:triumph-config:1.0.5-SNAPSHOT',
         'net.kyori:adventure-text-serializer-gson:4.13.1',
         'net.kyori:adventure-text-serializer-legacy:4.13.1',
