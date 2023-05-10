@@ -22,7 +22,7 @@ import me.dkim19375.bedwars.plugin.BedwarsPlugin
 import me.dkim19375.bedwars.plugin.data.MainShopConfigItem
 import me.dkim19375.bedwars.plugin.gui.MainShopGUI
 import me.dkim19375.bedwars.plugin.util.getConfigItem
-import me.dkim19375.dkimbukkitcore.config.ConfigFile
+import me.dkim19375.dkimbukkitcore.config.SpigotConfigFile
 import org.bukkit.Material
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.inventory.ItemStack
@@ -30,7 +30,7 @@ import org.bukkit.inventory.PlayerInventory
 
 @Suppress("MemberVisibilityCanBePrivate")
 class ShopConfigManager(private val plugin: BedwarsPlugin) {
-    private val shopFile: ConfigFile
+    private val shopFile: SpigotConfigFile
         get() = plugin.shopFile
     private val shopConfig: FileConfiguration
         get() = shopFile.config
