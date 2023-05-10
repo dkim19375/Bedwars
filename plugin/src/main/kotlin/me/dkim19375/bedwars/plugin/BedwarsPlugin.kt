@@ -36,13 +36,17 @@ import me.dkim19375.bedwars.plugin.data.GameData
 import me.dkim19375.bedwars.plugin.data.MainDataFile
 import me.dkim19375.bedwars.plugin.data.MainShopConfigItem
 import me.dkim19375.bedwars.plugin.listener.*
-import me.dkim19375.bedwars.plugin.manager.*
+import me.dkim19375.bedwars.plugin.manager.BedwarsGame
+import me.dkim19375.bedwars.plugin.manager.DataFileManager
+import me.dkim19375.bedwars.plugin.manager.GameManager
+import me.dkim19375.bedwars.plugin.manager.PacketManager
+import me.dkim19375.bedwars.plugin.manager.ScoreboardManager
 import me.dkim19375.bedwars.plugin.placeholder.BedwarsPAPIExpansion
 import me.dkim19375.bedwars.plugin.serializer.LocationSerializer
 import me.dkim19375.bedwars.plugin.serializer.ShopConfigItemSerializer
 import me.dkim19375.bedwars.plugin.serializer.WorldSerializer
 import me.dkim19375.bedwars.plugin.util.initNBTVariables
-import me.dkim19375.dkimbukkitcore.config.ConfigFile
+import me.dkim19375.dkimbukkitcore.config.SpigotConfigFile
 import me.dkim19375.dkimbukkitcore.function.logInfo
 import me.dkim19375.dkimbukkitcore.javaplugin.CoreJavaPlugin
 import me.dkim19375.dkimcore.file.JsonFile
@@ -55,7 +59,7 @@ import org.bukkit.plugin.Plugin
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
-import java.util.*
+import java.util.Properties
 import kotlin.io.path.nameWithoutExtension
 import kotlin.system.measureTimeMillis
 
@@ -66,7 +70,7 @@ val NEW_MATERIALS: Boolean = MinecraftVersion.isAtLeastVersion(MinecraftVersion.
 class BedwarsPlugin : CoreJavaPlugin() {
     val mainConfigManager: MainConfigManager by lazy { MainConfigManager(this) }
     val shopConfigManager = ShopConfigManager(this)
-    val shopFile by lazy { ConfigFile(this, "shop.yml") }
+    val shopFile by lazy { SpigotConfigFile(this, dataFolder.resolve("shop.yml")) }
     val gameDataFiles = mutableMapOf<String, JsonFile<GameData>>()
     val mainDataFile: JsonFile<MainDataFile> by lazy {
         JsonFile(
