@@ -74,7 +74,7 @@ final dependencyStrings = [
         'net.kyori:adventure-text-serializer-legacy:4.14.0',
         'io.github.dkim19375:item-move-detection-lib:1.1.8',
         'net.kyori:adventure-platform-bukkit:4.3.0',
-        'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1',
+        'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2',
         'org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.7.1'
 ]
 
