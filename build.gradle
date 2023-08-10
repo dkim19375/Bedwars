@@ -147,7 +147,7 @@ subprojects {
             exclude group: 'org.bukkit'
             exclude group: 'net.md-5'
         }
-        compileOnly('com.alessiodp.parties:parties-api:3.2.11') {
+        compileOnly('com.alessiodp.parties:parties-api:3.2.12') {
             exclude group: 'org.spigotmc'
             exclude group: 'org.bukkit'
             exclude group: 'net.md-5'
