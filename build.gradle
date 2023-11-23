@@ -129,7 +129,7 @@ subprojects {
     dependencies {
         dependencyStrings.forEach { compileOnly it }
         // implementation slimjar('1.2.6')
-        implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.20'
+        implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.21'
 
 
         implementation('io.github.dkim19375:dkim-bukkit-core:3.4.3') {
