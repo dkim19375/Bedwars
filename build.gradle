@@ -63,7 +63,7 @@ static def addRepositories(Project project) {
 }
 
 final dependencyStrings = [
-        'de.tr7zw:item-nbt-api:2.12.1',
+        'de.tr7zw:item-nbt-api:2.12.2',
         'de.tr7zw:nbt-injector:2.12.1',
         'commons-io:commons-io:2.15.1',
         'net.kyori:adventure-api:4.14.0',
