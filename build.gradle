@@ -71,7 +71,7 @@ final dependencyStrings = [
         'dev.triumphteam:triumph-gui:3.1.7',
         'me.mattstudios:triumph-config:1.0.5-SNAPSHOT',
         'net.kyori:adventure-text-serializer-gson:4.15.0',
-        'net.kyori:adventure-text-serializer-legacy:4.14.0',
+        'net.kyori:adventure-text-serializer-legacy:4.15.0',
         'io.github.dkim19375:item-move-detection-lib:1.1.8',
         'net.kyori:adventure-platform-bukkit:4.3.1',
         'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3',
